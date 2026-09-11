@@ -1,0 +1,86 @@
+{
+  "high_benign_group": [
+    1,
+    2,
+    4,
+    6,
+    7,
+    9
+  ],
+  "by_f": {
+    "f3": {
+      "locked_combo": [
+        0,
+        3,
+        5
+      ],
+      "locked_min_coverage": 0.38595729763117037,
+      "best_group_restricted_combo": [
+        2,
+        4,
+        9
+      ],
+      "best_group_restricted_min_coverage": 0.05419029615626969,
+      "best_group_restricted_full_coverage_vector": {
+        "Bot": 0.05419029615626969,
+        "BruteForce": 0.27178070548236294,
+        "DDoS": 0.15477562206097598,
+        "DoS": 0.21387910455235964,
+        "PortScan": 0.2821786117875503,
+        "WebAttack": 0.4250720461095101
+      },
+      "ratio_locked_stronger": 7.122258503961248,
+      "n_candidates_in_group": 20
+    },
+    "f2": {
+      "locked_combo": [
+        0,
+        3
+      ],
+      "locked_min_coverage": 0.16729678638941398,
+      "best_group_restricted_combo": [
+        2,
+        4
+      ],
+      "best_group_restricted_min_coverage": 0.043478260869565216,
+      "best_group_restricted_full_coverage_vector": {
+        "Bot": 0.043478260869565216,
+        "BruteForce": 0.0716107097322567,
+        "DDoS": 0.12975304412818037,
+        "DoS": 0.21062384187770228,
+        "PortScan": 0.08723678556080791,
+        "WebAttack": 0.3688760806916426
+      },
+      "ratio_locked_stronger": 3.8478260869565215,
+      "n_candidates_in_group": 15
+    }
+  },
+  "structural_ceiling": {
+    "group_row_counts": {
+      "Bot": 211,
+      "BruteForce": 2707,
+      "DDoS": 30798,
+      "DoS": 35156,
+      "PortScan": 36758,
+      "WebAttack": 699
+    },
+    "federation_row_totals": {
+      "Bot": 3174,
+      "BruteForce": 4706,
+      "DDoS": 64222,
+      "DoS": 119806,
+      "PortScan": 125658,
+      "WebAttack": 1388
+    },
+    "coverage_ceiling_all_group_poisoned": {
+      "Bot": 0.06647763074984248,
+      "BruteForce": 0.5752231194220144,
+      "DDoS": 0.47955529257886703,
+      "DoS": 0.29344106305193396,
+      "PortScan": 0.2925241528593484,
+      "WebAttack": 0.5036023054755043
+    },
+    "weakest_link_family": "Bot",
+    "weakest_link_ceiling": 0.06647763074984248
+  }
+}

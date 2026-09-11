@@ -1,0 +1,737 @@
+/**
+ * Global styles, ported from app_lib/theme.py's CUSTOM_CSS. Streamlit-chrome
+ * rules and stSomething selectors are dropped (nothing to hide -- there's no
+ * Streamlit chrome here); everything else -- typography scale, spacing,
+ * .xf-* component classes, motion, focus, scrollbar -- is a direct port.
+ */
+
+:root {
+  --bg: #0d1117;
+  --surface: #151b23;
+  --surface-hi: #1c232c;
+  --border: #2a323d;
+  --border-hi: #3a4553;
+
+  --text: #e6edf3;
+  --text-muted: #8b98a5;
+  --text-faint: #6b7681;
+
+  --accent: #4cc9f0;
+  --accent-dim: #2a7f9e;
+  --alert: #f2726f;
+  --warn: #e8b339;
+  --positive: #5bc0a0;
+  --violet: #a78bfa;
+
+  --font-stack: 'Segoe UI Variable Display', 'Segoe UI Variable', 'Segoe UI', -apple-system,
+    BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  --mono-stack: 'Cascadia Code', 'JetBrains Mono', Consolas, 'SF Mono', Menlo, monospace;
+
+  --sp-xs: 0.25rem;
+  --sp-sm: 0.5rem;
+  --sp-md: 1rem;
+  --sp-lg: 1.5rem;
+  --sp-xl: 2.25rem;
+  --sp-2xl: 3.5rem;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-stack);
+}
+
+p,
+li,
+span,
+label {
+  color: var(--text);
+}
+
+code {
+  font-family: var(--mono-stack);
+  font-size: 0.86em;
+  background: var(--surface-hi);
+  color: var(--accent);
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+}
+
+/* ---- Typography scale --------------------------------------------- */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-stack);
+  color: var(--text);
+}
+h1 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0 0 0.1rem 0;
+}
+h2 {
+  font-size: 1.28rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  margin: 0;
+}
+h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---- App shell ------------------------------------------------------ */
+.xf-app {
+  display: flex;
+  min-height: 100vh;
+}
+.xf-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.6rem 1rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.xf-main {
+  flex: 1;
+  min-width: 0;
+  padding: 2.2rem 3rem 4rem 3rem;
+  max-width: 1500px;
+}
+
+/* ---- Section header ------------------------------------------------ */
+.xf-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+.xf-lede {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.62;
+  max-width: 78ch;
+  margin-top: 0.55rem;
+}
+.xf-rule {
+  height: 1px;
+  border: 0;
+  margin: 2.1rem 0 1.5rem 0;
+  background: linear-gradient(90deg, var(--border-hi) 0%, var(--border) 45%, transparent 100%);
+}
+.xf-subhead {
+  font-size: 1.28rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  color: var(--text);
+  margin: 0 0 0.15rem 0;
+}
+
+/* ---- Stat cards ------------------------------------------------------ */
+.xf-stat {
+  background: linear-gradient(160deg, var(--surface-hi) 0%, var(--surface) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.15rem 1.05rem 1.15rem;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.xf-stat::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--tone, var(--accent));
+}
+.xf-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.45rem;
+}
+.xf-stat-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.xf-stat-value.sm {
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+}
+.xf-stat-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  line-height: 1.45;
+}
+.xf-stat:hover {
+  border-color: var(--border-hi);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.65);
+}
+
+/* ---- Pills / badges --------------------------------------------------- */
+.xf-pill {
+  display: inline-block;
+  padding: 0.2rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid;
+  margin-right: 0.35rem;
+  white-space: nowrap;
+}
+
+/* ---- Callouts ----------------------------------------------------------- */
+.xf-callout {
+  border-radius: 10px;
+  padding: 0.9rem 1.05rem;
+  margin: 0.5rem 0;
+  border: 1px solid;
+  border-left-width: 3px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.xf-callout b {
+  font-weight: 650;
+}
+
+/* ---- Verdict block (big prediction readout) ----------------------------- */
+.xf-verdict {
+  background: linear-gradient(160deg, var(--surface-hi) 0%, var(--surface) 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.35rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.xf-verdict::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--tone, var(--accent));
+}
+.xf-verdict-name {
+  font-size: 2.15rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--tone, var(--text));
+}
+.xf-verdict-meta {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  line-height: 1.55;
+}
+
+/* ---- Sidebar brand / nav ------------------------------------------------ */
+.xf-brand {
+  font-size: 1.32rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.xf-brand span {
+  color: var(--accent);
+}
+.xf-brand-sub {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+  line-height: 1.5;
+  margin-top: 0.2rem;
+  margin-bottom: 1.1rem;
+}
+.xf-navlabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 1.1rem 0 0.5rem 0;
+}
+.xf-navlabel:first-of-type {
+  margin-top: 0;
+}
+
+.xf-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.xf-navitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+.xf-navitem:hover {
+  background: var(--surface-hi);
+}
+.xf-navitem.active {
+  background: var(--surface-hi);
+  border-color: var(--border-hi);
+  color: var(--accent);
+  font-weight: 600;
+}
+.xf-navitem svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  fill: var(--text-faint);
+  transition: fill 180ms ease;
+}
+.xf-navitem.active svg {
+  fill: var(--accent);
+}
+
+/* ---- Layout helpers (column groups, ported from st.columns gutters) ----- */
+.xf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.xf-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.xf-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+/* Narrower left / wider right split (Detect, Explain's Input+result
+   layout) -- a dedicated class rather than an inline gridTemplateColumns
+   override, so it still collapses to one column at the same breakpoint
+   as every other grid here instead of silently bypassing it (inline
+   styles beat the media query below). */
+.xf-grid-explain {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 1.25rem;
+}
+/* Grid tracks default to min-width: auto, sized by content -- defensively
+   let the explicit fr sizing win instead of a child's own intrinsic width
+   (matters for anything measuring its container, like Recharts'
+   ResponsiveContainer). */
+.xf-grid-2 > *,
+.xf-grid-3 > *,
+.xf-grid-4 > *,
+.xf-grid-explain > * {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .xf-grid-2,
+  .xf-grid-3,
+  .xf-grid-4,
+  .xf-grid-explain {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Limitations list (plain st.markdown bullets, not a colored box) ---- */
+.xf-limitations-list {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+.xf-limitations-list li {
+  margin-bottom: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+.xf-limitations-list li b {
+  color: var(--text);
+  font-weight: 650;
+}
+
+/* ---- Source citation note ------------------------------------------------ */
+.xf-source-note {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin: 0.3rem 0 1rem 0;
+}
+
+/* ---- Tabs (ports button[data-baseweb="tab"]) ----------------------------- */
+.xf-tabs {
+  display: flex;
+  gap: 1.4rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.xf-tab {
+  background: none;
+  border: none;
+  padding: 0.6rem 0.1rem;
+  font-size: 0.9rem;
+  font-weight: 550;
+  font-family: var(--font-stack);
+  color: var(--text-faint);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+.xf-tab:hover {
+  color: var(--text-muted);
+}
+.xf-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---- Radio group (ports div[role="radiogroup"] in the main body) -------- */
+.xf-radio-group {
+  display: flex;
+  gap: 1.2rem;
+}
+.xf-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.xf-radio-option input {
+  accent-color: var(--accent);
+}
+.xf-checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1.5;
+}
+.xf-checkbox-option input {
+  accent-color: var(--accent);
+  margin-top: 0.2rem;
+}
+
+/* ---- Textarea / file input / code block (ports stTextArea, stFileUploader,
+   and <code> block styling) ------------------------------------------------ */
+.xf-textarea {
+  width: 100%;
+  background: var(--surface-hi);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.6rem 0.7rem;
+  font-family: var(--mono-stack);
+  font-size: 0.82rem;
+  resize: vertical;
+}
+.xf-textarea:hover {
+  border-color: var(--border-hi);
+}
+.xf-file-input {
+  background: var(--surface-hi);
+  border: 1px dashed var(--border-hi);
+  border-radius: 10px;
+  padding: 0.7rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  width: 100%;
+}
+.xf-code-block {
+  background: var(--surface-hi);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-family: var(--mono-stack);
+  font-size: 0.78rem;
+  color: var(--accent);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ---- Figure (ports st.image's frame -- no direct theme.py equivalent) --- */
+.xf-figure {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  margin-bottom: 1rem;
+}
+.xf-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.xf-figure-caption {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Chart card (ports div[data-testid="stPlotlyChart"]'s frame) -------- */
+.xf-chart-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 0.9rem 0.9rem 0.4rem 0.9rem;
+}
+
+/* ---- Tables (ports div[data-testid="stDataFrame"]'s frame) -------------- */
+.xf-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow-x: auto;
+  background: var(--surface);
+}
+.xf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.xf-table th {
+  text-align: left;
+  background: var(--surface-hi);
+  color: var(--text-faint);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.xf-table td {
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.xf-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- Caption (ports div[data-testid="stCaptionContainer"]) -------------- */
+.xf-caption {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.86rem;
+  margin-top: 0.6rem;
+}
+
+/* ---- Expander (ports div[data-testid="stExpander"]) ---------------------- */
+.xf-expander {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  margin: 0.5rem 0;
+}
+.xf-expander summary {
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 550;
+  color: var(--text);
+  list-style: none;
+}
+.xf-expander summary::-webkit-details-marker {
+  display: none;
+}
+.xf-expander summary:hover {
+  color: var(--accent);
+}
+.xf-expander[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+.xf-expander-body {
+  padding: 0.9rem 1rem 1rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* ---- Chart placeholder ("not built yet", not an error) ------------------- */
+.xf-placeholder {
+  border: 1px dashed var(--border-hi);
+  border-radius: 12px;
+  padding: 1.4rem 1.3rem;
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  background: var(--surface);
+}
+.xf-placeholder-title {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+}
+
+/* ---- Form fields (ports div[data-baseweb="select"]) ----------------------- */
+.xf-field-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.35rem;
+}
+.xf-select {
+  background: var(--surface-hi);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.5rem 0.7rem;
+  font-size: 0.88rem;
+  font-family: var(--font-stack);
+  min-width: 320px;
+}
+.xf-select:hover {
+  border-color: var(--border-hi);
+}
+
+/* ---- Recharts tooltip (ports plots.py's HOVER dict) ---------------------- */
+.xf-chart-tooltip {
+  background: var(--surface-hi);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+.xf-chart-tooltip .xf-tt-title {
+  font-weight: 650;
+  margin-bottom: 0.15rem;
+}
+.xf-chart-tooltip .xf-tt-row {
+  color: var(--text-muted);
+}
+
+/* ---- Sidebar footer (live backend status) ------------------------------- */
+.xf-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  line-height: 1.6;
+}
+.xf-sidebar-footer b {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.xf-status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.xf-status-dot.ok {
+  background: var(--positive);
+}
+.xf-status-dot.error {
+  background: var(--alert);
+}
+.xf-status-dot.loading {
+  background: var(--text-faint);
+}
+
+/* ---- Page footer --------------------------------------------------------- */
+.xf-footer {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  padding-top: 1.1rem;
+  margin-top: 3.5rem;
+}
+.xf-footer b {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ---- Motion: fast enough to feel responsive, slow enough to read -------- */
+.xf-stat,
+.xf-verdict,
+.xf-navitem {
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+  .xf-stat:hover {
+    transform: none;
+  }
+}
+
+/* ---- Focus visibility (keyboard nav) ------------------------------------- */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- Scrollbar ------------------------------------------------------------ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hi);
+}

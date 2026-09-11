@@ -1,0 +1,230 @@
+[
+  {
+    "silo": 0,
+    "malicious_in": [
+      "f3_{0,3,5}",
+      "f2_{0,3}"
+    ],
+    "clean_flag_rate": 0.95,
+    "f3_flag_rate": 1.0,
+    "f2_flag_rate": 1.0,
+    "composition_row": {
+      "silo": "0",
+      "Benign": "8112",
+      "Bot": "151",
+      "BruteForce": "801",
+      "DDoS": "18026",
+      "DoS": "9440",
+      "Heartbleed": "2",
+      "Infiltration": "0",
+      "PortScan": "51516",
+      "WebAttack": "54",
+      "TOTAL": "88102",
+      "NON_BENIGN": "79990",
+      "pct_benign": 9.2
+    }
+  },
+  {
+    "silo": 1,
+    "malicious_in": [],
+    "clean_flag_rate": 0.1,
+    "f3_flag_rate": 0.0,
+    "f2_flag_rate": 0.0,
+    "composition_row": {
+      "silo": "1",
+      "Benign": "39322",
+      "Bot": "8",
+      "BruteForce": "54",
+      "DDoS": "669",
+      "DoS": "3109",
+      "Heartbleed": "0",
+      "Infiltration": "23",
+      "PortScan": "90",
+      "WebAttack": "27",
+      "TOTAL": "43302",
+      "NON_BENIGN": "3980",
+      "pct_benign": 90.8
+    }
+  },
+  {
+    "silo": 2,
+    "malicious_in": [],
+    "clean_flag_rate": 0.25,
+    "f3_flag_rate": 0.05,
+    "f2_flag_rate": 0.05,
+    "composition_row": {
+      "silo": "2",
+      "Benign": "353124",
+      "Bot": "99",
+      "BruteForce": "300",
+      "DDoS": "5378",
+      "DoS": "22029",
+      "Heartbleed": "1",
+      "Infiltration": "2",
+      "PortScan": "9604",
+      "WebAttack": "192",
+      "TOTAL": "390729",
+      "NON_BENIGN": "37605",
+      "pct_benign": 90.4
+    }
+  },
+  {
+    "silo": 3,
+    "malicious_in": [
+      "f3_{0,3,5}",
+      "f2_{0,3}"
+    ],
+    "clean_flag_rate": 1.0,
+    "f3_flag_rate": 1.0,
+    "f2_flag_rate": 1.0,
+    "composition_row": {
+      "silo": "3",
+      "Benign": "109",
+      "Bot": "380",
+      "BruteForce": "777",
+      "DDoS": "172",
+      "DoS": "33290",
+      "Heartbleed": "0",
+      "Infiltration": "0",
+      "PortScan": "3586",
+      "WebAttack": "513",
+      "TOTAL": "38827",
+      "NON_BENIGN": "38718",
+      "pct_benign": 0.3
+    }
+  },
+  {
+    "silo": 4,
+    "malicious_in": [],
+    "clean_flag_rate": 0.0,
+    "f3_flag_rate": 0.0,
+    "f2_flag_rate": 0.0,
+    "composition_row": {
+      "silo": "4",
+      "Benign": "44982",
+      "Bot": "39",
+      "BruteForce": "37",
+      "DDoS": "2955",
+      "DoS": "3205",
+      "Heartbleed": "0",
+      "Infiltration": "1",
+      "PortScan": "1358",
+      "WebAttack": "320",
+      "TOTAL": "52897",
+      "NON_BENIGN": "7915",
+      "pct_benign": 85.0
+    }
+  },
+  {
+    "silo": 5,
+    "malicious_in": [
+      "f3_{0,3,5}"
+    ],
+    "clean_flag_rate": 1.0,
+    "f3_flag_rate": 1.0,
+    "f2_flag_rate": 1.0,
+    "composition_row": {
+      "silo": "5",
+      "Benign": "18",
+      "Bot": "1296",
+      "BruteForce": "402",
+      "DDoS": "15089",
+      "DoS": "3510",
+      "Heartbleed": "0",
+      "Infiltration": "3",
+      "PortScan": "1044",
+      "WebAttack": "116",
+      "TOTAL": "21478",
+      "NON_BENIGN": "21460",
+      "pct_benign": 0.1
+    }
+  },
+  {
+    "silo": 6,
+    "malicious_in": [],
+    "clean_flag_rate": 0.0,
+    "f3_flag_rate": 0.0,
+    "f2_flag_rate": 0.0,
+    "composition_row": {
+      "silo": "6",
+      "Benign": "124839",
+      "Bot": "1",
+      "BruteForce": "1366",
+      "DDoS": "36",
+      "DoS": "152",
+      "Heartbleed": "2",
+      "Infiltration": "4",
+      "PortScan": "908",
+      "WebAttack": "54",
+      "TOTAL": "127362",
+      "NON_BENIGN": "2523",
+      "pct_benign": 98.0
+    }
+  },
+  {
+    "silo": 7,
+    "malicious_in": [],
+    "clean_flag_rate": 0.05,
+    "f3_flag_rate": 0.0,
+    "f2_flag_rate": 0.0,
+    "composition_row": {
+      "silo": "7",
+      "Benign": "270577",
+      "Bot": "30",
+      "BruteForce": "8",
+      "DDoS": "20153",
+      "DoS": "6271",
+      "Heartbleed": "1",
+      "Infiltration": "0",
+      "PortScan": "302",
+      "WebAttack": "28",
+      "TOTAL": "297370",
+      "NON_BENIGN": "26793",
+      "pct_benign": 91.0
+    }
+  },
+  {
+    "silo": 8,
+    "malicious_in": [],
+    "clean_flag_rate": 0.95,
+    "f3_flag_rate": 1.0,
+    "f2_flag_rate": 1.0,
+    "composition_row": {
+      "silo": "8",
+      "Benign": "10120",
+      "Bot": "1136",
+      "BruteForce": "19",
+      "DDoS": "137",
+      "DoS": "38410",
+      "Heartbleed": "0",
+      "Infiltration": "5",
+      "PortScan": "32754",
+      "WebAttack": "6",
+      "TOTAL": "82587",
+      "NON_BENIGN": "72467",
+      "pct_benign": 12.3
+    }
+  },
+  {
+    "silo": 9,
+    "malicious_in": [],
+    "clean_flag_rate": 0.0,
+    "f3_flag_rate": 0.0,
+    "f2_flag_rate": 0.0,
+    "composition_row": {
+      "silo": "9",
+      "Benign": "121404",
+      "Bot": "34",
+      "BruteForce": "942",
+      "DDoS": "1607",
+      "DoS": "390",
+      "Heartbleed": "1",
+      "Infiltration": "7",
+      "PortScan": "24496",
+      "WebAttack": "78",
+      "TOTAL": "148959",
+      "NON_BENIGN": "27555",
+      "pct_benign": 81.5
+    }
+  }
+]

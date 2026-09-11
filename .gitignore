@@ -1,0 +1,41 @@
+# Data — never commit
+*.csv
+*.parquet
+data/shards/
+
+# Run outputs
+results/runs/
+*.pth
+*.pt
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.env
+
+# OS
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# results/ -- track what can't be cheaply regenerated, ignore the rest
+results/**/*.npz
+results/**/*.png
+results/xgboost/
+results/**/*_raw*.json
+results/**/*.log
+.vite/
+
+# Exceptions: small, every-number-reads-from-these, or expensive/
+# nondeterministic to regenerate (LLM calls, or a read against the
+# spent test_global.parquet test set) -- must stay tracked.
+!results/inspection/*.csv
+!results/inspection/best_rounds_manifest.json
+!results/shap/**/eval_rows_sidecar.npz
+# ...and these two: served live by GET /faithfulness/*.png and rendered
+# by the Faithfulness page -- not illustrative like the other figures.
+!results/figures/deletion_curve.png
+!results/figures/insertion_curve.png

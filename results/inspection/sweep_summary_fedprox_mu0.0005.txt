@@ -1,0 +1,12 @@
+﻿XFed-IDS FedProx (mu=0.0005) sweep started: 2026-08-25 13:43:16
+PASS  fedprox_mu0.0005_a0.1_s42  (15.2 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a0.1_s1337  (15.2 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a0.1_s2024  (15.2 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a0.5_s42  (17.8 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a0.5_s1337  (18 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a0.5_s2024  (15.2 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a5.0_s42  (16.1 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a5.0_s1337  (15.3 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+PASS  fedprox_mu0.0005_a5.0_s2024  (15.4 min)  round_ckpts=21 silo_ckpts=200 metrics=400 mu=0.0005
+
+ALL 9 CONFIGS PASSED. Total time: 2.39 hours.

@@ -1,0 +1,191 @@
+[
+  {
+    "alpha": "0.1",
+    "seed": 42,
+    "tag": "fedavg_a0.1_s42",
+    "best_round": 20,
+    "best_val_macro_f1_headline": 0.5440290883625463,
+    "test_macro_f1_headline": 0.5426478662391514,
+    "global_checkpoint": "results\\federated\\fedavg_a0.1_s42\\round_checkpoints\\round_020.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_0.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_1.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_2.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_3.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_4.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_5.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_6.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_7.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_8.pt",
+      "results\\federated\\fedavg_a0.1_s42\\silo_checkpoints\\round_020_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.1",
+    "seed": 1337,
+    "tag": "fedavg_a0.1_s1337",
+    "best_round": 16,
+    "best_val_macro_f1_headline": 0.45508550109799273,
+    "test_macro_f1_headline": 0.4480995785655644,
+    "global_checkpoint": "results\\federated\\fedavg_a0.1_s1337\\round_checkpoints\\round_016.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_0.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_1.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_2.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_3.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_4.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_5.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_6.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_7.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_8.pt",
+      "results\\federated\\fedavg_a0.1_s1337\\silo_checkpoints\\round_016_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.1",
+    "seed": 2024,
+    "tag": "fedavg_a0.1_s2024",
+    "best_round": 16,
+    "best_val_macro_f1_headline": 0.5693557565455213,
+    "test_macro_f1_headline": 0.5572274364085863,
+    "global_checkpoint": "results\\federated\\fedavg_a0.1_s2024\\round_checkpoints\\round_016.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_0.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_1.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_2.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_3.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_4.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_5.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_6.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_7.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_8.pt",
+      "results\\federated\\fedavg_a0.1_s2024\\silo_checkpoints\\round_016_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 42,
+    "tag": "fedavg_a0.5_s42",
+    "best_round": 18,
+    "best_val_macro_f1_headline": 0.9759668074383557,
+    "test_macro_f1_headline": 0.9753310761756105,
+    "global_checkpoint": "results\\federated\\fedavg_a0.5_s42\\round_checkpoints\\round_018.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_0.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_1.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_2.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_3.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_4.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_5.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_6.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_7.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_8.pt",
+      "results\\federated\\fedavg_a0.5_s42\\silo_checkpoints\\round_018_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 1337,
+    "tag": "fedavg_a0.5_s1337",
+    "best_round": 11,
+    "best_val_macro_f1_headline": 0.9871291446306404,
+    "test_macro_f1_headline": 0.986559260219992,
+    "global_checkpoint": "results\\federated\\fedavg_a0.5_s1337\\round_checkpoints\\round_011.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_0.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_1.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_2.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_3.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_4.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_5.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_6.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_7.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_8.pt",
+      "results\\federated\\fedavg_a0.5_s1337\\silo_checkpoints\\round_011_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 2024,
+    "tag": "fedavg_a0.5_s2024",
+    "best_round": 17,
+    "best_val_macro_f1_headline": 0.864383114463526,
+    "test_macro_f1_headline": 0.8604800708264585,
+    "global_checkpoint": "results\\federated\\fedavg_a0.5_s2024\\round_checkpoints\\round_017.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_0.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_1.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_2.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_3.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_4.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_5.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_6.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_7.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_8.pt",
+      "results\\federated\\fedavg_a0.5_s2024\\silo_checkpoints\\round_017_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 42,
+    "tag": "fedavg_a5.0_s42",
+    "best_round": 18,
+    "best_val_macro_f1_headline": 0.9897689347281103,
+    "test_macro_f1_headline": 0.989951020697142,
+    "global_checkpoint": "results\\federated\\fedavg_a5.0_s42\\round_checkpoints\\round_018.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_0.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_1.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_2.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_3.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_4.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_5.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_6.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_7.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_8.pt",
+      "results\\federated\\fedavg_a5.0_s42\\silo_checkpoints\\round_018_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 1337,
+    "tag": "fedavg_a5.0_s1337",
+    "best_round": 18,
+    "best_val_macro_f1_headline": 0.9898072235985556,
+    "test_macro_f1_headline": 0.9905214272368779,
+    "global_checkpoint": "results\\federated\\fedavg_a5.0_s1337\\round_checkpoints\\round_018.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_0.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_1.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_2.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_3.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_4.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_5.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_6.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_7.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_8.pt",
+      "results\\federated\\fedavg_a5.0_s1337\\silo_checkpoints\\round_018_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 2024,
+    "tag": "fedavg_a5.0_s2024",
+    "best_round": 20,
+    "best_val_macro_f1_headline": 0.9913311280401996,
+    "test_macro_f1_headline": 0.9889039275100305,
+    "global_checkpoint": "results\\federated\\fedavg_a5.0_s2024\\round_checkpoints\\round_020.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_0.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_1.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_2.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_3.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_4.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_5.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_6.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_7.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_8.pt",
+      "results\\federated\\fedavg_a5.0_s2024\\silo_checkpoints\\round_020_silo_9.pt"
+    ]
+  }
+]

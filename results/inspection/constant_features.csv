@@ -1,0 +1,9 @@
+column,n_unique,top_value,top_value_frac,constant
+Fwd URG Flags,5,0,0.999956,False
+Bwd URG Flags,2,0,1.0,False
+URG Flag Count,5,0,0.999955,False
+CWR Flag Count,9,0,0.999636,False
+ECE Flag Count,5,0,0.999673,False
+Subflow Bwd Packets,2,0,0.999984,False
+ICMP Code,6,-1,0.999713,False
+ICMP Type,5,-1,0.999713,False

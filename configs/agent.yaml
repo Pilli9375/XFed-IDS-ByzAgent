@@ -1,0 +1,93 @@
+# configs/agent.yaml
+# ByzAgent -- Contribution B, Phase 3. LLM-based per-round trust-decision
+# agent for federated/xfed_federated/server_app.py. Deliberately a SEPARATE
+# file from configs/model.yaml / configs/attack.yaml / configs/defense.yaml:
+# Contribution B stays visibly distinct from Contribution A, same convention
+# those two files already established.
+#
+# Consumed by server_app.py's main() ONLY when configs/defense.yaml has
+# defense.strategy: byzagent. Inert otherwise -- every locked Contribution
+# A/B result (fedavg, multikrum, krum, trimmed_mean) is reproducible
+# byte-for-byte regardless of this file's contents when defense.strategy is
+# anything other than byzagent.
+
+agent:
+  provider: ollama
+  host: http://localhost:11434
+
+  # Selected empirically, Phase 3 Step 1 (see PHASE3_SUMMARY.md / the Step 1
+  # report): of 3 candidates tested (llama3.1:8b-instruct-q4_K_M,
+  # qwen2.5:7b-instruct-q4_K_M, phi3.5:latest), all 3 hit 100% JSON-schema
+  # parse success, but only llama3.1 combined 100% id-coverage with
+  # explanations that actually cite the specific numbers given (91.6% after
+  # the citation-instruction prompt tweak, vs 65.1% before it, vs <1% for
+  # qwen2.5, 0% for phi3.5). phi3.5 additionally failed id-coverage in 9/22
+  # synthetic test rounds (wrong/malformed client_id set returned) --
+  # disqualifying on its own per the "a single malformed response could
+  # corrupt that round's aggregation" reliability bar.
+  model: llama3.1:8b-instruct-q4_K_M
+
+  # ALWAYS 0 for live server_app.py runs. Empirically confirmed (Phase 3
+  # Step 1b): llama3.1:8b-instruct-q4_K_M uses ~4.8GB VRAM resident, and a
+  # keep_alive:0 call unloads it back to baseline (~688MiB) within 3-8s --
+  # verified via nvidia-smi + `ollama ps` before/after, not assumed from the
+  # Ollama docs. This keeps Ollama's footprint out of the way of PyTorch's
+  # own GPU usage during the next round's client training, respecting the
+  # project's 6GB VRAM ceiling. Do not change this for a live run without
+  # re-verifying the VRAM math.
+  keep_alive: 0
+
+  temperature: 0.2
+  timeout_seconds: 120
+
+  # One retry on a malformed/schema-invalid response before failing loudly
+  # (src/agents/byz_agent.py AgentResponseError) -- never silently defaults
+  # a corrupted round to any particular decision.
+  max_retries: 1
+
+  # AGGREGATION WIRING (01_Planning, locked):
+  #   trust      -> included at normal (sample-count) weight
+  #   downweight -> included at this multiplier x sample-count weight
+  #   quarantine -> excluded entirely from that round's aggregation
+  #                 (weight 0, not controlled by this value)
+  downweight_multiplier: 0.3
+
+  # results/federated/{tag}/agent_decisions.jsonl -- one row per (round,
+  # silo): round, silo_id, decision, explanation, raw_stats_given. Path is
+  # constructed by server_app.py from the run's own tag, same convention as
+  # client_stats.jsonl / krum_selection.jsonl / trim_rate.jsonl -- nothing
+  # to configure here beyond the results root.
+  log:
+    results_dir: results/federated
+
+  # NO ORACLE f. Unlike configs/defense.yaml's num_malicious_nodes (given to
+  # multikrum/krum/trimmed_mean as a documented advantage), ByzAgent is
+  # never told the true attack strength or malicious-silo identity in any
+  # form -- it infers trust purely from the behavioral stats
+  # (src/monitoring/client_stats.py). This asymmetry is intentional and
+  # must be stated explicitly in every ByzAgent-vs-baseline comparison.
+
+  # Phase 4: rolling-history vs current-round-only stat presentation.
+  # Consumed by AgentConfig.from_yaml_dict (src/agents/byz_agent.py).
+  # Resting state below (mode: current_round) reproduces Phase 3's prompt
+  # byte-for-byte -- this block has zero effect on any Phase 3 result
+  # unless mode is switched to rolling_history.
+  history:
+    # current_round   -- Phase 3 baseline, UNCHANGED. Each client's 5 stats
+    #                    are this round's scalar values only
+    #                    (decide_round / build_prompt / PROMPT_TEMPLATE).
+    # rolling_history  -- Phase 4. Each client's 5 stats are a sequence of
+    #                    its own last `window` per-round values, oldest to
+    #                    newest, ending with the current round
+    #                    (decide_round_history / build_prompt_history /
+    #                    PROMPT_TEMPLATE_HISTORY). Early rounds (round <
+    #                    window) get a PARTIAL window -- however many real
+    #                    rounds of history actually exist, never padded or
+    #                    skipped. See build_client_history()'s docstring.
+    mode: current_round
+
+    # N -- how many of a client's own most recent rounds are shown per
+    # stat when mode: rolling_history. Locked starting value per 01_Planning
+    # (results/agents/PHASE3_SUMMARY.md's Phase 4 motivation section);
+    # unused when mode: current_round.
+    window: 5

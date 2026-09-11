@@ -1,0 +1,106 @@
+# configs/backend.yaml
+# Configuration for the Phase 2 dashboard backend (backend/*.py).
+# Every path, tag, and tolerance the backend depends on lives here -- nothing
+# is hardcoded in backend/*.py. Backend code is read-only against results/,
+# docs/, and federated/: entries below only ever point INTO them.
+
+paths:
+  train_pool: data/processed/train_pool.parquet
+  val_mask: data/processed/val_mask.parquet
+  model_config: configs/model.yaml
+  data_config: configs/data.yaml
+  best_rounds_manifest: results/inspection/best_rounds_manifest.json
+  federated_results_dir: results/federated
+  shap_dir: results/shap
+  # Resolved per-request as shap_dir/<tag>/<shap_filename>.
+  shap_filename: global_shap.npz
+  # Sidecar built OFFLINE by tools/build_shap_eval_sidecar.py (raw_values,
+  # base_values for the same 14 fixed eval rows) -- read at startup exactly
+  # like shap_filename above. Never built or refreshed by the backend
+  # itself; if this file is missing for the configured tag, run that script
+  # by hand first.
+  shap_sidecar_filename: eval_rows_sidecar.npz
+  agreement_metrics: results/inspection/agreement_metrics.csv
+  per_silo_agreement: results/inspection/per_silo_agreement.csv
+  round_wise_agreement: results/inspection/round_wise_agreement.csv
+  centralized_instability_floor: results/inspection/centralized_instability_floor.csv
+  parity_monitor: results/inspection/parity_monitor.csv
+  # Demo traffic source for backend/simulator.py ONLY -- a demo-serving read,
+  # not an evaluation read. load_and_verify() must never touch this path;
+  # see the verify: block's own comment for why the test set is otherwise
+  # off-limits.
+  test_global: data/processed/test_global.parquet
+  # ByzAgent trust panel (GET /trust). attacks_dir holds one subdirectory per
+  # attack condition, each with attack_config.json (TRUE malicious_silos --
+  # never hardcoded) and flip_log.csv. decision_variance_phase3 /
+  # decision_variance_phase4 are precomputed structured summaries (already
+  # computed n_stable/stability_rate per condition -- not raw LLM logs, and
+  # not re-derived here) backing results/agents/PHASE3_SUMMARY.md and
+  # PHASE4_SUMMARY.md's published decision-variance tables.
+  attacks_dir: results/attacks
+  decision_variance_phase3: results/inspection/phase3_gate_analysis_a0.5_s42.json
+  decision_variance_phase4: results/inspection/phase4_gate_analysis_a0.5_s42.json
+
+  # GET /federation -- serves ALL 9 (alpha, seed) configs, unlike every
+  # other endpoint in this file. best_rounds_manifest above is reused for
+  # manifest_summaries; these are the additional sources.
+  silo_sizes: results/inspection/silo_sizes.csv
+
+  # GET /faithfulness -- single config only (alpha=0.5, seed=42), per
+  # app_lib/loaders.py's FAITHFULNESS_CONFIG_LABEL. Per-step curve data
+  # does not exist (tools/deletion_curve.py / insertion_curve.py wrote only
+  # the final AUC + a PNG) -- do not regenerate or modify these.
+  deletion_auc: results/inspection/deletion_auc.csv
+  insertion_auc: results/inspection/insertion_auc.csv
+  figures_dir: results/figures
+
+model:
+  # Which (algo, alpha, seed) run this backend serves. Must match a "tag"
+  # entry in best_rounds_manifest.json.
+  tag: fedavg_a0.5_s42
+  device: cpu
+
+verify:
+  # Boot-time reproduction check -- see backend/model_loader.py:load_and_verify().
+  # Recomputed on the FULL validation split ONLY (train_pool.parquet rows where
+  # val_mask.is_val is true). Never reads test_global.parquet: the test set is
+  # spent and a per-boot check must not touch it.
+  #
+  # Compared against results/federated/<tag>/round_history.json, the entry for
+  # best_round, field `metric`, at `tolerance`. Measured 0.0 diff on both CPU
+  # and CUDA for fedavg_a0.5_s42 round 18 -- the tolerance is deliberately
+  # tight. Do not widen it to silence a failure; a mismatch here means the
+  # serving path (scaler scope, feature order, architecture) has drifted from
+  # whatever produced the reported numbers, and that must be root-caused, not
+  # papered over.
+  split: val
+  source: round_history
+  metric: val_macro_f1_headline
+  tolerance: 1.0e-5
+
+alerts:
+  # In-memory ring buffer in backend/main.py, newest-first via GET /alerts.
+  # Every POST /predict call appends one entry (see main.py's PredictRequest
+  # true_family field) -- not just simulator-originated ones. Lost on
+  # restart; nothing here is persisted to results/.
+  buffer_size: 200
+
+simulator:
+  # backend/simulator.py is a separate process/task: it talks to the API
+  # over HTTP like any other client, so the backend serves normally whether
+  # or not this is running.
+  backend_url: http://127.0.0.1:8000
+  rate_per_second: 1.0
+  # true = restart from row 0 (of the SHUFFLED order below) after the last
+  # row of test_global.parquet (478,376 rows) so the demo feed never just
+  # stops.
+  loop: true
+  # Row order is shuffled ONCE at simulator startup with this seed (see
+  # _load_demo_rows in backend/simulator.py), then replayed sequentially and
+  # looped -- not resampled per tick. Sequential file order is 100% Benign
+  # for the first ~2,000 rows (CICIDS2017's day-file chronology), which
+  # made the un-shuffled demo show nothing but Benign for the first ~30
+  # minutes at 1/sec. A fixed seed keeps a rehearsed demo run reproducible.
+  # Deliberately NOT stratified or curated -- the natural class mix (heavily
+  # Benign, per real network traffic) is the honest one to show.
+  shuffle_seed: 42

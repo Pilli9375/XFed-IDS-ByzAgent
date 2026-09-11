@@ -1,0 +1,2173 @@
+{
+  "conditions": {
+    "clean": {
+      "malicious_silos": [],
+      "per_round_decision_distribution": {
+        "1": {
+          "all": {
+            "trust": 5,
+            "downweight": 2,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 2,
+            "quarantine": 3
+          }
+        },
+        "2": {
+          "all": {
+            "trust": 7,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 7,
+            "downweight": 1,
+            "quarantine": 2
+          }
+        },
+        "3": {
+          "all": {
+            "trust": 4,
+            "downweight": 3,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 4,
+            "downweight": 3,
+            "quarantine": 3
+          }
+        },
+        "4": {
+          "all": {
+            "trust": 5,
+            "downweight": 2,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 2,
+            "quarantine": 3
+          }
+        },
+        "5": {
+          "all": {
+            "trust": 5,
+            "downweight": 4,
+            "quarantine": 1
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 4,
+            "quarantine": 1
+          }
+        },
+        "6": {
+          "all": {
+            "trust": 5,
+            "downweight": 3,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 3,
+            "quarantine": 2
+          }
+        },
+        "7": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "8": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "9": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "10": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "11": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "12": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "13": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          }
+        },
+        "14": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "15": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "16": {
+          "all": {
+            "trust": 5,
+            "downweight": 3,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 3,
+            "quarantine": 2
+          }
+        },
+        "17": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "18": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "19": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        },
+        "20": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          }
+        }
+      },
+      "malicious_silo_flag_rate_downweight_or_quarantine": null,
+      "malicious_silo_quarantine_only_rate": null,
+      "clean_silo_false_positive_rate_downweight_or_quarantine": 0.43,
+      "clean_silo_quarantine_only_rate": 0.22,
+      "n_malicious_observations": 0,
+      "n_clean_observations": 200,
+      "krum_comparison_note": "Krum's mechanism-level malicious-silo exclusion rate (Phase 2, PHASE2_SUMMARY.md) was 0.0000 at BOTH f=3 and f=2 -- Krum's weight-space distance metric never once excluded a truly malicious silo. Krum has NO chance-baseline analogy that applies cleanly to ByzAgent: Krum's f/n chance baseline follows from its fixed num_excluded=f construction, which ByzAgent has no equivalent of (ByzAgent's decisions are a free 3-way choice per client, not a fixed-count selection). The clean_silo_false_positive_rate above is the honest empirical baseline to compare malicious_silo_flag_rate against instead -- if the two rates are close, that is as uninformative as Krum's 0.0000, reported the same way Phase 2 corrected the trimmed-mean f/n baseline rather than reusing an ill-fitting analogy."
+    },
+    "f3_{0,3,5}": {
+      "malicious_silos": [
+        0,
+        3,
+        5
+      ],
+      "per_round_decision_distribution": {
+        "1": {
+          "all": {
+            "trust": 5,
+            "downweight": 4,
+            "quarantine": 1
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 3,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "2": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "3": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "4": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "5": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "6": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "7": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "8": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "9": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "10": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "11": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "12": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "13": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "14": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "15": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 1
+          }
+        },
+        "16": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "17": {
+          "all": {
+            "trust": 6,
+            "downweight": 3,
+            "quarantine": 1
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 2,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "18": {
+          "all": {
+            "trust": 6,
+            "downweight": 3,
+            "quarantine": 1
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 2,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "19": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        },
+        "20": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 3
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 0
+          }
+        }
+      },
+      "malicious_silo_flag_rate_downweight_or_quarantine": 1.0,
+      "malicious_silo_quarantine_only_rate": 0.7166666666666667,
+      "clean_silo_false_positive_rate_downweight_or_quarantine": 0.15,
+      "clean_silo_quarantine_only_rate": 0.07142857142857142,
+      "n_malicious_observations": 60,
+      "n_clean_observations": 140,
+      "krum_comparison_note": "Krum's mechanism-level malicious-silo exclusion rate (Phase 2, PHASE2_SUMMARY.md) was 0.0000 at BOTH f=3 and f=2 -- Krum's weight-space distance metric never once excluded a truly malicious silo. Krum has NO chance-baseline analogy that applies cleanly to ByzAgent: Krum's f/n chance baseline follows from its fixed num_excluded=f construction, which ByzAgent has no equivalent of (ByzAgent's decisions are a free 3-way choice per client, not a fixed-count selection). The clean_silo_false_positive_rate above is the honest empirical baseline to compare malicious_silo_flag_rate against instead -- if the two rates are close, that is as uninformative as Krum's 0.0000, reported the same way Phase 2 corrected the trimmed-mean f/n baseline rather than reusing an ill-fitting analogy."
+    },
+    "f2_{0,3}": {
+      "malicious_silos": [
+        0,
+        3
+      ],
+      "per_round_decision_distribution": {
+        "1": {
+          "all": {
+            "trust": 5,
+            "downweight": 2,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 5,
+            "downweight": 1,
+            "quarantine": 2
+          }
+        },
+        "2": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "3": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "4": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "5": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "6": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "7": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "8": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "9": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "10": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "11": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "12": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "13": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "14": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "15": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "16": {
+          "all": {
+            "trust": 6,
+            "downweight": 4,
+            "quarantine": 0
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 2,
+            "quarantine": 0
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 0
+          }
+        },
+        "17": {
+          "all": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 4
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 0,
+            "quarantine": 2
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 2
+          }
+        },
+        "18": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "19": {
+          "all": {
+            "trust": 6,
+            "downweight": 2,
+            "quarantine": 2
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 1
+          }
+        },
+        "20": {
+          "all": {
+            "trust": 6,
+            "downweight": 1,
+            "quarantine": 3
+          },
+          "malicious": {
+            "trust": 0,
+            "downweight": 1,
+            "quarantine": 1
+          },
+          "clean": {
+            "trust": 6,
+            "downweight": 0,
+            "quarantine": 2
+          }
+        }
+      },
+      "malicious_silo_flag_rate_downweight_or_quarantine": 1.0,
+      "malicious_silo_quarantine_only_rate": 0.5,
+      "clean_silo_false_positive_rate_downweight_or_quarantine": 0.25625,
+      "clean_silo_quarantine_only_rate": 0.1375,
+      "n_malicious_observations": 40,
+      "n_clean_observations": 160,
+      "krum_comparison_note": "Krum's mechanism-level malicious-silo exclusion rate (Phase 2, PHASE2_SUMMARY.md) was 0.0000 at BOTH f=3 and f=2 -- Krum's weight-space distance metric never once excluded a truly malicious silo. Krum has NO chance-baseline analogy that applies cleanly to ByzAgent: Krum's f/n chance baseline follows from its fixed num_excluded=f construction, which ByzAgent has no equivalent of (ByzAgent's decisions are a free 3-way choice per client, not a fixed-count selection). The clean_silo_false_positive_rate above is the honest empirical baseline to compare malicious_silo_flag_rate against instead -- if the two rates are close, that is as uninformative as Krum's 0.0000, reported the same way Phase 2 corrected the trimmed-mean f/n baseline rather than reusing an ill-fitting analogy."
+    }
+  },
+  "decision_variance": {
+    "round": 10,
+    "repeats": 3,
+    "by_condition": {
+      "clean": {
+        "per_silo": {
+          "silo_0": {
+            "decisions": [
+              "downweight",
+              "downweight",
+              "downweight"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_1": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_2": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_3": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": true
+          },
+          "silo_4": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_5": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_6": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_7": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_8": {
+            "decisions": [
+              "downweight",
+              "downweight",
+              "downweight"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_9": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          }
+        },
+        "n_silos": 10,
+        "n_stable": 10,
+        "stability_rate": 1.0
+      },
+      "f3_{0,3,5}": {
+        "per_silo": {
+          "silo_0": {
+            "decisions": [
+              "downweight",
+              "downweight",
+              "quarantine"
+            ],
+            "stable": false,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_1": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_2": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_3": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_4": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_5": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_6": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_7": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_8": {
+            "decisions": [
+              "downweight",
+              "downweight",
+              "downweight"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_9": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss",
+                "update_norm",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          }
+        },
+        "n_silos": 10,
+        "n_stable": 9,
+        "stability_rate": 0.9
+      },
+      "f2_{0,3}": {
+        "per_silo": {
+          "silo_0": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "cosine_to_peer_mean",
+                "update_norm"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_1": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_2": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_3": {
+            "decisions": [
+              "quarantine",
+              "downweight",
+              "quarantine"
+            ],
+            "stable": false,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_4": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "train_loss",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_5": {
+            "decisions": [
+              "quarantine",
+              "quarantine",
+              "quarantine"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "val_accuracy"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_6": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_7": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_8": {
+            "decisions": [
+              "quarantine",
+              "downweight",
+              "quarantine"
+            ],
+            "stable": false,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          },
+          "silo_9": {
+            "decisions": [
+              "trust",
+              "trust",
+              "trust"
+            ],
+            "stable": true,
+            "cited_stat_sets": [
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "update_norm",
+                "val_accuracy"
+              ],
+              [
+                "cosine_to_global",
+                "train_loss"
+              ]
+            ],
+            "explanation_cites_same_stats_all_3x": false
+          }
+        },
+        "n_silos": 10,
+        "n_stable": 8,
+        "stability_rate": 0.8
+      }
+    }
+  },
+  "citation_frequency": {
+    "clean": {
+      "overall": {
+        "update_norm": 186,
+        "cosine_to_global": 199,
+        "cosine_to_peer_mean": 14,
+        "train_loss": 15,
+        "val_accuracy": 87
+      },
+      "by_decision": {
+        "trust": {
+          "update_norm": 110,
+          "cosine_to_global": 114,
+          "cosine_to_peer_mean": 9,
+          "train_loss": 11,
+          "val_accuracy": 41
+        },
+        "downweight": {
+          "update_norm": 40,
+          "cosine_to_global": 42,
+          "cosine_to_peer_mean": 2,
+          "train_loss": 1,
+          "val_accuracy": 13
+        },
+        "quarantine": {
+          "update_norm": 36,
+          "cosine_to_global": 43,
+          "cosine_to_peer_mean": 3,
+          "train_loss": 3,
+          "val_accuracy": 33
+        }
+      },
+      "by_truth": {
+        "malicious": {
+          "update_norm": 0,
+          "cosine_to_global": 0,
+          "cosine_to_peer_mean": 0,
+          "train_loss": 0,
+          "val_accuracy": 0
+        },
+        "clean": {
+          "update_norm": 186,
+          "cosine_to_global": 199,
+          "cosine_to_peer_mean": 14,
+          "train_loss": 15,
+          "val_accuracy": 87
+        }
+      },
+      "n_explanations": 200,
+      "n_explanations_malicious": 0,
+      "n_explanations_clean": 200
+    },
+    "f3_{0,3,5}": {
+      "overall": {
+        "update_norm": 146,
+        "cosine_to_global": 172,
+        "cosine_to_peer_mean": 23,
+        "train_loss": 78,
+        "val_accuracy": 130
+      },
+      "by_decision": {
+        "trust": {
+          "update_norm": 74,
+          "cosine_to_global": 93,
+          "cosine_to_peer_mean": 12,
+          "train_loss": 62,
+          "val_accuracy": 74
+        },
+        "downweight": {
+          "update_norm": 23,
+          "cosine_to_global": 27,
+          "cosine_to_peer_mean": 1,
+          "train_loss": 2,
+          "val_accuracy": 17
+        },
+        "quarantine": {
+          "update_norm": 49,
+          "cosine_to_global": 52,
+          "cosine_to_peer_mean": 10,
+          "train_loss": 14,
+          "val_accuracy": 39
+        }
+      },
+      "by_truth": {
+        "malicious": {
+          "update_norm": 55,
+          "cosine_to_global": 59,
+          "cosine_to_peer_mean": 8,
+          "train_loss": 12,
+          "val_accuracy": 40
+        },
+        "clean": {
+          "update_norm": 91,
+          "cosine_to_global": 113,
+          "cosine_to_peer_mean": 15,
+          "train_loss": 66,
+          "val_accuracy": 90
+        }
+      },
+      "n_explanations": 200,
+      "n_explanations_malicious": 60,
+      "n_explanations_clean": 140
+    },
+    "f2_{0,3}": {
+      "overall": {
+        "update_norm": 98,
+        "cosine_to_global": 143,
+        "cosine_to_peer_mean": 6,
+        "train_loss": 106,
+        "val_accuracy": 115
+      },
+      "by_decision": {
+        "trust": {
+          "update_norm": 30,
+          "cosine_to_global": 62,
+          "cosine_to_peer_mean": 6,
+          "train_loss": 98,
+          "val_accuracy": 69
+        },
+        "downweight": {
+          "update_norm": 37,
+          "cosine_to_global": 39,
+          "cosine_to_peer_mean": 0,
+          "train_loss": 4,
+          "val_accuracy": 14
+        },
+        "quarantine": {
+          "update_norm": 31,
+          "cosine_to_global": 42,
+          "cosine_to_peer_mean": 0,
+          "train_loss": 4,
+          "val_accuracy": 32
+        }
+      },
+      "by_truth": {
+        "malicious": {
+          "update_norm": 38,
+          "cosine_to_global": 40,
+          "cosine_to_peer_mean": 0,
+          "train_loss": 4,
+          "val_accuracy": 21
+        },
+        "clean": {
+          "update_norm": 60,
+          "cosine_to_global": 103,
+          "cosine_to_peer_mean": 6,
+          "train_loss": 102,
+          "val_accuracy": 94
+        }
+      },
+      "n_explanations": 200,
+      "n_explanations_malicious": 40,
+      "n_explanations_clean": 160
+    }
+  },
+  "citation_accuracy": {
+    "n_citations_extracted": 1327,
+    "n_correct": 1123,
+    "loose_overall_error_rate": 0.1537302185380558,
+    "strict_overall_error_rate_excl_ambiguous": 0.11744386873920552,
+    "strict_ambiguous_fraction": 0.12735493594574226,
+    "by_stat": {
+      "update_norm": {
+        "n": 420,
+        "accuracy": 0.719047619047619,
+        "loose_error_rate": 0.28095238095238095,
+        "strict_wrong": 89,
+        "strict_ambiguous": 66,
+        "strict_error_rate_excl_ambiguous": 0.2514124293785311
+      },
+      "cosine_to_global": {
+        "n": 504,
+        "accuracy": 0.9365079365079365,
+        "loose_error_rate": 0.06349206349206349,
+        "strict_wrong": 21,
+        "strict_ambiguous": 28,
+        "strict_error_rate_excl_ambiguous": 0.04411764705882353
+      },
+      "cosine_to_peer_mean": {
+        "n": 11,
+        "accuracy": 0.5454545454545454,
+        "loose_error_rate": 0.4545454545454546,
+        "strict_wrong": 5,
+        "strict_ambiguous": 1,
+        "strict_error_rate_excl_ambiguous": 0.5
+      },
+      "train_loss": {
+        "n": 184,
+        "accuracy": 0.8369565217391305,
+        "loose_error_rate": 0.1630434782608695,
+        "strict_wrong": 5,
+        "strict_ambiguous": 53,
+        "strict_error_rate_excl_ambiguous": 0.03816793893129771
+      },
+      "val_accuracy": {
+        "n": 208,
+        "accuracy": 0.9086538461538461,
+        "loose_error_rate": 0.09134615384615385,
+        "strict_wrong": 16,
+        "strict_ambiguous": 21,
+        "strict_error_rate_excl_ambiguous": 0.0855614973262032
+      }
+    },
+    "method_note": "LOOSE: a citation is 'correct' if its qualitative direction (low/high/moderate) matches the cited value's actual within-round percentile rank among that round's 10 silos for that stat (low<=0.5, high>=0.5, moderate in [0.25,0.75]) -- this is a strict median split with no dead zone, so a value at e.g. the 55.6th percentile called 'low' counts as an error even though, at n=10 silos, that is only one rank above the exact median and may read as reasonable to a human, especially for train_loss where clean-round values often cluster tightly near zero regardless of local rank. STRICT (excl. ambiguous): requires high>=0.6 / low<=0.4 to count as correct, wrong requires the clear opposite side (high<=0.4 / low>=0.6), and the 0.4-0.6 band is excluded from the denominator entirely (ambiguous, not scored either way) -- this isolates genuinely clear-cut misreadings from boundary-threshold artifacts. Both are reported; hand-checked sample (phase3_citation_accuracy_sample.json) confirmed both real unambiguous errors (e.g. a value at the round's 100th percentile called 'low') and boundary-artifact cases (percentile ~0.44-0.56 flagged 'incorrect' under the loose rule alone) are present in the loose-rule sample -- the strict rate is the more defensible number for 'genuine misreading', the loose rate is the more conservative upper bound."
+  },
+  "decision_stat_correlation": {
+    "pooled": {
+      "update_norm": {
+        "spearman_rho": 0.41875633444159516,
+        "p_value": 7.106480119504892e-27,
+        "n": 600
+      },
+      "cosine_to_global": {
+        "spearman_rho": -0.8083852576345888,
+        "p_value": 9.586275857537176e-140,
+        "n": 600
+      },
+      "cosine_to_peer_mean": {
+        "spearman_rho": 0.2984696492103809,
+        "p_value": 8.229985037015343e-14,
+        "n": 600
+      },
+      "train_loss": {
+        "spearman_rho": 0.7934573170904151,
+        "p_value": 4.518730332507933e-131,
+        "n": 600
+      },
+      "val_accuracy": {
+        "spearman_rho": -0.7447212964853553,
+        "p_value": 4.114228924001886e-107,
+        "n": 600
+      }
+    },
+    "by_condition": {
+      "clean": {
+        "update_norm": {
+          "spearman_rho": 0.48403707354372805,
+          "p_value": 3.833640450508474e-13,
+          "n": 200
+        },
+        "cosine_to_global": {
+          "spearman_rho": -0.7427109766762633,
+          "p_value": 2.474614018539072e-36,
+          "n": 200
+        },
+        "cosine_to_peer_mean": {
+          "spearman_rho": 0.38768958367255635,
+          "p_value": 1.4131604849642146e-08,
+          "n": 200
+        },
+        "train_loss": {
+          "spearman_rho": 0.7338844779551766,
+          "p_value": 4.271068898016755e-35,
+          "n": 200
+        },
+        "val_accuracy": {
+          "spearman_rho": -0.7333433899109721,
+          "p_value": 5.067154509813098e-35,
+          "n": 200
+        }
+      },
+      "f3_{0,3,5}": {
+        "update_norm": {
+          "spearman_rho": 0.38679915756141675,
+          "p_value": 1.5346614227185467e-08,
+          "n": 200
+        },
+        "cosine_to_global": {
+          "spearman_rho": -0.8317085021027074,
+          "p_value": 1.7181487074486496e-52,
+          "n": 200
+        },
+        "cosine_to_peer_mean": {
+          "spearman_rho": 0.29772439492619257,
+          "p_value": 1.8558412997409466e-05,
+          "n": 200
+        },
+        "train_loss": {
+          "spearman_rho": 0.8266509547456669,
+          "p_value": 2.4652538077189983e-51,
+          "n": 200
+        },
+        "val_accuracy": {
+          "spearman_rho": -0.7084694909944135,
+          "p_value": 8.559366264461568e-32,
+          "n": 200
+        }
+      },
+      "f2_{0,3}": {
+        "update_norm": {
+          "spearman_rho": 0.3884049150713127,
+          "p_value": 1.3223213984546133e-08,
+          "n": 200
+        },
+        "cosine_to_global": {
+          "spearman_rho": -0.8506937164908044,
+          "p_value": 3.328982984128495e-57,
+          "n": 200
+        },
+        "cosine_to_peer_mean": {
+          "spearman_rho": 0.2114643265257776,
+          "p_value": 0.0026481416372567553,
+          "n": 200
+        },
+        "train_loss": {
+          "spearman_rho": 0.82026892206609,
+          "p_value": 6.2974957060930095e-50,
+          "n": 200
+        },
+        "val_accuracy": {
+          "spearman_rho": -0.794652217419934,
+          "p_value": 8.55431381045495e-45,
+          "n": 200
+        }
+      }
+    },
+    "method_note": "Spearman correlation between decision severity (trust=0, downweight=1, quarantine=2) and each stat's WITHIN-ROUND percentile rank (0=lowest of that round's 10 silos, 1=highest) -- percentile, not raw value, so cross-round scale drift (e.g. train_loss shrinking over training) does not confound the correlation. Negative rho for cosine_to_global/cosine_to_peer_mean is expected in the correct direction (higher cosine = more aligned = less severe decision); positive rho expected for update_norm/train_loss (higher = more severe decision); val_accuracy's expected sign is deliberately NOT stated here -- read the caveat note in citation_frequency/prompt before interpreting it. This is computed independent of what the explanations claim -- compare against citation_frequency above for the 'right answer, wrong stated reason' check."
+  }
+}

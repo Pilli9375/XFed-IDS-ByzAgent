@@ -1,0 +1,6 @@
+{
+  "strategy": "trimmed_mean",
+  "num_malicious_nodes_oracle": 2,
+  "n_silos": 10,
+  "note": "num_malicious_nodes is the TRUE f from configs/attack.yaml for the condition under test -- an ORACLE given to this defense, not inferred or estimated. Documented advantage, not an oversight; disclose explicitly wherever this run's results are shown. multikrum.num_nodes_to_select = n_silos - num_malicious_nodes; trimmed_mean.beta = num_malicious_nodes / n_silos. Classical 'krum' (select=1) is a secondary sanity check only, never a standalone baseline."
+}

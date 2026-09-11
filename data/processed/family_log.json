@@ -1,0 +1,71 @@
+{
+  "family_counts": {
+    "Benign": 1440899,
+    "PortScan": 186160,
+    "DoS": 177491,
+    "DDoS": 95144,
+    "BruteForce": 6972,
+    "Bot": 4703,
+    "WebAttack": 2056,
+    "Infiltration": 66,
+    "Heartbleed": 11
+  },
+  "below_floor_families": [
+    "Heartbleed",
+    "Infiltration"
+  ],
+  "family_floor": 1000,
+  "n_distinct_feature_vectors": 1714074,
+  "families_starved_by_group_split": [],
+  "per_family_split_balance": {
+    "Benign": {
+      "train": 1080674,
+      "test": 360225,
+      "test_pct": 25.0
+    },
+    "PortScan": {
+      "train": 139620,
+      "test": 46540,
+      "test_pct": 25.0
+    },
+    "DoS": {
+      "train": 133118,
+      "test": 44373,
+      "test_pct": 25.0
+    },
+    "DDoS": {
+      "train": 71358,
+      "test": 23786,
+      "test_pct": 25.0
+    },
+    "BruteForce": {
+      "train": 5229,
+      "test": 1743,
+      "test_pct": 25.0
+    },
+    "Bot": {
+      "train": 3527,
+      "test": 1176,
+      "test_pct": 25.0
+    },
+    "WebAttack": {
+      "train": 1542,
+      "test": 514,
+      "test_pct": 25.0
+    },
+    "Infiltration": {
+      "train": 50,
+      "test": 16,
+      "test_pct": 24.2
+    },
+    "Heartbleed": {
+      "train": 8,
+      "test": 3,
+      "test_pct": 27.3
+    }
+  },
+  "n_train_pool": 1435126,
+  "n_test_global": 478376,
+  "split_seed": 42,
+  "test_size": 0.25
+}

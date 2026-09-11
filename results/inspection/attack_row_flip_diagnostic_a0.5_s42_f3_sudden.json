@@ -1,0 +1,22 @@
+{
+  "config": {
+    "alpha": "0.5",
+    "partition_seed": 42,
+    "f": 3,
+    "malicious_silos": [
+      0,
+      1,
+      9
+    ],
+    "mode": "sudden",
+    "flip_fraction": 0.4,
+    "attack_seed": 9001,
+    "round_replayed": 1
+  },
+  "total_attack_rows_all8_families_federation_train": 319006,
+  "total_attack_rows_headline7_families_federation_train": 318954,
+  "total_attack_rows_flipped_this_round": 44610,
+  "fraction_of_all_federation_attack_rows_flipped": 0.13984062995680333,
+  "fraction_of_headline_federation_attack_rows_flipped": 0.13986342858217798,
+  "denominator_used_by_flip_labels": "non-Benign rows only (n_eligible), confirmed exact match against flip_log.csv n_rows_flipped for all 3 malicious silos"
+}

@@ -1,0 +1,128 @@
+# configs/model.yaml
+# Chat 03 — centralized baseline and federated model configuration.
+#
+# This file is the single source of truth. Replace it wholesale when a lock
+# changes; do not hand-edit a downloaded copy and keep this one stale --
+# that mismatch is exactly what corrupted the architecture pilot on 2026-08-08
+# (it silently ran on scaler=robust after the scaler lock had only been
+# applied to the user's local copy, not here).
+#
+# Values under `PILOT` are placeholders pending an unrun or invalidated pilot.
+# They are NOT results. Do not cite them.
+
+# ---------------------------------------------------------------------------
+# Label vocabulary — FROZEN. Never derived from a silo's own rows.
+# ---------------------------------------------------------------------------
+labels:
+  vocabulary:
+    Benign: 0
+    Bot: 1
+    BruteForce: 2
+    DDoS: 3
+    DoS: 4
+    Heartbleed: 5
+    Infiltration: 6
+    PortScan: 7
+    WebAttack: 8
+  n_classes: 9
+  headline_classes: [Benign, Bot, BruteForce, DDoS, DoS, PortScan, WebAttack]
+  below_floor_classes: [Heartbleed, Infiltration]
+
+# ---------------------------------------------------------------------------
+# Splits
+# ---------------------------------------------------------------------------
+splits:
+  val_seed: 42
+  val_fraction: 0.10
+  val_mask_path: data/processed/val_mask.parquet
+  hold_out_val_in_federated: true
+
+# ---------------------------------------------------------------------------
+# Model
+# ---------------------------------------------------------------------------
+model:
+  input_dim: 82
+  hidden_dims: [128, 64]     # LOCKED by the architecture pilot, 2026-08-08
+                            # (re-run after the scaler-drift bug was fixed;
+                            # scaler=standard confirmed in the run header).
+                            # Val macro-F1 across all 6 arms: 0.9878-0.9939 --
+                            # top 4 arms within 0.0008 of each other, smaller
+                            # than the epoch-to-epoch noise inside any single
+                            # run. Capacity bought nothing measurable, so
+                            # selected on the tiebreaker that actually matters
+                            # for federation: 19,849 params vs 56,073 (256,128)
+                            # vs 209,673 (512,256,128) -- 3.7x / 10.6x less
+                            # per-round upload/download at zero accuracy cost.
+                            # h512_256_128_d01 also showed a real one-epoch
+                            # instability (val mF1 0.988 -> 0.881, epoch 19->20,
+                            # caught by best-checkpoint selection but a second
+                            # reason to prefer the smaller model). See
+                            # results/pilots/architecture_comparison.csv.
+  activation: relu
+  norm: layernorm           # LOCKED. Not batchnorm -- BN running stats are in the
+                            # state_dict and FedAvg would average them across
+                            # incompatible per-silo input distributions.
+  dropout: 0.1                # LOCKED alongside hidden_dims above. Direction
+                              # flips by model size across the sweep (0.1 beats
+                              # 0.3 at small/mid size, loses at largest) --
+                              # inside noise, not a strong effect either way.
+
+# ---------------------------------------------------------------------------
+# Training
+# ---------------------------------------------------------------------------
+training:
+  optimizer: adamw
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  batch_size: 1024
+  max_epochs: 50
+  early_stopping:
+    monitor: val_macro_f1_headline
+    patience: 5
+    mode: max
+  lr_schedule:
+    kind: reduce_on_plateau
+    monitor: val_macro_f1_headline
+    factor: 0.5
+    patience: 3
+
+  class_weighting:
+    scheme: effective_number   # LOCKED by the weights pilot, 2026-08-08.
+                               # eff_999 beat none/invsqrt/eff_9999/eff_99999 on
+                               # val macro-F1 (0.9941) and test headline (0.9924).
+                               # Stronger correction (larger beta) monotonically
+                               # hurt: Infiltration precision fell 0.92 -> 0.12
+                               # from beta=0.999 to 0.99999 while recall barely
+                               # moved -- overcorrection, not saturation, was
+                               # the operative failure mode. See
+                               # results/pilots/weights_comparison.csv.
+    beta: 0.999
+
+  seeds: [42, 1337, 2024]
+
+# ---------------------------------------------------------------------------
+# Preprocessing
+# ---------------------------------------------------------------------------
+preprocessing:
+  scaler: standard           # LOCKED by the scaler pilot, 2026-08-08.
+                             # standard 0.9924 vs robust_clipped 0.9228 vs
+                             # robust 0.9179 (test macro-F1, 7 headline
+                             # families). RobustScaler degenerates on 28 of 82
+                             # zero-inflated features (IQR = 0 -> scale_ = 1.0
+                             # -> centering only), leaving them unnormalized.
+                             # StandardScaler degenerates on 1
+                             # ('Bwd URG Flags', all-zero). See
+                             # results/pilots/scaler_comparison.csv.
+  clip_percentiles: [0.1, 99.9]   # unused while scaler == standard
+
+  fit_scope_centralized: train_split
+  fit_scope_federated: per_silo_train
+  assert_no_silent_unit_scale: true
+
+# ---------------------------------------------------------------------------
+# Output
+# ---------------------------------------------------------------------------
+output:
+  results_dir: results/
+  save_per_class_metrics: true
+  save_scaler_params: true

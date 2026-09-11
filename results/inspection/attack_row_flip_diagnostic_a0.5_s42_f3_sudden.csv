@@ -1,0 +1,9 @@
+family,is_headline,fed_total_train_rows,flipped_round1,frac_flipped,effectively_untouched_lt5pct
+Bot,True,3174,69,0.021739130434782608,True
+BruteForce,True,4706,720,0.1529961750956226,False
+DDoS,True,64222,7995,0.12449005013858179,False
+DoS,True,119806,5184,0.04326995309083018,True
+PortScan,True,125658,30575,0.2433191679001735,False
+WebAttack,True,1388,57,0.04106628242074928,True
+Infiltration,False,45,9,0.2,False
+Heartbleed,False,7,1,0.14285714285714285,False

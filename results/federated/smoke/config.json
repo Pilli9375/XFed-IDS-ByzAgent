@@ -1,0 +1,10 @@
+{
+  "tag": "smoke",
+  "alpha": "0.5",
+  "seed": 42,
+  "strategy": "fedavg",
+  "num_rounds": 3,
+  "n_silos": 10,
+  "git_commit": "unknown",
+  "elapsed_seconds": 136.9
+}

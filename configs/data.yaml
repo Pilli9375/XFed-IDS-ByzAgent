@@ -1,0 +1,157 @@
+# XFed-IDS -- Chat 02_Data
+# Configuration for src/data/clean.py and src/data/families.py.
+# Every value here is a decision made and defended in Chat 02. Change nothing
+# here without updating data/README.md with the reason.
+
+paths:
+  raw_dir: "C:/Pilli/Capstone/Dataset"
+  processed_dir: "C:/Pilli/Capstone/xfed-ids/data/processed"
+
+seed: 42
+
+schema:
+  label_col: "Label"
+  attempted_col: "Attempted Category"
+  identifier_cols:
+    - "id"
+    - "Flow ID"
+    - "Src IP"
+    - "Src Port"
+    - "Dst IP"
+    - "Dst Port"
+    - "Timestamp"
+  # 82 candidate features = every other column. Computed at runtime from
+  # whatever the CSV header actually contains, not listed here, so this file
+  # can't silently drift from reality if the header ever changes.
+
+cleaning:
+  # Rows with Inf/NaN in any numeric feature (all traced to Flow Duration==0).
+  # Phase 1 finding: 5 rows total, 0.0002% of data. Drop outright.
+  drop_inf_nan_rows: true
+
+  # Feature-identical rows with DIFFERENT labels. No model can separate
+  # these; keeping any one arbitrarily injects label noise. Drop the whole
+  # conflicting group. Phase 1 finding: 872 rows, 0.04% of data.
+  drop_label_conflicts: true
+
+  # Exact duplicates (features + label) are NOT blanket-dropped. Phase 1
+  # finding: Portscan (99.2%), Infiltration-Portscan (95.0%), and
+  # Botnet-Attempted (89.6%) duplication is a structural side effect of
+  # dropping Src/Dst Port and IP as identifiers -- many distinct real probes
+  # collapse to identical feature vectors once those columns are gone.
+  # Deduping those away would strip most of the mass from three already-thin
+  # families. Only duplicate groups that SPAN MORE THAN ONE DAY-FILE are
+  # dropped (keep first occurrence) -- that pattern has no comparable
+  # behavioral explanation and matches capture-overlap issues documented in
+  # the corrected-CICIDS2017 literature.
+  dedup_cross_file_only: true
+
+  # Near-constant features (URG/ECE/CWR flag counts, ICMP Type/Code,
+  # Subflow Bwd Packets -- 8 columns, >=99.9% one value, none strictly
+  # constant) are NOT dropped at this stage. Revisit with feature-importance
+  # evidence from the Chat 03 centralized baseline, not a variance heuristic
+  # alone -- ICMP Type/Code are the only features that could carry signal for
+  # an ICMP-based attack, if one exists anywhere in this data.
+  drop_near_constant: false
+
+attempted_handling:
+  # A flow is "Attempted" iff Label ends with this suffix. Verified
+  # equivalent to (Attempted Category != -1) with zero exceptions across all
+  # 2,099,976 rows in Phase 1 -- the string check alone is sufficient, the
+  # Attempted Category column is not needed downstream.
+  suffix: " - Attempted"
+
+  # Attempted flows join their PARENT FAMILY, not Benign, and are not
+  # dropped. Reason: for several families (Web Attack XSS 97%, Web Attack
+  # Brute Force 95%, Botnet 85%, DoS Slowhttptest 66% attempted-share),
+  # folding to Benign would have removed most of the family's mass. One
+  # uniform rule, no per-family exceptions. This is implemented implicitly:
+  # family_map below lists both the clean and "- Attempted" raw label for
+  # every family, mapping both to the same family.
+  target: "parent_family"
+
+family_floor: 1000  # families below this are flagged, never deleted; excluded from headline macro-F1 only
+
+# Raw Label -> family. Every raw label observed in Phase 1 must appear
+# exactly once below. families.py asserts this at runtime and raises if a
+# label is unmapped -- a silent NaN family on a future rerun is worse than a
+# crash now.
+family_map:
+  Benign:
+    - "BENIGN"
+
+  DoS:
+    - "DoS Hulk"
+    - "DoS Hulk - Attempted"
+    - "DoS GoldenEye"
+    - "DoS GoldenEye - Attempted"
+    - "DoS Slowloris"
+    - "DoS Slowloris - Attempted"
+    - "DoS Slowhttptest"
+    - "DoS Slowhttptest - Attempted"
+
+  DDoS:
+    - "DDoS"
+
+  PortScan:
+    - "Portscan"
+    # Routed here, not to Infiltration, on FEATURE-SIGNATURE grounds: this is
+    # the internal-scan phase of the infiltration scenario and looks like a
+    # port scan (short flows, low bytes, many probes), not like the ~80
+    # genuine stealthy infiltration flows. Merging it into Infiltration would
+    # make that family >99.9% portscan-shaped and hollow out what
+    # "Infiltration" is supposed to mean. Locked 2026-08-06.
+    - "Infiltration - Portscan"
+
+  BruteForce:
+    - "FTP-Patator"
+    - "FTP-Patator - Attempted"
+    - "SSH-Patator"
+    - "SSH-Patator - Attempted"
+
+  WebAttack:
+    - "Web Attack - Brute Force"
+    - "Web Attack - Brute Force - Attempted"
+    - "Web Attack - XSS"
+    - "Web Attack - XSS - Attempted"
+    - "Web Attack - SQL Injection"
+    - "Web Attack - SQL Injection - Attempted"
+
+  Bot:
+    - "Botnet"
+    - "Botnet - Attempted"
+
+  Infiltration:
+    # 66 rows total. Under family_floor. Reported, excluded from headline
+    # macro-F1. Kept in the data, not deleted -- what happens to
+    # excluded-family rows at model-output time is a Chat 03 decision.
+    - "Infiltration"
+    - "Infiltration - Attempted"
+
+  Heartbleed:
+    # 11 rows. Under family_floor for the same reason as above.
+    - "Heartbleed"
+
+federation:
+  # 10 simulated organizations. Locked decision 3.
+  n_silos: 10
+
+  # Dirichlet concentration over labels. See partition.py docstring for what
+  # this controls. 0.1 = pathological heterogeneity, 0.5 = realistic,
+  # 5.0 = near-IID control. The control matters: without it we cannot separate
+  # "federation costs accuracy" from "non-IID costs accuracy".
+  alphas: [0.1, 0.5, 5.0]
+
+  # Three seeds per (alpha) configuration. Single-run numbers are not results;
+  # every reported figure gets a mean and a spread across these.
+  seeds: [42, 1337, 2024]
+
+split:
+  # Global, family-stratified, BEFORE any Dirichlet partitioning. This is
+  # what makes the centralized-baseline vs. federated-global-model comparison
+  # in Chat 03 apples-to-apples -- both evaluate on the identical held-out
+  # set. Per-silo local test shards (Chat 03/04) come from applying the SAME
+  # Dirichlet assignment to this test set, not from a second independent split.
+  test_size: 0.25   # matches Engelen et al.'s own 75/25 split of this dataset lineage
+  stratify_by: "family"
+  seed: 42

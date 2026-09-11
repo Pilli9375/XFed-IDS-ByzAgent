@@ -1,0 +1,56 @@
+{
+  "n_start": 2099976,
+  "family_counts_pre_clean": {
+    "Benign": 1587280,
+    "PortScan": 226138,
+    "DoS": 177491,
+    "DDoS": 95144,
+    "BruteForce": 6972,
+    "Bot": 4803,
+    "WebAttack": 2056,
+    "Infiltration": 81,
+    "Heartbleed": 11
+  },
+  "dropped_inf_nan": 5,
+  "dropped_family_conflicts": 44005,
+  "family_conflict_detail": {
+    "by_family_combination": {
+      "Benign | PortScan": {
+        "rows_dropped": 43890,
+        "n_groups": 756
+      },
+      "Bot | Infiltration": {
+        "rows_dropped": 115,
+        "n_groups": 15
+      }
+    },
+    "rows_dropped_per_family": {
+      "PortScan": 39978,
+      "Benign": 3912,
+      "Bot": 100,
+      "Infiltration": 15
+    }
+  },
+  "dropped_cross_file_dupes": 142464,
+  "rows_sharing_a_feature_vector": 213752,
+  "rows_sharing_a_feature_vector_by_family": {
+    "PortScan": 181668,
+    "Benign": 28531,
+    "Bot": 3545,
+    "DoS": 8
+  },
+  "n_end": 1913502,
+  "n_dropped_total": 186474,
+  "pct_dropped": 8.8798,
+  "family_counts_post_clean": {
+    "Benign": 1440899,
+    "PortScan": 186160,
+    "DoS": 177491,
+    "DDoS": 95144,
+    "BruteForce": 6972,
+    "Bot": 4703,
+    "WebAttack": 2056,
+    "Infiltration": 66,
+    "Heartbleed": 11
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "_note": "Parameter payload only. Excludes protocol overhead, serialization, TLS, and real network effects. Single-machine simulation makes no wall-clock or straggler claims.",
+  "model": {
+    "architecture": [128, 64],
+    "n_parameters": 19849,
+    "dtype": "float32",
+    "bytes_per_parameter": 4,
+    "model_size_kb": 77.5
+  },
+  "federation": {
+    "n_silos": 10,
+    "n_rounds": 20,
+    "directions_per_round": 2,
+    "_directions_note": "server->client broadcast + client->server upload"
+  },
+  "cost": {
+    "per_silo_per_round_kb": 155.1,
+    "per_round_all_silos_mb": 1.51,
+    "full_run_mb": 30.3
+  },
+  "architecture_comparison": {
+    "_note": "All six architecture-pilot arms fell within 0.0008 validation macro-F1 of each other, so parameter count was the operative tiebreaker. See results/pilots/architecture_comparison.csv.",
+    "h128_64_selected": {"n_parameters": 19849, "full_run_mb": 30.3, "ratio": 1.0},
+    "h256_128": {"n_parameters": 56073, "full_run_mb": 85.6, "ratio": 2.8},
+    "h512_256_128": {"n_parameters": 209673, "full_run_mb": 320.0, "ratio": 10.6}
+  }
+}

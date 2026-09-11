@@ -1,0 +1,466 @@
+{
+  "a0.1_s42": {
+    "train": {
+      "rows_per_silo": [
+        165471,
+        2255,
+        636676,
+        3206,
+        7431,
+        42077,
+        37491,
+        98394,
+        441982,
+        143
+      ],
+      "min_silo": 143,
+      "max_silo": 636676,
+      "empty_silos": [],
+      "silos_below_threshold": [
+        9
+      ]
+    },
+    "test": {
+      "rows_per_silo": [
+        14248,
+        17887,
+        16844,
+        973,
+        10859,
+        2,
+        348292,
+        37877,
+        253,
+        31141
+      ],
+      "min_silo": 2,
+      "max_silo": 348292,
+      "empty_silos": [],
+      "silos_below_threshold": [
+        5,
+        8
+      ]
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      4,
+      5,
+      4,
+      5,
+      7,
+      4,
+      3,
+      6,
+      5,
+      9
+    ]
+  },
+  "a0.1_s1337": {
+    "train": {
+      "rows_per_silo": [
+        1067059,
+        2783,
+        2700,
+        7882,
+        16633,
+        25753,
+        97261,
+        16606,
+        836,
+        197613
+      ],
+      "min_silo": 836,
+      "max_silo": 1067059,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        36829,
+        92361,
+        2779,
+        6827,
+        6486,
+        69110,
+        30634,
+        206954,
+        5749,
+        20647
+      ],
+      "min_silo": 2779,
+      "max_silo": 206954,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      5,
+      5,
+      4,
+      8,
+      7,
+      6,
+      6,
+      7,
+      4,
+      9
+    ]
+  },
+  "a0.1_s2024": {
+    "train": {
+      "rows_per_silo": [
+        45875,
+        41999,
+        48284,
+        88802,
+        73359,
+        9092,
+        1039415,
+        34820,
+        1047,
+        52433
+      ],
+      "min_silo": 1047,
+      "max_silo": 1039415,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        3163,
+        109442,
+        35045,
+        142450,
+        23781,
+        4022,
+        118552,
+        26564,
+        1670,
+        13687
+      ],
+      "min_silo": 1670,
+      "max_silo": 142450,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      5,
+      7,
+      6,
+      3,
+      8,
+      4,
+      6,
+      7,
+      4,
+      9
+    ]
+  },
+  "a0.5_s42": {
+    "train": {
+      "rows_per_silo": [
+        97946,
+        48120,
+        434099,
+        43187,
+        58832,
+        23887,
+        141524,
+        330232,
+        91779,
+        165520
+      ],
+      "min_silo": 23887,
+      "max_silo": 434099,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        19316,
+        58138,
+        29365,
+        16053,
+        54770,
+        1728,
+        218092,
+        24635,
+        6150,
+        50129
+      ],
+      "min_silo": 1728,
+      "max_silo": 218092,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      8,
+      8,
+      9,
+      7,
+      8,
+      8,
+      9,
+      9,
+      8,
+      9
+    ]
+  },
+  "a0.5_s1337": {
+    "train": {
+      "rows_per_silo": [
+        467487,
+        50226,
+        29431,
+        147017,
+        18903,
+        66585,
+        99738,
+        70015,
+        149955,
+        335769
+      ],
+      "min_silo": 18903,
+      "max_silo": 467487,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        61999,
+        90370,
+        23812,
+        12463,
+        13144,
+        94304,
+        11833,
+        104268,
+        32710,
+        33473
+      ],
+      "min_silo": 11833,
+      "max_silo": 104268,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      7,
+      8,
+      8,
+      9,
+      7,
+      8,
+      7,
+      8,
+      9,
+      9
+    ]
+  },
+  "a0.5_s2024": {
+    "train": {
+      "rows_per_silo": [
+        149967,
+        172505,
+        129215,
+        101847,
+        155094,
+        108594,
+        182953,
+        99600,
+        325442,
+        9909
+      ],
+      "min_silo": 9909,
+      "max_silo": 325442,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        6392,
+        82493,
+        17307,
+        105010,
+        41052,
+        25477,
+        89325,
+        55920,
+        8282,
+        47118
+      ],
+      "min_silo": 6392,
+      "max_silo": 105010,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      8,
+      9,
+      8,
+      8,
+      8,
+      7,
+      9,
+      9,
+      7,
+      9
+    ]
+  },
+  "a5.0_s42": {
+    "train": {
+      "rows_per_silo": [
+        108237,
+        113710,
+        129397,
+        142345,
+        260826,
+        132788,
+        142250,
+        82129,
+        230339,
+        93105
+      ],
+      "min_silo": 82129,
+      "max_silo": 260826,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        48157,
+        24478,
+        34772,
+        33975,
+        33897,
+        91411,
+        56216,
+        33882,
+        67666,
+        53922
+      ],
+      "min_silo": 24478,
+      "max_silo": 91411,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      8,
+      9,
+      8,
+      9,
+      9,
+      9,
+      9,
+      8,
+      9,
+      9
+    ]
+  },
+  "a5.0_s1337": {
+    "train": {
+      "rows_per_silo": [
+        144625,
+        105728,
+        147751,
+        160190,
+        198669,
+        147299,
+        125196,
+        162553,
+        113208,
+        129907
+      ],
+      "min_silo": 105728,
+      "max_silo": 198669,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        47457,
+        36296,
+        52259,
+        47955,
+        60746,
+        63562,
+        34275,
+        37084,
+        69888,
+        28854
+      ],
+      "min_silo": 28854,
+      "max_silo": 69888,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      9,
+      9,
+      8,
+      9,
+      9,
+      8,
+      9,
+      9,
+      9,
+      9
+    ]
+  },
+  "a5.0_s2024": {
+    "train": {
+      "rows_per_silo": [
+        301686,
+        159956,
+        153145,
+        146584,
+        98024,
+        98099,
+        157181,
+        152309,
+        89047,
+        79095
+      ],
+      "min_silo": 79095,
+      "max_silo": 301686,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "test": {
+      "rows_per_silo": [
+        38864,
+        67493,
+        43311,
+        55936,
+        48192,
+        33761,
+        30576,
+        57408,
+        60871,
+        41964
+      ],
+      "min_silo": 30576,
+      "max_silo": 67493,
+      "empty_silos": [],
+      "silos_below_threshold": []
+    },
+    "single_class_silos": [],
+    "classes_per_silo": [
+      8,
+      9,
+      9,
+      9,
+      9,
+      8,
+      9,
+      9,
+      9,
+      9
+    ]
+  }
+}

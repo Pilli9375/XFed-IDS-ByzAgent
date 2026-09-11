@@ -1,0 +1,71 @@
+{
+  "scaler": "standard",
+  "n_probe_requested": 3000,
+  "min_per_class": 250,
+  "seed": 42,
+  "per_family": {
+    "Benign": {
+      "n_probe": 2259,
+      "median_test_nn_distance": 0.0013810679083690047,
+      "median_train_internal_nn_distance": 0.0013810679083690047,
+      "ratio": 1.0,
+      "frac_test_below_train_median": 0.46038069942452414
+    },
+    "Bot": {
+      "n_probe": 250,
+      "median_test_nn_distance": 0.0,
+      "median_train_internal_nn_distance": 0.0,
+      "ratio": Infinity,
+      "frac_test_below_train_median": 0.0
+    },
+    "BruteForce": {
+      "n_probe": 250,
+      "median_test_nn_distance": 0.003780106082558632,
+      "median_train_internal_nn_distance": 0.00390625,
+      "ratio": 0.9677071571350098,
+      "frac_test_below_train_median": 0.5
+    },
+    "DDoS": {
+      "n_probe": 250,
+      "median_test_nn_distance": 0.016105880960822105,
+      "median_train_internal_nn_distance": 0.017575109377503395,
+      "ratio": 0.9164028863136442,
+      "frac_test_below_train_median": 0.52
+    },
+    "DoS": {
+      "n_probe": 278,
+      "median_test_nn_distance": 0.015001699328422546,
+      "median_train_internal_nn_distance": 0.015191618353128433,
+      "ratio": 0.987498433656558,
+      "frac_test_below_train_median": 0.5035971223021583
+    },
+    "Heartbleed": {
+      "n_probe": 3,
+      "median_test_nn_distance": 2.241438865661621,
+      "median_train_internal_nn_distance": 1.6340268850326538,
+      "ratio": 1.3717270420656689,
+      "frac_test_below_train_median": 0.3333333333333333
+    },
+    "Infiltration": {
+      "n_probe": 16,
+      "median_test_nn_distance": 2.1942129135131836,
+      "median_train_internal_nn_distance": 1.4846113920211792,
+      "ratio": 1.4779712221700918,
+      "frac_test_below_train_median": 0.375
+    },
+    "PortScan": {
+      "n_probe": 292,
+      "median_test_nn_distance": 0.04555431008338928,
+      "median_train_internal_nn_distance": 0.001953125,
+      "ratio": 23.323806762695312,
+      "frac_test_below_train_median": 0.05821917808219178
+    },
+    "WebAttack": {
+      "n_probe": 250,
+      "median_test_nn_distance": 0.0,
+      "median_train_internal_nn_distance": 0.0,
+      "ratio": Infinity,
+      "frac_test_below_train_median": 0.0
+    }
+  }
+}

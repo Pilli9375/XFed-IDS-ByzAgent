@@ -1,0 +1,149 @@
+[
+  {
+    "round": 0,
+    "val_macro_f1_headline": 0.13026924370163342,
+    "val_macro_f1_all": 0.1013205228790482,
+    "val_false_positive_rate": 0.9792165971110515,
+    "val_attack_recall": 0.9994921852959431
+  },
+  {
+    "round": 1,
+    "val_macro_f1_headline": 0.7647749089070859,
+    "val_macro_f1_all": 0.5948249291499557,
+    "val_false_positive_rate": 0.001674886875734498,
+    "val_attack_recall": 0.9750042317892005
+  },
+  {
+    "round": 2,
+    "val_macro_f1_headline": 0.8375895134818759,
+    "val_macro_f1_all": 0.707014066041459,
+    "val_false_positive_rate": 0.0017766755808896332,
+    "val_attack_recall": 0.9901822490549004
+  },
+  {
+    "round": 3,
+    "val_macro_f1_headline": 0.8501925100424454,
+    "val_macro_f1_all": 0.7168163966996799,
+    "val_false_positive_rate": 0.0018136896554915005,
+    "val_attack_recall": 0.9929188060712069
+  },
+  {
+    "round": 4,
+    "val_macro_f1_headline": 0.8503637032669467,
+    "val_macro_f1_all": 0.8280606580965141,
+    "val_false_positive_rate": 0.0017489150249382327,
+    "val_attack_recall": 0.993454832703267
+  },
+  {
+    "round": 5,
+    "val_macro_f1_headline": 0.8504728942753724,
+    "val_macro_f1_all": 0.8009124689679912,
+    "val_false_positive_rate": 0.0017581685435886995,
+    "val_attack_recall": 0.9940754951193365
+  },
+  {
+    "round": 6,
+    "val_macro_f1_headline": 0.8645344695129564,
+    "val_macro_f1_all": 0.795872488633534,
+    "val_false_positive_rate": 0.0017026474316858985,
+    "val_attack_recall": 0.9942447666873554
+  },
+  {
+    "round": 7,
+    "val_macro_f1_headline": 0.8647006368622093,
+    "val_macro_f1_all": 0.8050985460195351,
+    "val_false_positive_rate": 0.001665633357084031,
+    "val_attack_recall": 0.9944704621113807
+  },
+  {
+    "round": 8,
+    "val_macro_f1_headline": 0.9873201996792274,
+    "val_macro_f1_all": 0.8975453404912511,
+    "val_false_positive_rate": 0.0016841403943849648,
+    "val_attack_recall": 0.9982790723918072
+  },
+  {
+    "round": 9,
+    "val_macro_f1_headline": 0.9837626119540782,
+    "val_macro_f1_all": 0.9045822493847623,
+    "val_false_positive_rate": 0.0018136896554915005,
+    "val_attack_recall": 0.9985329797438357
+  },
+  {
+    "round": 10,
+    "val_macro_f1_headline": 0.9838630998847083,
+    "val_macro_f1_all": 0.897780461703701,
+    "val_false_positive_rate": 0.0017859290995401,
+    "val_attack_recall": 0.9986458274558483
+  },
+  {
+    "round": 11,
+    "val_macro_f1_headline": 0.9889262487435486,
+    "val_macro_f1_all": 0.9173130082820191,
+    "val_false_positive_rate": 0.0016193657638316971,
+    "val_attack_recall": 0.998589403599842
+  },
+  {
+    "round": 12,
+    "val_macro_f1_headline": 0.9889228500534236,
+    "val_macro_f1_all": 0.9049646858440208,
+    "val_false_positive_rate": 0.0015916052078802966,
+    "val_attack_recall": 0.9985611916718389
+  },
+  {
+    "round": 13,
+    "val_macro_f1_headline": 0.9892959654593041,
+    "val_macro_f1_all": 0.9020060238172756,
+    "val_false_positive_rate": 0.0016008587265307634,
+    "val_attack_recall": 0.998758675167861
+  },
+  {
+    "round": 14,
+    "val_macro_f1_headline": 0.9888843677951643,
+    "val_macro_f1_all": 0.9085658372611625,
+    "val_false_positive_rate": 0.001563844651928896,
+    "val_attack_recall": 0.9987304632398578
+  },
+  {
+    "round": 15,
+    "val_macro_f1_headline": 0.8709279461690015,
+    "val_macro_f1_all": 0.7941975193850068,
+    "val_false_positive_rate": 0.0009068448277457503,
+    "val_attack_recall": 0.9946679456074028
+  },
+  {
+    "round": 16,
+    "val_macro_f1_headline": 0.8714979957548942,
+    "val_macro_f1_all": 0.863016959661214,
+    "val_false_positive_rate": 0.0008513237158429492,
+    "val_attack_recall": 0.9948936410314281
+  },
+  {
+    "round": 17,
+    "val_macro_f1_headline": 0.8714250997035622,
+    "val_macro_f1_all": 0.8506145837200545,
+    "val_false_positive_rate": 0.0008883377904448166,
+    "val_attack_recall": 0.9949218529594313
+  },
+  {
+    "round": 18,
+    "val_macro_f1_headline": 0.9897689347281103,
+    "val_macro_f1_all": 0.9023738888041248,
+    "val_false_positive_rate": 0.0008790842717943498,
+    "val_attack_recall": 0.9988997348078767
+  },
+  {
+    "round": 19,
+    "val_macro_f1_headline": 0.8714357556212201,
+    "val_macro_f1_all": 0.8047674924672983,
+    "val_false_positive_rate": 0.0008790842717943498,
+    "val_attack_recall": 0.9948936410314281
+  },
+  {
+    "round": 20,
+    "val_macro_f1_headline": 0.8713391157386274,
+    "val_macro_f1_all": 0.8372523606742032,
+    "val_false_positive_rate": 0.0008420701971924824,
+    "val_attack_recall": 0.9948654291034249
+  }
+]

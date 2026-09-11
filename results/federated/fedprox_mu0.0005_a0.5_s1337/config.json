@@ -1,0 +1,9 @@
+{
+  "alpha": "0.5",
+  "seed": 1337,
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "mu": 0.0005,
+  "fraction_train": 1.0,
+  "fraction_evaluate": 1.0
+}

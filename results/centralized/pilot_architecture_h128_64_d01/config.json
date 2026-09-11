@@ -1,0 +1,95 @@
+{
+  "tag": "pilot_architecture_h128_64_d01",
+  "seed": 42,
+  "git_commit": "unknown",
+  "device": "cuda",
+  "elapsed_seconds": 51.0,
+  "subsampled_to": null,
+  "model_config": {
+    "labels": {
+      "vocabulary": {
+        "Benign": 0,
+        "Bot": 1,
+        "BruteForce": 2,
+        "DDoS": 3,
+        "DoS": 4,
+        "Heartbleed": 5,
+        "Infiltration": 6,
+        "PortScan": 7,
+        "WebAttack": 8
+      },
+      "n_classes": 9,
+      "headline_classes": [
+        "Benign",
+        "Bot",
+        "BruteForce",
+        "DDoS",
+        "DoS",
+        "PortScan",
+        "WebAttack"
+      ],
+      "below_floor_classes": [
+        "Heartbleed",
+        "Infiltration"
+      ]
+    },
+    "splits": {
+      "val_seed": 42,
+      "val_fraction": 0.1,
+      "val_mask_path": "data/processed/val_mask.parquet",
+      "hold_out_val_in_federated": true
+    },
+    "model": {
+      "input_dim": 82,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "activation": "relu",
+      "norm": "layernorm",
+      "dropout": 0.1
+    },
+    "training": {
+      "optimizer": "adamw",
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 1024,
+      "max_epochs": 20,
+      "early_stopping": {
+        "monitor": "val_macro_f1_headline",
+        "patience": 5,
+        "mode": "max"
+      },
+      "lr_schedule": {
+        "kind": "reduce_on_plateau",
+        "monitor": "val_macro_f1_headline",
+        "factor": 0.5,
+        "patience": 3
+      },
+      "class_weighting": {
+        "scheme": "effective_number",
+        "beta": 0.999
+      },
+      "seeds": [
+        42,
+        1337,
+        2024
+      ]
+    },
+    "preprocessing": {
+      "scaler": "standard",
+      "clip_percentiles": [
+        0.1,
+        99.9
+      ],
+      "fit_scope_centralized": "train_split",
+      "fit_scope_federated": "per_silo_train",
+      "assert_no_silent_unit_scale": true
+    },
+    "output": {
+      "results_dir": "results/",
+      "save_per_class_metrics": true,
+      "save_scaler_params": true
+    }
+  }
+}

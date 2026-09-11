@@ -1,0 +1,11 @@
+{
+  "alpha": "0.5",
+  "seed": 42,
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "mu": 0.0,
+  "fraction_train": 1.0,
+  "fraction_evaluate": 1.0,
+  "defense_strategy": "multikrum",
+  "num_malicious_nodes_oracle": 3
+}

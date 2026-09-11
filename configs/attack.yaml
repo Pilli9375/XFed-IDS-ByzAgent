@@ -1,0 +1,143 @@
+# configs/attack.yaml
+# ByzAgent -- Contribution B. Label-flip poisoning attack for the federated
+# pipeline in src/federated/. Deliberately a SEPARATE file from
+# configs/model.yaml: Contribution B stays visibly distinct from Contribution
+# A (the clean federated baseline) in repo, slides, and report.
+#
+# Read by src/attacks/label_flip.py. Consumed from src/federated/client_app.py
+# with zero effect on the existing pipeline when enabled: false -- that branch
+# is not entered at all, so every locked Contribution A result
+# (results/aggregated/federated_headline.csv etc.) is reproducible byte-for-
+# byte regardless of this file's contents.
+
+attack:
+  enabled: false
+
+  # Number of malicious silos out of n_silos (10). A config parameter, never
+  # hardcoded. f=3 primary (LOCKED, Phase 0 PASS: malicious_silos [0,3,5],
+  # see below) -- RESTING STATE below. f=2 secondary was run once (Phase 0
+  # close-out item 1, malicious_silos [0,3]); see attack_val_summary.json
+  # under results/federated/fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3/ and
+  # results/attacks/a0.5_s42_f2_sudden_silos0-3/ for that run's full record.
+  # To re-run f=2, swap the values below back to f=2 / [0,3] deliberately --
+  # do not leave this file mid-swap between runs.
+  f: 3
+
+  # SEPARATE from the partition seed (configs/data.yaml seed / the alpha/seed
+  # pair that drove the Dirichlet draw and therefore silo sizes). Reusing the
+  # partition seed here would couple "which silos are attacked" to "which
+  # silos are big", making attack strength and silo selection confounded.
+  # Used only as a fallback when malicious_silos below is empty -- see
+  # resolve_malicious_silos() in src/attacks/label_flip.py.
+  attack_seed: 9001
+
+  # EXPLICIT resolved list -- the record of truth. Never derived at call time
+  # for a reported run: Dirichlet partitioning makes silo size a deterministic
+  # side effect of the label draw, and FedAvg weights updates by sample count,
+  # so WHICH silos are malicious determines whether the attack has any
+  # measurable effect at all. Picking this by hand (or via the helper below,
+  # then freezing the result here) is mandatory, not a convenience default.
+  #
+  # RETIRED selection rule (size-representative-by-total-rows: silos [0,1,9])
+  # sized a targeted attack-family->Benign flip against total row mass, but
+  # the flip only ever touches non-Benign rows. Silo 1 was 90.8% Benign --
+  # poisoning it barely moved anything. Result: only 13.98% of the
+  # federation's actual attack-class rows were ever flipped, concentrated in
+  # 3 of 6 attack families (PortScan/BruteForce/DDoS); DoS/Bot/WebAttack lost
+  # under 5% each. Headline macro-F1 (paired same-seed) barely moved:
+  # 0.97597 -> 0.97103. See results/inspection/attack_row_flip_diagnostic_*.
+  #
+  # CURRENT list [0, 3, 5] -- selected by enumerating ALL C(10,3)=120 triples
+  # at alpha=0.5, seed=42 against the GLOBAL per-silo family composition
+  # (results/inspection/silo_family_composition_a0.5_s42.csv), maximizing the
+  # MINIMUM per-family coverage across the 6 non-Benign headline families at
+  # flip_fraction=1.0. {0,3,5} achieves min coverage 38.60% (DoS), full
+  # vector: Bot 57.6% / BruteForce 42.1% / DDoS 51.8% / DoS 38.6% /
+  # PortScan 44.7% / WebAttack 49.2%. See results/inspection/frontier_f3_a0.5_s42.csv
+  # for all 120 triples ranked.
+  #
+  # MANDATORY FRAMING -- carry into every log, artifact, and write-up:
+  # {0,3,5} is a WORST-CASE / UPPER-BOUND ADVERSARY WITH FULL KNOWLEDGE OF
+  # FEDERATION COMPOSITION, not a realistic or naturalistic attacker -- no
+  # real attacker enumerates all C(10,3) triples against ground-truth global
+  # family composition before choosing a target. This framing is correct for
+  # ByzAgent: if rolling-history detection cannot catch the strongest
+  # feasible attacker, it cannot catch weaker ones. NEVER present {0,3,5} as
+  # a realistic attack scenario. See `selection_note` below, which is copied
+  # verbatim into every run's attack_config.json artifact for exactly this
+  # reason -- self-documenting, not dependent on this comment surviving.
+  #
+  # This list is NOT valid for any other (alpha, seed) partition -- a
+  # different Dirichlet draw reshuffles which silo index holds which amount
+  # of data and which family. Re-derive and freeze a new list (re-run the
+  # frontier enumeration) before running a different (alpha, seed) config.
+  #
+  # f=3 LOCKED PRIMARY (Phase 0 PASS, signed off by 01_Planning):
+  #   malicious_silos: [0, 3, 5]
+  #
+  # f=2 SECONDARY (CURRENT, pre-registered spec, Phase 0 close-out item 1):
+  #   best worst-case PAIR from the f=2 frontier (results/inspection/
+  #   frontier_f2_a0.5_s42.csv): ceiling 16.73% min per-family coverage at
+  #   flip_fraction=1.0 (vs f=3's 38.60%) -- f=2 exists to de-confound
+  #   Krum's n>=2f+3 margin (at f=3, 9<=10, zero margin). Same worst-case /
+  #   full-knowledge-adversary framing and selection_note convention as
+  #   {0,3,5}. Pre-registered interpretation (locked BEFORE running, not
+  #   chosen after seeing the result): if f=2 shows a detectable signal on
+  #   final-5-mean comparable to the f=3 runs, f=2 becomes the PRIMARY
+  #   Krum-margin-clean evidence for Phase 4 and f=3 becomes secondary; if
+  #   f=2's signal is too weak to distinguish from noise, that IS the
+  #   result (empirical detection floor at f=2), f=3 stays primary, and the
+  #   Krum zero-margin confound is disclosed explicitly in the write-up.
+  malicious_silos: [0, 3, 5]
+
+  # Copied verbatim into every run's results/attacks/{tag}/attack_config.json
+  # so the adversary framing survives independently of this file's comments.
+  selection_note: >-
+    Worst-case/upper-bound adversary with full knowledge of federation
+    composition. Selected by enumerating all C(10,3)=120 malicious-silo
+    triples at alpha=0.5 seed=42 against the global per-silo family
+    composition and maximizing the minimum per-family coverage across the 6
+    non-Benign headline families at flip_fraction=1.0 (achieved: 38.60% min,
+    on DoS). NOT a realistic or naturalistic attacker -- no real attacker has
+    this global view. Retired rule: size-representative-by-total-training-rows
+    (silos [0,1,9]), which achieved only 13.98% federation-wide attack-row
+    coverage because it sized against a denominator the targeted flip does
+    not modify (Benign rows). LOCKED PRIMARY, Phase 0 PASS, signed off by
+    01_Planning. f=2 secondary condition ([0,3], ceiling 16.73%) was run
+    once as Phase 0 close-out item 1 -- see
+    results/federated/fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3/.
+
+  # "sudden": flip_fraction fixed from round 1.
+  # "gradual": flip_fraction ramps linearly, see `gradual` below.
+  mode: sudden
+
+  sudden:
+    flip_fraction: 0.40
+
+  gradual:
+    start_fraction: 0.05
+    increment_per_round: 0.05
+    max_fraction: 1.0
+
+  # "targeted_to_benign": the real IDS threat model -- hide attacks from the
+  #   detector by relabeling them Benign. flip_fraction is applied to the
+  #   ELIGIBLE population (this silo's training rows whose true family is NOT
+  #   the target class), not to all rows -- flipping an already-Benign row to
+  #   Benign is a no-op and would make flip_fraction mean something different
+  #   in every silo depending on its (Dirichlet-skewed) Benign share.
+  # "random_permutation": alternative strategy, config-swappable. Applied to
+  #   all training rows; each selected row's label is reassigned to a
+  #   uniformly random DIFFERENT class among all n_classes.
+  strategy: targeted_to_benign
+
+  targeted_to_benign:
+    target_class: Benign
+
+  random_permutation: {}
+
+  # Per-round, per-silo audit log. See append_flip_log() in
+  # src/attacks/label_flip.py. Path: results/attacks/{tag}/flip_log.csv,
+  # tag = a{alpha}_s{seed}_f{f}_{mode} (constructed in client_app.py, not
+  # read from here -- it depends on the run's alpha/seed, not this file).
+  log:
+    results_dir: results/attacks

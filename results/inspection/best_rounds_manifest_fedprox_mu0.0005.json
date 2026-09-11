@@ -1,0 +1,191 @@
+[
+  {
+    "alpha": "0.1",
+    "seed": 42,
+    "tag": "fedprox_mu0.0005_a0.1_s42",
+    "best_round": 19,
+    "best_val_macro_f1_headline": 0.5422655864160225,
+    "test_macro_f1_headline": 0.5526014551373383,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.1_s42\\round_checkpoints\\round_019.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s42\\silo_checkpoints\\round_019_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.1",
+    "seed": 1337,
+    "tag": "fedprox_mu0.0005_a0.1_s1337",
+    "best_round": 9,
+    "best_val_macro_f1_headline": 0.44565645353659894,
+    "test_macro_f1_headline": 0.4201633487567592,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\round_checkpoints\\round_009.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s1337\\silo_checkpoints\\round_009_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.1",
+    "seed": 2024,
+    "tag": "fedprox_mu0.0005_a0.1_s2024",
+    "best_round": 19,
+    "best_val_macro_f1_headline": 0.5826094039880269,
+    "test_macro_f1_headline": 0.6265415382943688,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\round_checkpoints\\round_019.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.1_s2024\\silo_checkpoints\\round_019_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 42,
+    "tag": "fedprox_mu0.0005_a0.5_s42",
+    "best_round": 17,
+    "best_val_macro_f1_headline": 0.9787083799563081,
+    "test_macro_f1_headline": 0.9794365800970394,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.5_s42\\round_checkpoints\\round_017.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s42\\silo_checkpoints\\round_017_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 1337,
+    "tag": "fedprox_mu0.0005_a0.5_s1337",
+    "best_round": 20,
+    "best_val_macro_f1_headline": 0.98838261640652,
+    "test_macro_f1_headline": 0.9846451244669047,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\round_checkpoints\\round_020.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s1337\\silo_checkpoints\\round_020_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "0.5",
+    "seed": 2024,
+    "tag": "fedprox_mu0.0005_a0.5_s2024",
+    "best_round": 19,
+    "best_val_macro_f1_headline": 0.8599385030027548,
+    "test_macro_f1_headline": 0.8590664014787616,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\round_checkpoints\\round_019.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a0.5_s2024\\silo_checkpoints\\round_019_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 42,
+    "tag": "fedprox_mu0.0005_a5.0_s42",
+    "best_round": 16,
+    "best_val_macro_f1_headline": 0.9894632823210727,
+    "test_macro_f1_headline": 0.9888666540514226,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a5.0_s42\\round_checkpoints\\round_016.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s42\\silo_checkpoints\\round_016_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 1337,
+    "tag": "fedprox_mu0.0005_a5.0_s1337",
+    "best_round": 18,
+    "best_val_macro_f1_headline": 0.9889656828782162,
+    "test_macro_f1_headline": 0.9889988276828615,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\round_checkpoints\\round_018.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s1337\\silo_checkpoints\\round_018_silo_9.pt"
+    ]
+  },
+  {
+    "alpha": "5.0",
+    "seed": 2024,
+    "tag": "fedprox_mu0.0005_a5.0_s2024",
+    "best_round": 18,
+    "best_val_macro_f1_headline": 0.991792518175443,
+    "test_macro_f1_headline": 0.9918519658758228,
+    "global_checkpoint": "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\round_checkpoints\\round_018.pt",
+    "silo_checkpoints": [
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_0.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_1.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_2.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_3.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_4.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_5.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_6.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_7.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_8.pt",
+      "results\\federated\\fedprox_mu0.0005_a5.0_s2024\\silo_checkpoints\\round_018_silo_9.pt"
+    ]
+  }
+]

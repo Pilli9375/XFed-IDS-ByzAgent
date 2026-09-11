@@ -1,0 +1,218 @@
+{
+  "by_mode": {
+    "current_round": {
+      "n_explanations": 600,
+      "citation_frequency_count": {
+        "update_norm": 480,
+        "cosine_to_global": 529,
+        "cosine_to_peer_mean": 30,
+        "train_loss": 188,
+        "val_accuracy": 317
+      },
+      "citation_frequency_rate": {
+        "update_norm": 0.8,
+        "cosine_to_global": 0.8817,
+        "cosine_to_peer_mean": 0.05,
+        "train_loss": 0.3133,
+        "val_accuracy": 0.5283
+      },
+      "citation_accuracy": {
+        "n_citations_extracted": 1417,
+        "loose_overall_error_rate": 0.1793,
+        "strict_overall_error_rate_excl_ambiguous": 0.1413,
+        "strict_ambiguous_fraction": 0.1362,
+        "by_stat": {
+          "update_norm": {
+            "n": 480,
+            "loose_error_rate": 0.3,
+            "strict_error_rate_excl_ambiguous": 0.2768,
+            "strict_ambiguous_fraction": 0.1646
+          },
+          "cosine_to_global": {
+            "n": 516,
+            "loose_error_rate": 0.0814,
+            "strict_error_rate_excl_ambiguous": 0.0521,
+            "strict_ambiguous_fraction": 0.0698
+          },
+          "cosine_to_peer_mean": {
+            "n": 11,
+            "loose_error_rate": 0.5455,
+            "strict_error_rate_excl_ambiguous": 0.6,
+            "strict_ambiguous_fraction": 0.0909
+          },
+          "train_loss": {
+            "n": 187,
+            "loose_error_rate": 0.1979,
+            "strict_error_rate_excl_ambiguous": 0.1071,
+            "strict_ambiguous_fraction": 0.2513
+          },
+          "val_accuracy": {
+            "n": 223,
+            "loose_error_rate": 0.1121,
+            "strict_error_rate_excl_ambiguous": 0.0829,
+            "strict_ambiguous_fraction": 0.1345
+          }
+        }
+      },
+      "decision_stat_correlation": {
+        "update_norm": {
+          "spearman_rho": 0.3998,
+          "p_value": 1.942834026698307e-24,
+          "n": 600
+        },
+        "cosine_to_global": {
+          "spearman_rho": -0.7789,
+          "p_value": 2.6753089320926982e-123,
+          "n": 600
+        },
+        "cosine_to_peer_mean": {
+          "spearman_rho": 0.2686,
+          "p_value": 2.229228568786258e-11,
+          "n": 600
+        },
+        "train_loss": {
+          "spearman_rho": 0.751,
+          "p_value": 6.935476190491997e-110,
+          "n": 600
+        },
+        "val_accuracy": {
+          "spearman_rho": -0.7265,
+          "p_value": 1.6398433076910375e-99,
+          "n": 600
+        }
+      }
+    },
+    "rolling_history": {
+      "n_explanations": 600,
+      "citation_frequency_count": {
+        "update_norm": 570,
+        "cosine_to_global": 453,
+        "cosine_to_peer_mean": 148,
+        "train_loss": 134,
+        "val_accuracy": 453
+      },
+      "citation_frequency_rate": {
+        "update_norm": 0.95,
+        "cosine_to_global": 0.755,
+        "cosine_to_peer_mean": 0.2467,
+        "train_loss": 0.2233,
+        "val_accuracy": 0.755
+      },
+      "citation_accuracy": {
+        "n_citations_extracted": 200,
+        "loose_overall_error_rate": 0.23,
+        "strict_overall_error_rate_excl_ambiguous": 0.1677,
+        "strict_ambiguous_fraction": 0.165,
+        "by_stat": {
+          "update_norm": {
+            "n": 76,
+            "loose_error_rate": 0.1974,
+            "strict_error_rate_excl_ambiguous": 0.0645,
+            "strict_ambiguous_fraction": 0.1842
+          },
+          "cosine_to_global": {
+            "n": 77,
+            "loose_error_rate": 0.2468,
+            "strict_error_rate_excl_ambiguous": 0.2273,
+            "strict_ambiguous_fraction": 0.1429
+          },
+          "cosine_to_peer_mean": {
+            "n": 10,
+            "loose_error_rate": 0.3,
+            "strict_error_rate_excl_ambiguous": 0.2857,
+            "strict_ambiguous_fraction": 0.3
+          },
+          "train_loss": {
+            "n": 19,
+            "loose_error_rate": 0.3158,
+            "strict_error_rate_excl_ambiguous": 0.2941,
+            "strict_ambiguous_fraction": 0.1053
+          },
+          "val_accuracy": {
+            "n": 18,
+            "loose_error_rate": 0.1667,
+            "strict_error_rate_excl_ambiguous": 0.1333,
+            "strict_ambiguous_fraction": 0.1667
+          }
+        }
+      },
+      "decision_stat_correlation": {
+        "update_norm": {
+          "spearman_rho": 0.4893,
+          "p_value": 1.9317671331763836e-37,
+          "n": 600
+        },
+        "cosine_to_global": {
+          "spearman_rho": -0.2091,
+          "p_value": 2.3456524860003563e-07,
+          "n": 600
+        },
+        "cosine_to_peer_mean": {
+          "spearman_rho": 0.2535,
+          "p_value": 2.9762009793242497e-10,
+          "n": 600
+        },
+        "train_loss": {
+          "spearman_rho": 0.2105,
+          "p_value": 1.9537353295544216e-07,
+          "n": 600
+        },
+        "val_accuracy": {
+          "spearman_rho": -0.225,
+          "p_value": 2.509940143657647e-08,
+          "n": 600
+        }
+      }
+    }
+  },
+  "trend_language_check": {
+    "method_note": "Rolling-history explanations only. For each stat the explanation mentions with a trend word (increasing/decreasing/stable-family) within 90 chars, the CITED direction is compared against the ACTUAL direction computed from the sequence itself (endpoint comparison: stable if |last-first| <= 5% relative tolerance, else sign of last-first -- a simple rule, not a regression fit, documented as such). Claims where the two nearest trend words disagree (ambiguous attribution) are skipped, not guessed. insufficient_history = the claim was made when window_size < 2, i.e. the round genuinely had no prior data to form a trend from -- a spurious/hallucinated trend claim if it occurs.",
+    "n_trend_claims_total": 920,
+    "n_scoreable_window_ge_2": 920,
+    "n_insufficient_history_window_lt_2": 0,
+    "overall_error_rate": 0.45,
+    "by_stat": {
+      "update_norm": {
+        "n": 335,
+        "error_rate": 0.3224
+      },
+      "cosine_to_global": {
+        "n": 223,
+        "error_rate": 0.5605
+      },
+      "cosine_to_peer_mean": {
+        "n": 96,
+        "error_rate": 0.6042
+      },
+      "train_loss": {
+        "n": 67,
+        "error_rate": 0.6269
+      },
+      "val_accuracy": {
+        "n": 199,
+        "error_rate": 0.407
+      }
+    },
+    "insufficient_history_examples": []
+  },
+  "comparison_to_phase3_published": {
+    "caveat": "Phase 3's published pooled numbers were computed over {clean, f3_{0,3,5}, f2_{0,3}}; this replay's pooled numbers are computed over {clean, sudden_{0,3,5}, gradual_{0,3,5}} -- sudden_{0,3,5} is the identical condition to Phase 3's f3_{0,3,5}, but f2_{0,3} is replaced by gradual_{0,3,5} here, so the two pooled numbers are not from an identical condition set. current_round mode's numbers below are this replay's OWN fresh current_round pass (same prompt/model as Phase 3, new sample) -- the cleanest same-conditions-modulo-f2-vs-gradual comparison point for rolling_history is against THIS replay's own current_round column, not directly against Phase 3's on-disk numbers.",
+    "phase3_published": {
+      "citation_accuracy_strict_overall_error_rate": 0.117,
+      "citation_accuracy_strict_by_stat_error_rate": {
+        "update_norm": 0.251,
+        "cosine_to_global": 0.044,
+        "cosine_to_peer_mean": null,
+        "train_loss": 0.038,
+        "val_accuracy": 0.086
+      },
+      "decision_stat_correlation_spearman_rho": {
+        "cosine_to_global": -0.808,
+        "train_loss": 0.793,
+        "val_accuracy": -0.745,
+        "update_norm": 0.419,
+        "cosine_to_peer_mean": 0.298
+      }
+    }
+  }
+}

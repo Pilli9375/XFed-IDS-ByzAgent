@@ -1,0 +1,19 @@
+{
+  "tag": "fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5",
+  "alpha": "0.5",
+  "seed": 42,
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "mu": 0.0,
+  "attack": {
+    "f": 3,
+    "mode": "gradual",
+    "strategy": "targeted_to_benign"
+  },
+  "defense": {
+    "strategy": "fedavg",
+    "num_malicious_nodes_oracle": 0
+  },
+  "best_round": 14,
+  "best_val_macro_f1_headline": 0.9758123420425955
+}

@@ -1,0 +1,7 @@
+Label,count
+BENIGN,222500
+Portscan,157753
+Infiltration - Portscan,63747
+Botnet - Attempted,3645
+DoS Slowloris - Attempted,6
+DoS Hulk - Attempted,2

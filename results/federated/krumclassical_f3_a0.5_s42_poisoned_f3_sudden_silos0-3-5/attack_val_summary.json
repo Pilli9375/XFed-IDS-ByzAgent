@@ -1,0 +1,19 @@
+{
+  "tag": "krumclassical_f3_a0.5_s42_poisoned_f3_sudden_silos0-3-5",
+  "alpha": "0.5",
+  "seed": 42,
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "mu": 0.0,
+  "attack": {
+    "f": 3,
+    "mode": "sudden",
+    "strategy": "targeted_to_benign"
+  },
+  "defense": {
+    "strategy": "krum",
+    "num_malicious_nodes_oracle": 3
+  },
+  "best_round": 20,
+  "best_val_macro_f1_headline": 0.846580771832973
+}

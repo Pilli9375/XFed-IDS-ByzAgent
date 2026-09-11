@@ -1,0 +1,42 @@
+# pyproject.toml
+# Python package manifest for src/ (data/model/attack/monitoring code shared
+# across the project). NOT a Flower app manifest -- see below.
+#
+# THIS FILE DELIBERATELY CARRIES NO [tool.flwr.app] SECTION.
+#
+# It used to point `flwr run`'s default app target (bare `flwr run` /
+# `flwr run .` from repo root) at src/federated/, an early, much smaller
+# prototype harness (server_app.py/client_app.py) that never implements
+# best-by-validation checkpoint selection. Every number in results/ was
+# produced by the separate, independent Flower app in federated/ (invoked as
+# `flwr run federated local-simulation`, which resolves entirely through
+# federated/pyproject.toml -- see flwr.cli.run.run.run(): the `app` argument
+# is resolved to an absolute path and `pyproject.toml` is loaded from
+# THAT directory only, this file is never read for that invocation). Bare
+# `flwr run` silently running the incomplete src/federated/ harness and
+# producing numbers that look comparable to, but are not produced by, the
+# same selection logic as everything in results/ was a correctness landmine.
+#
+# Fix: the [tool.flwr.app] section was removed. A bare `flwr run` (or
+# `flwr run .`) from repo root now fails immediately with a `ValueError:
+# Invalid Flower App configuration` from flwr's own config validation,
+# instead of silently training against the wrong harness. src/federated/
+# itself is untouched -- it still exists, just no longer wired as any
+# Flower app's entry point.
+#
+# To run anything for real: `flwr run federated local-simulation`.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xfed-ids"
+version = "0.1.0"
+description = "XFed-IDS federated client/server apps"
+dependencies = [
+    "flwr[simulation]>=1.33.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

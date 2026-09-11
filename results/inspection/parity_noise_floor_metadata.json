@@ -1,0 +1,26 @@
+{
+  "generated_by": "tools/parity_noise_floor.py",
+  "purpose": "explainer-stochasticity noise floor for tools/parity_monitor.py's KNOWN GAP",
+  "slice": {
+    "alphas": [
+      "0.1",
+      "0.5",
+      "5.0"
+    ],
+    "seed": 1337,
+    "round": 5,
+    "note": "seed/round chosen because that is where parity_monitor.py's only two flags occurred (fedavg_a0.1_s1337, round 5, silos 6 and 8) -- not extended to other rounds/seeds in this pass"
+  },
+  "nsamples": 1000,
+  "rseed_draw_A": 1001,
+  "rseed_draw_B": 2002,
+  "method": "same checkpoint, same background, same eval rows for both draws; only GradientExplainer's internal rseed differs -- isolates explainer sampling noise from every other source of variation",
+  "reused_from_parity_monitor": [
+    "aggregate_topk_for_silo",
+    "jaccard_sets",
+    "leave_one_out_consensus",
+    "modified_z_flags",
+    "K"
+  ],
+  "n_rows": 30
+}

@@ -1,0 +1,40 @@
+{
+  "generated_by": "tools/parity_monitor.py (v2: multi-draw averaged, see module docstring)",
+  "scope": "full sweep (--all)",
+  "k": 10,
+  "n_draws": 3,
+  "rseeds": [
+    1001,
+    2002,
+    3003
+  ],
+  "nsamples": 1000,
+  "configs_run": [
+    "a0.1_s42",
+    "a0.1_s1337",
+    "a0.1_s2024",
+    "a0.5_s42",
+    "a0.5_s1337",
+    "a0.5_s2024",
+    "a5.0_s42",
+    "a5.0_s1337",
+    "a5.0_s2024"
+  ],
+  "rounds_run": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "n_eval_rows": 14,
+  "eligibility_filters": {
+    "T_SILO": 400,
+    "M_FAMILY": 20
+  },
+  "boundary_discipline": "only top-k (k=10) feature-index lists are used past the per-row aggregation step -- no SHAP magnitude, no raw data, no feature statistics enter the parity/deviation computation or this CSV",
+  "silo_deviation": "mean over 3 independent GradientExplainer draws of [1 - Jaccard@10(silo top-10, leave-one-out consensus of other eligible silos IN THE SAME DRAW)] -- consensus never mixes feature indices across draws",
+  "threshold_method": "modified z-score (median/MAD) on the draw-averaged deviation, per (tag, round), flagged if z > 3.5 (Iglewicz & Hoaglin 1993)",
+  "why_averaged": "single-draw version flagged 2 silos (fedavg_a0.1_s1337 round 5) that did not reproduce under independent re-explanation -- traced to single-draw MAD collapse from coarse top-k vote ties; see tools/parity_noise_floor.py and module docstring 'v2' section",
+  "elapsed_minutes": 392.0,
+  "n_rows": 356
+}

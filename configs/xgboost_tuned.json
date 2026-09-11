@@ -1,0 +1,21 @@
+{
+  "params": {
+    "objective": "multi:softprob",
+    "num_class": 9,
+    "tree_method": "hist",
+    "device": "cuda",
+    "disable_default_eval_metric": 1,
+    "max_depth": 6,
+    "learning_rate": 0.11796150167282794,
+    "subsample": 0.9182067803770825,
+    "colsample_bytree": 0.8416043884786937,
+    "min_child_weight": 1,
+    "reg_lambda": 0.06815110776728935,
+    "reg_alpha": 0.006398213811114084
+  },
+  "search_val_macro_f1_headline": 0.994969,
+  "n_trials": 40,
+  "search_subsample": 300000,
+  "seed": 42,
+  "note": "Selected on a subsample for search speed. Not a reportable number -- re-evaluated on full data by xgboost_baseline.py."
+}

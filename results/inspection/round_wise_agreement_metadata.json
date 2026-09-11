@@ -1,0 +1,21 @@
+{
+  "generated_by": "tools/round_wise_agreement.py + tools/round_wise_shap.py",
+  "nsamples": 1000,
+  "nsamples_note": "reduced fidelity, this pass only -- headline pipeline (results/inspection/agreement_metrics.csv) used nsamples=4000",
+  "rounds": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "n_eval_rows": 14,
+  "eval_seed": 12345,
+  "eligibility_filters": {
+    "T_SILO": 400,
+    "M_FAMILY": 20,
+    "note": "computed once from silo_sizes.csv, applied identically at every round"
+  },
+  "aggregation": "mean jaccard_at_10 / tau_w across family-eligible eval rows, per (tag, alpha, seed, round, silo_id)",
+  "accuracy_overlay_metric": "val_macro_f1_headline (not accuracy, not test -- see script docstring)",
+  "n_configs": 9
+}

@@ -1,0 +1,620 @@
+[
+  {
+    "condition": "clean",
+    "round": 18,
+    "client_id": "silo_2",
+    "stat": "cosine_to_global",
+    "cited_direction": "increasing",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.7765349848132146,
+      0.7738780084021446,
+      0.7423676551422381,
+      0.7524270121774179,
+      0.7900761798073482
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is relatively high, but cosine_to_global and cosine_to_peer_mean are both high and increasing, suggesting the client is adapting well to the global model. train_loss is low and stable, and val_accuracy is very high and increasing."
+  },
+  {
+    "condition": "clean",
+    "round": 9,
+    "client_id": "silo_9",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.6012518237271739,
+      0.5684368576029929,
+      0.5426061533920273,
+      0.5023538142333903,
+      0.47354941422368985
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is relatively stable, and cosine_to_global and cosine_to_peer_mean are within reasonable ranges. val_accuracy is very high, but not suspiciously so given the Benign-heavy validation set."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 3,
+    "client_id": "silo_0",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 3,
+    "sequence": [
+      3.757691305454254,
+      3.011663774989831,
+      2.948590313332405
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "stable update_norm (2.948590313332405) and val_accuracy (0.9254004863670887) indicate a trustworthy client"
+  },
+  {
+    "condition": "gradual_{0,3,5}",
+    "round": 2,
+    "client_id": "silo_5",
+    "stat": "update_norm",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 2,
+    "sequence": [
+      2.8864715895386674,
+      2.5411989956937253
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has decreased by 11.4%, but cosine_to_global has decreased by 22.2%. Additionally, val_accuracy has increased by 459.1%, which is an unusually large improvement. This suggests that the client may be manipulating the validation set."
+  },
+  {
+    "condition": "clean",
+    "round": 4,
+    "client_id": "silo_6",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 4,
+    "sequence": [
+      3.586890033751884,
+      3.4239192347779457,
+      2.6261158451824493,
+      2.6270722633176535
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "stable update_norm (2.6270722633176535) and cosine_to_global (0.5350342387800842) values, with low train_loss (0.010296264948570001) and high val_accuracy (0.887703552988231)"
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_5",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "increasing",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.40791396291532744,
+      0.3413391045273305,
+      0.35631557802334185,
+      0.36234723794427526,
+      0.39123925634783613
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm has been increasing, cosine_to_global is low, cosine_to_peer_mean is moderate, train_loss is high, and val_accuracy is moderate. This suggests a potential deviation from the norm."
+  },
+  {
+    "condition": "gradual_{0,3,5}",
+    "round": 16,
+    "client_id": "silo_1",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "decreasing",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.4165926578386281,
+      0.40737166692222665,
+      0.4203158466892432,
+      0.4369859012905911,
+      0.40497347772128583
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm has been decreasing, and val_accuracy has been high, but cosine_to_global and cosine_to_peer_mean are low, indicating potential divergence from the global model."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 11,
+    "client_id": "silo_6",
+    "stat": "cosine_to_global",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.46551053412268484,
+      0.48381946752836424,
+      0.45986936953498325,
+      0.43104429342180817,
+      0.4555324268323925
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively consistent, and val_accuracy is high. Cosine_to_global is low, indicating the client's updates are not aligned with the global model. This could be a sign of a Byzantine client, but the high val_accuracy suggests it may be a legitimate client with non-IID data."
+  },
+  {
+    "condition": "clean",
+    "round": 7,
+    "client_id": "silo_2",
+    "stat": "cosine_to_global",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.9166536251997354,
+      0.900098016729853,
+      0.8892782704055662,
+      0.8493261503149417,
+      0.8398085865345112
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing (5.350, 4.919, 4.498, 3.802, 3.649), and cosine_to_global has been decreasing (0.917, 0.900, 0.889, 0.849, 0.840). This suggests a divergence from the global model."
+  },
+  {
+    "condition": "clean",
+    "round": 19,
+    "client_id": "silo_8",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "increasing",
+    "window_size": 5,
+    "sequence": [
+      2.804341407070365,
+      2.84368687352699,
+      2.8758630031077392,
+      2.9081003282668263,
+      2.950257192385023
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is relatively stable (2.804-2.950). Cosine similarity to global and peer mean are within reasonable bounds (0.177-0.204 and 0.587-0.598, respectively). Val accuracy is high but not suspiciously so (0.793-0.800)."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 18,
+    "client_id": "silo_2",
+    "stat": "cosine_to_global",
+    "cited_direction": "increasing",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.7683208571873325,
+      0.7801524946268856,
+      0.763733292041729,
+      0.7566009158664632,
+      0.7501287749153854
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is increasing, and cosine_to_global is low, indicating a potential attack."
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_1",
+    "stat": "train_loss",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.025888406290124663,
+      0.020916534064976903,
+      0.017321718496203245,
+      0.014651369862818708,
+      0.012906012835865606
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing, cosine_to_global and cosine_to_peer_mean are within reasonable ranges, train_loss is low, and val_accuracy is very high."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 9,
+    "client_id": "silo_9",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.5894850231732378,
+      0.5690377080586936,
+      0.5207716876098133,
+      0.5138759921981727,
+      0.4901693273142332
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is decreasing over the last 5 rounds, which is unusual. cosine_to_global is relatively high (avg 0.51), but cosine_to_peer_mean is relatively low (avg 0.49). val_accuracy is high (avg 0.97), but not suspiciously so given the Benign-heavy validation set."
+  },
+  {
+    "condition": "clean",
+    "round": 12,
+    "client_id": "silo_5",
+    "stat": "cosine_to_global",
+    "cited_direction": "increasing",
+    "actual_direction": "increasing",
+    "window_size": 5,
+    "sequence": [
+      0.04438809948158224,
+      0.06382083500454702,
+      0.08013789093480815,
+      0.06571637450022541,
+      0.08043952644870624
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is increasing (3.1-3.4), and cosine_to_global is low (0.04-0.08), indicating a diverging update."
+  },
+  {
+    "condition": "clean",
+    "round": 3,
+    "client_id": "silo_7",
+    "stat": "train_loss",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 3,
+    "sequence": [
+      0.010116952130747708,
+      0.005608699105907566,
+      0.005167707810217117
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing over the last three rounds (4.229841728601805), and cosine_to_global has been decreasing as well (0.7761559084276268). This suggests that the client's model updates are converging with the global model. Additionally, train_loss has been decreasing (0.005167707810217117), which is a good sign. Val_accuracy has been increasing, but we should be cautious as it's a Benign-heavy validation set."
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_9",
+    "stat": "update_norm",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      3.8606690747181633,
+      3.203299105826884,
+      2.9757432516898783,
+      2.986330046260951,
+      2.8400511096317933
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing, cosine_to_global and cosine_to_peer_mean are within reasonable ranges, train_loss is low, and val_accuracy is high."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 5,
+    "client_id": "silo_8",
+    "stat": "update_norm",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      4.0168895048844515,
+      3.1010939876412382,
+      2.385484723181461,
+      2.29471495449459,
+      2.2991978482796154
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is decreasing, cosine_to_global is low and decreasing, and val_accuracy is low."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 4,
+    "client_id": "silo_8",
+    "stat": "update_norm",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 4,
+    "sequence": [
+      4.0168895048844515,
+      3.1010939876412382,
+      2.385484723181461,
+      2.29471495449459
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing (2.29-4.02), and cosine_to_global has been low (0.31-0.44). This could indicate a Byzantine client."
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_4",
+    "stat": "train_loss",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.024200663664655262,
+      0.019710863143255503,
+      0.016727501456612996,
+      0.015076503494671437,
+      0.013901903131256237
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing, cosine_to_global and cosine_to_peer_mean are within reasonable ranges, train_loss is low, and val_accuracy is very high."
+  },
+  {
+    "condition": "clean",
+    "round": 13,
+    "client_id": "silo_9",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      2.455797278879006,
+      2.4615621352651904,
+      2.268044784549439,
+      2.487441684717388,
+      2.404554913556581
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively stable, cosine_to_global is relatively stable, and val_accuracy is very high."
+  },
+  {
+    "condition": "clean",
+    "round": 7,
+    "client_id": "silo_0",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      2.3970476547639548,
+      2.239471737664895,
+      2.1508747614230246,
+      2.1525792788313813,
+      2.2893659601902545
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been relatively stable (2.397, 2.239, 2.151, 2.153, 2.289), and val_accuracy has been increasing (0.698, 0.701, 0.744, 0.768, 0.786)."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 13,
+    "client_id": "silo_2",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "decreasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.45996202719007634,
+      0.4762969348523225,
+      0.4683639673726035,
+      0.4051806972243459,
+      0.3749371043619371
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been decreasing, which could indicate a Byzantine client. cosine_to_global and cosine_to_peer_mean are both low, which is unusual. val_accuracy is very high, but this is a Benign-heavy validation set."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 5,
+    "client_id": "silo_0",
+    "stat": "val_accuracy",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.8803035265097935,
+      0.9014096283960338,
+      0.9254004863670887,
+      0.9008034115376308,
+      0.9019810052051034
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively stable, cosine_to_global is low but consistent, and val_accuracy is high and consistent."
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_2",
+    "stat": "update_norm",
+    "cited_direction": "increasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      5.996839005216529,
+      5.350411540742464,
+      4.918993756984124,
+      4.498057773350677,
+      3.8018638945709853
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm has been increasing, cosine_to_global is high, but cosine_to_peer_mean is low, train_loss is low, and val_accuracy is very high. This suggests a potential attack."
+  },
+  {
+    "condition": "gradual_{0,3,5}",
+    "round": 16,
+    "client_id": "silo_4",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      1.518479203415277,
+      1.4951936170464797,
+      1.4602090229570885,
+      1.4720894750128348,
+      1.4802996134017856
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been relatively consistent, and val_accuracy has been high, indicating a well-performing model."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 14,
+    "client_id": "silo_3",
+    "stat": "update_norm",
+    "cited_direction": "increasing",
+    "actual_direction": "increasing",
+    "window_size": 5,
+    "sequence": [
+      3.3279903784052296,
+      3.3669304858115234,
+      3.4311581718432405,
+      3.456940480262387,
+      3.5322536341698503
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is increasing (3.5322536341698503), and val_accuracy is relatively low (0.7855455603325134), indicating a client that may be experiencing difficulties."
+  },
+  {
+    "condition": "clean",
+    "round": 9,
+    "client_id": "silo_1",
+    "stat": "cosine_to_peer_mean",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.43327929018774974,
+      0.4262231162850388,
+      0.41605516795821407,
+      0.4082338830735463,
+      0.3893593804046033
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is relatively stable, and cosine_to_global and cosine_to_peer_mean are within reasonable ranges. val_accuracy is very high, but again, not suspiciously so given the Benign-heavy validation set."
+  },
+  {
+    "condition": "clean",
+    "round": 13,
+    "client_id": "silo_1",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      1.8512530059648757,
+      1.884454591593979,
+      1.8600815521373093,
+      1.9195085252106265,
+      1.858577395026801
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively stable, but cosine_to_global and cosine_to_peer_mean are both low, indicating potential divergence from the global model."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 20,
+    "client_id": "silo_1",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      1.9438654344923778,
+      1.9508986357886298,
+      1.907896026667826,
+      1.9444837798684989,
+      1.9555997821368012
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm has been stable (1.94-1.96), and val_accuracy has been consistently high (0.99-0.99) with no significant drops."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 19,
+    "client_id": "silo_9",
+    "stat": "train_loss",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.0048894713738918665,
+      0.004870701492420841,
+      0.0047869501895811675,
+      0.005163568756381387,
+      0.004486196762844004
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm is relatively stable, cosine_to_global and cosine_to_peer_mean are within a reasonable range, train_loss is very low, and val_accuracy is very high."
+  },
+  {
+    "condition": "clean",
+    "round": 6,
+    "client_id": "silo_2",
+    "stat": "train_loss",
+    "cited_direction": "increasing",
+    "actual_direction": "decreasing",
+    "window_size": 5,
+    "sequence": [
+      0.012384959446286235,
+      0.010297742384200496,
+      0.008903633915125116,
+      0.00739074788449078,
+      0.006238663730892973
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "update_norm has been increasing, cosine_to_global is high, but cosine_to_peer_mean is low, train_loss is low, and val_accuracy is very high. This suggests a potential attack."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 14,
+    "client_id": "silo_9",
+    "stat": "val_accuracy",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      0.9700933016521152,
+      0.9825381672740449,
+      0.9726087532139945,
+      0.9785942736894916,
+      0.9878617268122052
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively stable (2.581128242871364), and val_accuracy is very high (0.9878617268122052), indicating a well-performing client."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 18,
+    "client_id": "silo_4",
+    "stat": "update_norm",
+    "cited_direction": "stable",
+    "actual_direction": "stable",
+    "window_size": 5,
+    "sequence": [
+      1.439173345960265,
+      1.4066000104476322,
+      1.4306531579286703,
+      1.433612530800766,
+      1.4765196676127013
+    ],
+    "heuristic_correct": true,
+    "full_explanation": "update_norm is relatively consistent, and val_accuracy is high."
+  },
+  {
+    "condition": "sudden_{0,3,5}",
+    "round": 3,
+    "client_id": "silo_4",
+    "stat": "train_loss",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 3,
+    "sequence": [
+      0.07940089782405177,
+      0.024502229833064517,
+      0.019373874841189794
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "stable val_accuracy (0.993220126399699) and low train_loss (0.019373874841189794) indicate a trustworthy client"
+  },
+  {
+    "condition": "clean",
+    "round": 4,
+    "client_id": "silo_6",
+    "stat": "cosine_to_global",
+    "cited_direction": "stable",
+    "actual_direction": "decreasing",
+    "window_size": 4,
+    "sequence": [
+      0.6225441886720733,
+      0.578174794008744,
+      0.5355882798118058,
+      0.5350342387800842
+    ],
+    "heuristic_correct": false,
+    "full_explanation": "stable update_norm (2.6270722633176535) and cosine_to_global (0.5350342387800842) values, with low train_loss (0.010296264948570001) and high val_accuracy (0.887703552988231)"
+  }
+]

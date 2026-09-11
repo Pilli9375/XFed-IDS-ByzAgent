@@ -1,0 +1,185 @@
+"""Flower ServerApp -- orchestrates FedAvg and evaluates the global model.
+
+Server-side evaluation runs the aggregated global model against the SAME
+centralized test set (test_global.parquet) the MLP baseline used. This is the
+number that goes in the federated-vs-centralized comparison table -- it is not
+an average of the 10 silos' own test performance, which would answer a
+different question (how good is each local view) rather than the one that
+matters (how good is the thing federation actually produced).
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import numpy as np
+import torch
+
+from flwr.app import ArrayRecord, ConfigRecord, Context
+from flwr.serverapp import Grid, ServerApp
+from flwr.serverapp.strategy import FedAvg
+
+from xfed_federated.task import (
+    DEVICE,
+    build_model,
+    class_names,
+    compute_metrics,
+    format_per_class,
+    headline_class_indices,
+    load_centralized_for_server,
+    load_yaml,
+    predict,
+)
+
+app = ServerApp()
+
+
+@app.main()
+def main(grid: Grid, context: Context) -> None:
+    data_cfg = load_yaml("configs/data.yaml")
+    model_cfg = load_yaml("configs/model.yaml")
+
+    alpha = str(context.run_config["alpha"])
+    seed = int(context.run_config["seed"])
+    num_rounds = int(context.run_config["num-server-rounds"])
+    local_epochs = int(context.run_config["local-epochs"])
+    mu = float(context.run_config.get("mu", 0.0))
+    fraction_train = float(context.run_config["fraction-train"])
+    fraction_evaluate = float(context.run_config["fraction-evaluate"])
+
+    algo = "fedavg" if mu == 0.0 else f"fedprox_mu{mu}"
+    tag = f"{algo}_a{alpha}_s{seed}"
+    out_dir = Path(model_cfg["output"]["results_dir"]) / "federated" / tag
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Chat 04 Pre-check A: only best/last were saved previously, so
+    # intermediate global checkpoints did not exist and silo-local
+    # reconstruction was impossible. Every round now lands on disk.
+    round_ckpt_dir = out_dir / "round_checkpoints"
+    round_ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"\n[{tag}] rounds={num_rounds} local_epochs={local_epochs} mu={mu} "
+          f"fraction_train={fraction_train} fraction_evaluate={fraction_evaluate}")
+
+    # Loaded ONCE here, reused every round via closure. Both val and test come
+    # from the identical centralized split the MLP baseline used, so the
+    # federated-vs-centralized comparison is apples-to-apples.
+    print("\nLoading centralized split for server-side evaluation ...")
+    centralized = load_centralized_for_server(data_cfg, model_cfg)
+    X_val, y_val = centralized.X_val, centralized.y_val
+    X_test, y_test = centralized.X_test, centralized.y_test
+    cnames = class_names(model_cfg)
+    headline_idx = headline_class_indices(model_cfg)
+    headline_names = list(model_cfg["labels"]["headline_classes"])
+    n_classes = int(model_cfg["labels"]["n_classes"])
+    print(f"  {centralized.summary()}")
+
+    global_model = build_model(model_cfg, seed=seed, device="cpu")
+    initial_arrays = ArrayRecord(global_model.state_dict())
+
+    round_history: list[dict] = []
+    best = {"round": -1, "val_macro_f1_headline": -1.0, "state": None}
+
+    def global_evaluate(server_round: int, arrays: ArrayRecord, config: dict | None = None):
+        """Round-by-round evaluation on the VALIDATION set.
+
+        Deliberately not the test set. FedAvg's global macro-F1 oscillates
+        substantially between rounds under non-IID partitioning -- at alpha=0.5
+        it swung between 0.86 and 0.97 across consecutive late rounds -- so
+        whichever round the budget happens to end on decides the headline
+        number. Selecting the best round fixes that, but selecting it on test
+        would make every reported test number optimistically biased. Validation
+        selection here mirrors the centralized baseline exactly: best checkpoint
+        chosen on val macro-F1 over the 7 headline families, test touched once.
+
+        Confirmed against flwr 1.33: called as evaluate_fn(server_round, arrays)
+        -- two positional args, no config -- and must return a plain dict.
+        """
+        model = build_model(model_cfg, seed=seed, device=DEVICE)
+        model.load_state_dict(arrays.to_torch_state_dict())
+        torch.save(model.state_dict(),
+                   round_ckpt_dir / f"round_{server_round:03d}.pt")
+        Xv = torch.from_numpy(X_val.copy()).to(DEVICE)
+        y_pred = predict(model, Xv).cpu().numpy()
+        m = compute_metrics(y_val, y_pred, n_classes, cnames, headline_idx)
+
+        score = m["macro_f1_headline"]
+        flag = ""
+        if score > best["val_macro_f1_headline"]:
+            best["val_macro_f1_headline"] = score
+            best["round"] = server_round
+            best["state"] = {k: v.detach().cpu().clone()
+                             for k, v in model.state_dict().items()}
+            flag = "  *"
+
+        round_history.append({
+            "round": server_round,
+            "val_macro_f1_headline": score,
+            "val_macro_f1_all": m["macro_f1_all"],
+            "val_false_positive_rate": m["false_positive_rate"],
+            "val_attack_recall": m["attack_recall"],
+        })
+        print(f"  round {server_round:>3}/{num_rounds}  "
+              f"val macro-F1 {score:.4f}  FPR {m['false_positive_rate']:.5f}{flag}")
+
+        return {
+            "val_macro_f1_headline": score,
+            "val_macro_f1_all": m["macro_f1_all"],
+            "val_false_positive_rate": m["false_positive_rate"],
+            "val_attack_recall": m["attack_recall"],
+        }
+
+    strategy = FedAvg(fraction_train=fraction_train, fraction_evaluate=fraction_evaluate)
+
+    result = strategy.start(
+        grid=grid,
+        initial_arrays=initial_arrays,
+        train_config=ConfigRecord({"local-epochs": local_epochs}),
+        num_rounds=num_rounds,
+        evaluate_fn=global_evaluate,
+    )
+
+    # ---- test evaluated ONCE, on the best-by-validation model --------------
+    print(f"\n  best val macro-F1 {best['val_macro_f1_headline']:.4f} "
+          f"at round {best['round']}")
+
+    best_model = build_model(model_cfg, seed=seed, device=DEVICE)
+    best_model.load_state_dict(best["state"])
+    Xt = torch.from_numpy(X_test.copy()).to(DEVICE)
+    y_pred = predict(best_model, Xt).cpu().numpy()
+    best_m = compute_metrics(y_test, y_pred, n_classes, cnames, headline_idx)
+
+    print("\nBEST-BY-VALIDATION GLOBAL MODEL, centralized test set\n"
+          + format_per_class(best_m, headline_names))
+
+    # The last round is also reported, separately. The gap between the two is
+    # the size of the round-lottery effect and belongs in the paper as a
+    # stability observation, not hidden behind the selected number.
+    last_model = build_model(model_cfg, seed=seed, device=DEVICE)
+    last_model.load_state_dict(result.arrays.to_torch_state_dict())
+    y_pred_last = predict(last_model, Xt).cpu().numpy()
+    last_m = compute_metrics(y_test, y_pred_last, n_classes, cnames, headline_idx)
+    print(f"  final-round test macro-F1 (not selected): "
+          f"{last_m['macro_f1_headline']:.4f}")
+
+    torch.save(best["state"], out_dir / "model_best.pt")
+    torch.save(result.arrays.to_torch_state_dict(), out_dir / "model_last.pt")
+    (out_dir / "round_history.json").write_text(json.dumps(round_history, indent=2))
+    (out_dir / "final_metrics.json").write_text(json.dumps({
+        "alpha": alpha, "seed": seed, "num_rounds": num_rounds,
+        "local_epochs": local_epochs, "mu": mu,
+        "best_round": best["round"],
+        "best_val_macro_f1_headline": best["val_macro_f1_headline"],
+        "test": best_m,
+        "test_final_round_unselected": last_m,
+        "class_names": cnames,
+        "headline_classes": headline_names,
+    }, indent=2))
+    (out_dir / "config.json").write_text(json.dumps({
+        "alpha": alpha, "seed": seed, "num_rounds": num_rounds,
+        "local_epochs": local_epochs, "mu": mu, "fraction_train": fraction_train,
+        "fraction_evaluate": fraction_evaluate,
+    }, indent=2))
+
+    print(f"\n  written: {out_dir}")

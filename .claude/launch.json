@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "streamlit-dashboard",
+      "runtimeExecutable": "C:\\Users\\nagaa\\anaconda3\\envs\\xfed\\Scripts\\streamlit.exe",
+      "runtimeArgs": ["run", "app.py", "--server.headless", "true"],
+      "port": 8501
+    },
+    {
+      "name": "react-dashboard",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["frontend/node_modules/vite/bin/vite.js", "frontend"],
+      "port": 5173
+    },
+    {
+      "name": "react-preview",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["frontend/node_modules/vite/bin/vite.js", "preview", "frontend", "--port", "4173", "--strictPort"],
+      "port": 4173
+    }
+  ]
+}

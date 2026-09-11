@@ -1,0 +1,5 @@
+column,+Inf,-Inf,NaN,negative,suspicious_negative
+Flow Bytes/s,5,0,0,0,False
+Flow Packets/s,5,0,0,0,False
+ICMP Code,0,0,0,2099373,False
+ICMP Type,0,0,0,2099373,False

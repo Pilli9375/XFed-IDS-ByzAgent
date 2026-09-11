@@ -1,0 +1,22 @@
+{
+  "tag": "a0.5_s42_f2_sudden_silos0-3",
+  "alpha": "0.5",
+  "partition_seed": 42,
+  "f": 2,
+  "attack_seed": 9001,
+  "malicious_silos": [
+    0,
+    3
+  ],
+  "mode": "sudden",
+  "strategy": "targeted_to_benign",
+  "sudden": {
+    "flip_fraction": 0.4
+  },
+  "gradual": {
+    "start_fraction": 0.05,
+    "increment_per_round": 0.05,
+    "max_fraction": 1.0
+  },
+  "selection_note": "Worst-case/upper-bound adversary with full knowledge of federation composition. Selected by enumerating all C(10,3)=120 malicious-silo triples at alpha=0.5 seed=42 against the global per-silo family composition and maximizing the minimum per-family coverage across the 6 non-Benign headline families at flip_fraction=1.0 (achieved: 38.60% min, on DoS). NOT a realistic or naturalistic attacker -- no real attacker has this global view. Retired rule: size-representative-by-total-training-rows (silos [0,1,9]), which achieved only 13.98% federation-wide attack-row coverage because it sized against a denominator the targeted flip does not modify (Benign rows). LOCKED PRIMARY, Phase 0 PASS, signed off by 01_Planning. f=2 secondary condition ([0,3], ceiling 16.73%) was run once as Phase 0 close-out item 1 -- see results/federated/fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3/."
+}

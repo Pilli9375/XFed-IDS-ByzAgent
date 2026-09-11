@@ -1,0 +1,33 @@
+{
+  "n_rows": 1435126,
+  "n_train": 1291613,
+  "n_val": 143513,
+  "seed": 42,
+  "n_splits": 10,
+  "n_features": 82,
+  "n_distinct_feature_vectors": 1285553,
+  "group_key": "pd.util.hash_pandas_object(df[feature_cols], index=False)",
+  "sha256_mask": "fbc47c8442f583eee0d8e8c44779d17b04aa09f90f56144b015ff5f7084e9de5",
+  "train_family_counts": {
+    "Benign": 972607,
+    "PortScan": 125658,
+    "DoS": 119806,
+    "DDoS": 64222,
+    "BruteForce": 4706,
+    "Bot": 3174,
+    "WebAttack": 1388,
+    "Infiltration": 45,
+    "Heartbleed": 7
+  },
+  "val_family_counts": {
+    "Benign": 108067,
+    "PortScan": 13962,
+    "DoS": 13312,
+    "DDoS": 7136,
+    "BruteForce": 523,
+    "Bot": 353,
+    "WebAttack": 154,
+    "Infiltration": 5,
+    "Heartbleed": 1
+  }
+}

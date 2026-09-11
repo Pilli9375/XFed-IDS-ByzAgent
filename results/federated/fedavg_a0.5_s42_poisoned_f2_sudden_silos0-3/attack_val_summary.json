@@ -1,0 +1,15 @@
+{
+  "tag": "fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3",
+  "alpha": "0.5",
+  "seed": 42,
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "mu": 0.0,
+  "attack": {
+    "f": 2,
+    "mode": "sudden",
+    "strategy": "targeted_to_benign"
+  },
+  "best_round": 16,
+  "best_val_macro_f1_headline": 0.9867025881731166
+}

@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xfed-federated"
+version = "0.1.0"
+description = "XFed-IDS Chat 03 -- FedAvg over the locked MLP baseline"
+license = "Apache-2.0"
+dependencies = [
+    "flwr[simulation]>=1.32.0",
+    "numpy",
+    "torch",
+    "pandas",
+    "pyarrow",
+    "scikit-learn",
+    "pyyaml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.flwr.app]
+publisher = "pilli"
+
+[tool.flwr.app.components]
+serverapp = "xfed_federated.server_app:app"
+clientapp = "xfed_federated.client_app:app"
+
+[tool.flwr.app.config]
+# One (alpha, seed) combination per `flwr run` invocation. Override with
+# --run-config "alpha='0.1' seed=1337" for the sweep.
+alpha = "0.5"
+seed = 42
+num-server-rounds = 20
+# LOCKED 2026-08-08 by a head-to-head at alpha=0.5, seed=42:
+#   epochs=1 -> macro-F1 0.8600, WebAttack recall 0.0350 (F1 0.0677)
+#   epochs=3 -> macro-F1 0.9747, WebAttack recall 0.9436 (F1 0.9671)
+# One local epoch is too little for a thin class (WebAttack, 1,388 train rows)
+# to leave a durable mark on the weights before averaging. Cost: Bot recall
+# regressed 0.9430 -> 0.7823, consistent with more local training producing
+# more client drift -- the effect FedProx is meant to damp.
+local-epochs = 3
+# FedProx (Li et al., 2020). mu=0.0 is exactly FedAvg -- the proximal term
+# vanishes and every run so far used this default. Override per run:
+# --run-config "mu=0.01"
+mu = 0.0
+# All 10 silos train and evaluate every round -- locked decision 5: no
+# size-based exclusion during training, only 10 clients total so no
+# subsampling is needed either.
+fraction-train = 1.0
+fraction-evaluate = 1.0
+
+
+#######################################################################
+# CONFIGURATION MIGRATION NOTICE:
+#
+# What was previously called "federation config" for SuperLink
+# connections in pyproject.toml has been renamed and moved.
+#
+# These settings are now **SuperLink connection configuration**
+# and are defined in the Flower configuration file.
+#
+# The entries below are commented out intentionally and are kept
+# only as a migration reference.
+#
+# Docs: https://flower.ai/docs/framework/ref-flower-configuration.html
+#######################################################################
+
+# [tool.flwr.federations]
+# default = "local-simulation"
+
+# [tool.flwr.federations.local-simulation]
+# # 10 silos, matching the locked federation shape. num-gpus=1.0 per client
+# # means the whole GPU is requested per client, which forces the simulation
+# # backend to run one client at a time -- sequential, not concurrent, per the
+# # 6GB VRAM constraint decided before any of this code was written.
+# options.num-supernodes = 10
+# options.backend.client-resources.num-cpus = 2
+# options.backend.client-resources.num-gpus = 1.0
