@@ -1,0 +1,59 @@
+# configs/hotswap.yaml
+# Step 2A -- hot-swap retraining service. All parameters here, none hardcoded
+# in src/hotswap/retrain.py, per project convention.
+#
+# Scope reminder (see PROJECT_INSTRUCTIONS.md and the Step 2 design writeup):
+# this file governs a WARM-STARTED, short federated continuation triggered by
+# an analyst confirming/rejecting a live alert -- never a from-scratch run,
+# never a read of data/processed/test_global.parquet (spent).
+
+paths:
+  train_pool: data/processed/train_pool.parquet
+  val_mask: data/processed/val_mask.parquet
+  partitions_dir: data/processed/partitions
+  manifest: data/processed/partitions/manifest.json
+  model_config: configs/model.yaml
+  data_config: configs/data.yaml
+  global_class_weights: configs/global_class_weights.json
+  federated_results_dir: results/federated
+  best_rounds_manifest: results/inspection/best_rounds_manifest.json
+  # Operational state, not a contribution artifact -- same directory as the
+  # audit log itself (src/hotswap/audit_log.py), never results/, never git.
+  checkpoints_dir: state/hotswap_log/checkpoints
+
+candidate_selection:
+  # How many additional train_pool rows of the confirmed family to route into
+  # the target silo. Capped to whatever is actually eligible (family match,
+  # not in val_mask, not already in the target silo's own base partition) --
+  # never padded or duplicated to hit this number. Some families (Heartbleed:
+  # 8 rows total in the whole dataset) will always be capped far below this.
+  samples_per_event: 200
+
+training:
+  # Warm-started from the currently-served model's best-round checkpoint --
+  # never from-scratch. See run_hotswap()'s docstring for why: the base runs
+  # took real wall-clock time for 20 rounds x 10 silos; a live demo can't
+  # wait for that on every analyst confirmation.
+  num_rounds: 2
+  local_epochs: 3      # matches the locked base-run default (results/federated/*/config.json)
+  mu: 0.0              # plain FedAvg -- PROJECT_INSTRUCTIONS.md: "Start with FedAvg. Any
+                        # other strategy must be justified against it with numbers."
+  fraction_train: 1.0
+  fraction_evaluate: 1.0
+  # Model itself is ~19,849 params (locked architecture pilot) -- CPU already
+  # measured faster than GPU for this exact model (kernel-launch overhead
+  # dominates at this size, see the SHAP GPU-vs-CPU probe). The 6GB VRAM
+  # ceiling is not what shapes this value; CPU is simply faster here.
+  device: cpu
+
+verify:
+  # Same metric, same key names as results/inspection/best_rounds_manifest.json
+  # and results/federated/*/round_history.json -- so a hot-swap candidate is
+  # compared against the incumbent on identical terms.
+  metric: val_macro_f1_headline
+  # Strict non-regression, no tolerance band (signed off explicitly): a
+  # candidate round only replaces the served model if its val metric is >=
+  # the incumbent's. This is a live-served model, not an experimental
+  # comparison -- see PROJECT_INSTRUCTIONS.md's own "round lottery" finding
+  # (up to 0.118 gap between best-by-validation and final-round numbers) for
+  # why leniency here is the wrong default.
