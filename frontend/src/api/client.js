@@ -76,3 +76,38 @@ export async function postPredict(features, trueFamily) {
   }
   return res.json();
 }
+
+// Step 2B. { job_id, status, detail, hotswap: { active, event_id, swap_depth,
+// base_tag, job_status, job_detail } } -- same `hotswap` shape GET /config
+// carries, plus the current job's own id/status/detail. Polled, not fetched
+// once: a swap can complete while the dashboard is already open.
+export function getHotswapStatus() {
+  return getJSON('/hotswap/status');
+}
+
+// Body is a family label only -- see backend/hotswap_service.py's docstring
+// for why this can never be a feature vector. Returns immediately with
+// status: "running"; poll getHotswapStatus() for the outcome.
+export async function postHotswapTrigger(family) {
+  const res = await fetch(`${BASE}/hotswap/trigger`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ family }),
+  });
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(`POST /hotswap/trigger -> HTTP ${res.status}: ${detail}`);
+  }
+  return res.json();
+}
+
+// One call, no body -- reloads nothing from disk (the base model was never
+// touched by a swap), just stops routing /predict to the swapped-in model.
+export async function postHotswapRevert() {
+  const res = await fetch(`${BASE}/hotswap/revert`, { method: 'POST' });
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(`POST /hotswap/revert -> HTTP ${res.status}: ${detail}`);
+  }
+  return res.json();
+}

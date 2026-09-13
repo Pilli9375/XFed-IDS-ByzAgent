@@ -681,6 +681,74 @@ h3 {
   background: var(--text-faint);
 }
 
+/* ---- Hot-swap banner (Step 2B) -- sticky so it stays visible while a
+   section scrolls; renders above <Routes> in App.jsx, so it's the same
+   element regardless of which section is mounted. --------------------- */
+.xf-hotswap-banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  margin-bottom: 1.6rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.xf-hotswap-banner--active {
+  background: var(--alert);
+  background: color-mix(in srgb, var(--alert) 16%, var(--surface));
+  border: 1px solid var(--alert);
+  color: var(--text);
+}
+.xf-hotswap-banner--active code {
+  background: color-mix(in srgb, var(--alert) 30%, transparent);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  font-family: var(--mono-stack);
+  font-size: 0.85em;
+}
+.xf-hotswap-banner__text {
+  flex: 1;
+}
+.xf-hotswap-banner__revert {
+  flex-shrink: 0;
+  background: var(--alert);
+  color: #1a1010;
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.xf-hotswap-banner__revert:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.xf-hotswap-banner__revert:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.xf-hotswap-banner--running {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid var(--accent-dim);
+  color: var(--text-muted);
+}
+.xf-hotswap-banner--warn {
+  background: color-mix(in srgb, var(--warn) 14%, var(--surface));
+  border: 1px solid var(--warn);
+  color: var(--text);
+}
+.xf-hotswap-banner__detail {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  display: block;
+  margin-top: 0.2rem;
+}
+
 /* ---- Page footer --------------------------------------------------------- */
 .xf-footer {
   color: var(--text-faint);

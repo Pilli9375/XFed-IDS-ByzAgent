@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useBackendStatus } from './api/useBackendStatus';
+import HotSwapBanner from './components/HotSwapBanner';
 import Footer from './layout/Footer';
 import Sidebar from './layout/Sidebar';
 import ClientTrustMonitor from './sections/ClientTrustMonitor';
@@ -31,6 +32,7 @@ export default function App() {
     <div className="xf-app">
       <Sidebar status={status} />
       <main className="xf-main">
+        <HotSwapBanner />
         <Routes>
           <Route path="/" element={<Navigate to={SECTIONS[0].path} replace />} />
           {SECTIONS.map(({ key, path, ...section }) => {

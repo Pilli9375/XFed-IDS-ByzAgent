@@ -101,6 +101,7 @@ class HotSwapStatusResponse(BaseModel):
     job_id: str | None
     status: str | None
     detail: str | None
+    family: str | None = Field(default=None, description="Family label the current/last job was triggered with.")
     hotswap: HotSwapInfo
 
 
@@ -445,7 +446,8 @@ def hotswap_status() -> HotSwapStatusResponse:
     state: HotSwapState = app.state.hotswap
     info = _hotswap_info()  # polls first
     return HotSwapStatusResponse(
-        job_id=state.job_id, status=state.job_status, detail=state.job_detail, hotswap=info,
+        job_id=state.job_id, status=state.job_status, detail=state.job_detail,
+        family=state.job_family, hotswap=info,
     )
 
 
