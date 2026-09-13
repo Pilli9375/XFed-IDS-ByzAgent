@@ -33,6 +33,7 @@ from backend.model_loader import LoadedModel, load_and_verify, load_backend_conf
 from backend.trust import build_trust_snapshot
 from backend.federation import build_federation_snapshot
 from backend.faithfulness import build_faithfulness_snapshot, load_faithfulness_figures
+from backend.hotswap_service import HotSwapState, new_state, poll, revert, trigger
 
 log = logging.getLogger(__name__)
 
@@ -48,13 +49,59 @@ class HealthResponse(BaseModel):
     uptime_seconds: float
 
 
+class HotSwapInfo(BaseModel):
+    """Additive to ConfigResponse -- see that model. Every field here
+    describes whether the model actually answering /predict right now
+    differs from the base_tag/alpha/seed/best_round reported above it,
+    which never change regardless of hot-swap state."""
+
+    active: bool
+    event_id: str | None
+    swap_depth: int
+    base_tag: str
+    job_status: str | None = Field(
+        default=None,
+        description="Last known worker status: running / accepted / rejected / error / crashed / null (no job ever run).",
+    )
+    job_detail: str | None = None
+
+
 class ConfigResponse(BaseModel):
+    # Unchanged by hot-swap state -- always describes the base model
+    # loaded at startup (backend/model_loader.py::load_and_verify()),
+    # exactly as before Step 2B. This is deliberate: every number already
+    # rendered elsewhere on the dashboard (agreement, parity, faithfulness,
+    # federation) was computed against THIS model, not whatever /predict
+    # might currently be routing to -- see `hotswap` below for that.
     alpha: str
     seed: int
     tag: str
     best_round: int
     n_features: int
     n_classes: int
+    hotswap: HotSwapInfo
+
+
+class HotSwapTriggerRequest(BaseModel):
+    family: str = Field(
+        ...,
+        description="A family label only -- confirming or correcting an alert's predicted_family. "
+                    "Never a feature vector; see backend/hotswap_service.py's module docstring for why.",
+    )
+
+
+class HotSwapTriggerResponse(BaseModel):
+    job_id: str
+    status: str
+    family: str
+    seed: int
+
+
+class HotSwapStatusResponse(BaseModel):
+    job_id: str | None
+    status: str | None
+    detail: str | None
+    hotswap: HotSwapInfo
 
 
 class PredictRequest(BaseModel):
@@ -249,6 +296,13 @@ async def lifespan(app: FastAPI):
     app.state.alert_buffer = deque(maxlen=buffer_size)
     app.state.alert_lock = threading.Lock()
 
+    # Step 2B: always starts inactive, serving the base model -- see
+    # HotSwapState's own docstring for why a restart never resumes a prior
+    # swap. The retraining path itself is never imported here (see
+    # backend/hotswap_service.py's docstring); it only ever runs in the
+    # subprocess spawned by trigger().
+    app.state.hotswap = new_state(loaded.tag)
+
     log.info("startup complete: tag=%s best_round=%d device=%s", loaded.tag, loaded.best_round, loaded.device)
     yield
     # No teardown: nothing here holds an open file handle or external connection.
@@ -272,6 +326,23 @@ def health() -> HealthResponse:
     )
 
 
+def _hotswap_info() -> HotSwapInfo:
+    """Polls the current job (cheap, non-blocking) then reports state --
+    called from both GET /config and GET /hotswap/status so neither one
+    can show a stale "running" after the worker has actually finished."""
+    state: HotSwapState = app.state.hotswap
+    loaded: LoadedModel = app.state.loaded
+    poll(state, loaded.model_cfg, loaded.device)
+    return HotSwapInfo(
+        active=state.active,
+        event_id=state.event_id,
+        swap_depth=state.swap_depth,
+        base_tag=state.base_tag,
+        job_status=state.job_status,
+        job_detail=state.job_detail,
+    )
+
+
 @app.get("/config", response_model=ConfigResponse)
 def config() -> ConfigResponse:
     loaded: LoadedModel = app.state.loaded
@@ -282,6 +353,7 @@ def config() -> ConfigResponse:
         best_round=loaded.best_round,
         n_features=len(loaded.feature_cols),
         n_classes=int(loaded.model_cfg["labels"]["n_classes"]),
+        hotswap=_hotswap_info(),
     )
 
 
@@ -306,9 +378,18 @@ def predict(request: PredictRequest) -> PredictResponse:
     x_raw = np.array([[request.features[c] for c in loaded.feature_cols]], dtype=np.float32)
     x_scaled = loaded.scaler.transform(x_raw).astype(np.float32)
 
+    # Hot-swap only ever replaces the MODEL WEIGHTS -- scaler, feature_cols,
+    # class_names above are untouched (the swapped-in checkpoint was
+    # evaluated against this exact scaler; see src/hotswap/retrain.py's
+    # _pooled_val_split()). state.active_model is None until a swap is
+    # accepted, so this is a no-op change of behavior until then.
+    hotswap_state: HotSwapState = app.state.hotswap
+    active_model = hotswap_state.active_model if hotswap_state.active else None
+    model = active_model if active_model is not None else loaded.model
+
     with torch.no_grad():
-        loaded.model.eval()
-        logits = loaded.model(torch.from_numpy(x_scaled).to(loaded.device))
+        model.eval()
+        logits = model(torch.from_numpy(x_scaled).to(loaded.device))
         probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
 
     class_idx = int(np.argmax(probs))
@@ -336,6 +417,46 @@ def predict(request: PredictRequest) -> PredictResponse:
             app.state.alert_buffer.append(alert)
 
     return PredictResponse(family=family, confidence=confidence, probabilities=probabilities)
+
+
+@app.post("/hotswap/trigger", response_model=HotSwapTriggerResponse)
+def hotswap_trigger(request: HotSwapTriggerRequest) -> HotSwapTriggerResponse:
+    """An analyst confirming or rejecting an alert calls this with the
+    resulting family label -- confirm passes the alert's own
+    predicted_family through unchanged, reject passes the analyst's
+    corrected family. Either way this endpoint only ever sees a family
+    name: see backend/hotswap_service.py and src/hotswap/retrain.py's
+    module docstrings for why a feature vector can never reach this path.
+
+    Returns immediately with status="running" -- this does not wait for
+    the subprocess. Poll GET /hotswap/status (or GET /config) for the
+    outcome.
+    """
+    state: HotSwapState = app.state.hotswap
+    try:
+        result = trigger(state, request.family)
+    except RuntimeError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    return HotSwapTriggerResponse(**result)
+
+
+@app.get("/hotswap/status", response_model=HotSwapStatusResponse)
+def hotswap_status() -> HotSwapStatusResponse:
+    state: HotSwapState = app.state.hotswap
+    info = _hotswap_info()  # polls first
+    return HotSwapStatusResponse(
+        job_id=state.job_id, status=state.job_status, detail=state.job_detail, hotswap=info,
+    )
+
+
+@app.post("/hotswap/revert", response_model=HotSwapInfo)
+def hotswap_revert() -> HotSwapInfo:
+    """One call, one click from the frontend -- reloads nothing from disk
+    (the base model was never touched by a swap in the first place, see
+    /predict), just stops routing to the swapped-in model."""
+    state: HotSwapState = app.state.hotswap
+    revert(state)
+    return _hotswap_info()
 
 
 @app.get("/shap/{sample_id}", response_model=ShapResponse)
