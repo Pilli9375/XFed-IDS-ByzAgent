@@ -8,6 +8,13 @@ results/runs/
 *.pth
 *.pt
 
+# Operational state (not a contribution artifact) -- e.g. state/hotswap_log/
+# events.jsonl. Its own audit trail is the append-only file itself (fsync,
+# per-record timestamp + code_version + resulting_checkpoint_sha256), not
+# git history -- git-tracking it would make every hot-swap during a demo
+# or rehearsal a dirty-tree/commit event.
+state/
+
 # Python
 __pycache__/
 *.py[cod]
