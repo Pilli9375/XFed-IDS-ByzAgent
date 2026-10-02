@@ -6,7 +6,11 @@
  * "{family} — sample {n}" per row, n counting occurrences of that family in
  * ascending sample_id order. Mirrors sections.py's row_labels loop.
  */
-export function buildEvalRowLabels(rows) {
+export function buildEvalRowLabels(rows, complete = true) {
+  // "sample N" is a per-family running count over all 14 rows, so it is only
+  // correct when every row is present. With rows missing it would silently
+  // relabel the survivors, so fall back to the stable sample_id instead.
+  if (!complete) return rows.map((r) => `${r.eval_family} — eval row ${r.sample_id}`);
   const seen = {};
   return rows.map((r) => {
     seen[r.eval_family] = (seen[r.eval_family] ?? 0) + 1;

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { postPredict } from '../api/client';
 import { useEvalRows } from '../api/useEvalRows';
 import Callout from '../components/Callout';
+import EvalRowsStatus from '../components/EvalRowsStatus';
 import DataTable from '../components/DataTable';
 import Expander from '../components/Expander';
 import Pills from '../components/Pills';
@@ -30,18 +31,23 @@ export default function Explain({ eyebrow, title, lede }) {
       {evalStatus.state === 'loading' && (
         <Callout tone={TEXT_FAINT}>Loading the 14 fixed evaluation rows (GET /shap)…</Callout>
       )}
-      {evalStatus.state === 'error' && (
-        <Callout tone={ALERT}>Could not load evaluation rows: {evalStatus.error}</Callout>
+      <EvalRowsStatus
+        failed={evalStatus.failed}
+        retrying={evalStatus.retrying}
+        retry={evalStatus.retry}
+        allFailed={evalStatus.state === 'error'}
+      />
+      {evalStatus.state === 'ok' && (
+        <ExplainBody rows={evalStatus.rows} complete={evalStatus.failed.length === 0} />
       )}
-      {evalStatus.state === 'ok' && <ExplainBody rows={evalStatus.rows} />}
     </>
   );
 }
 
-function ExplainBody({ rows }) {
+function ExplainBody({ rows, complete }) {
   const featureNames = rows[0].feature_names;
   const classNames = rows[0].class_names;
-  const rowLabels = useMemo(() => buildEvalRowLabels(rows), [rows]);
+  const rowLabels = useMemo(() => buildEvalRowLabels(rows, complete), [rows, complete]);
   const [rowIdx, setRowIdx] = useState(0);
   const [explainTrue, setExplainTrue] = useState(false);
 

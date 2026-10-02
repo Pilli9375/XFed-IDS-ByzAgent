@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { postPredict } from '../api/client';
 import { useEvalRows } from '../api/useEvalRows';
 import Callout from '../components/Callout';
+import EvalRowsStatus from '../components/EvalRowsStatus';
 import Expander from '../components/Expander';
 import Rule from '../components/Rule';
 import SectionHeader from '../components/SectionHeader';
@@ -21,17 +22,22 @@ export default function Detect({ eyebrow, title, lede }) {
       {evalStatus.state === 'loading' && (
         <Callout tone={TEXT_FAINT}>Loading the 14 fixed evaluation rows (GET /shap)…</Callout>
       )}
-      {evalStatus.state === 'error' && (
-        <Callout tone={ALERT}>Could not load evaluation rows: {evalStatus.error}</Callout>
+      <EvalRowsStatus
+        failed={evalStatus.failed}
+        retrying={evalStatus.retrying}
+        retry={evalStatus.retry}
+        allFailed={evalStatus.state === 'error'}
+      />
+      {evalStatus.state === 'ok' && (
+        <DetectBody rows={evalStatus.rows} complete={evalStatus.failed.length === 0} />
       )}
-      {evalStatus.state === 'ok' && <DetectBody rows={evalStatus.rows} />}
     </>
   );
 }
 
-function DetectBody({ rows }) {
+function DetectBody({ rows, complete }) {
   const featureNames = rows[0].feature_names;
-  const rowLabels = useMemo(() => buildEvalRowLabels(rows), [rows]);
+  const rowLabels = useMemo(() => buildEvalRowLabels(rows, complete), [rows, complete]);
   const [mode, setMode] = useState('preset');
   const [rowIdx, setRowIdx] = useState(0);
 
@@ -149,7 +155,7 @@ function DetectBody({ rows }) {
             <div style={{ height: 'var(--sp-sm)' }} />
             <Expander title="Need a template?">
               <div className="xf-caption" style={{ marginTop: 0 }}>
-                Copy this correctly-shaped row (it's eval row 1) and edit the values.
+                Copy this correctly-shaped row (it's {complete ? 'eval row 1' : `eval row ${rows[0].sample_id}`}) and edit the values.
               </div>
               <div style={{ height: 'var(--sp-xs)' }} />
               <div className="xf-code-block">{evalRowTemplateText(rows[0])}</div>

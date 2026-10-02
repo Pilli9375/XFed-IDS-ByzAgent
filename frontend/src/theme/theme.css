@@ -958,3 +958,22 @@ h3 {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Retry button for partial /shap failure (Detect, Explain). */
+.xf-retry-btn {
+  background: var(--surface-hi);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: var(--font-stack);
+  cursor: pointer;
+}
+.xf-retry-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.xf-retry-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
