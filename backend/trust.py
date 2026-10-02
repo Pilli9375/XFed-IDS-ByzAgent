@@ -172,6 +172,74 @@ def _client_stats_means(client_stats_path: Path) -> dict[int, dict]:
     return out
 
 
+_STAT_SERIES_FIELDS = ("update_norm", "cosine_to_global", "cosine_to_peer_mean", "train_loss", "val_accuracy")
+
+
+def _stat_series(client_stats_path: Path) -> dict:
+    """{rounds:[...], silos:[{silo_id, <field>:[...]}]} for the stat small
+    multiples. Each field list is aligned 1:1 with `rounds`; a (silo, round)
+    with no row in client_stats.jsonl is None. Values are served as stored,
+    unrounded and unnormalized."""
+    rows = _read_jsonl(client_stats_path)
+    by_key = {(_silo_int(r["silo_id"]), int(r["round"])): r for r in rows}
+    rounds = sorted({rnd for _, rnd in by_key})
+    silo_ids = sorted({silo for silo, _ in by_key})
+    silos = []
+    for silo in silo_ids:
+        entry = {"silo_id": silo}
+        for field in _STAT_SERIES_FIELDS:
+            entry[field] = [
+                by_key[(silo, rnd)].get(field) if (silo, rnd) in by_key else None
+                for rnd in rounds
+            ]
+        silos.append(entry)
+    return {"rounds": rounds, "silos": silos}
+
+
+def _explanations(decision_rows: list[dict]) -> list[dict]:
+    """Every (silo, round) with a non-empty explanation, text verbatim from
+    the decision log -- never edited or summarized. The LLM-nondeterminism
+    caveat lives only in the snapshot's nondeterminism_notice."""
+    out = []
+    for row in decision_rows:
+        text = row.get("explanation")
+        if not isinstance(text, str) or not text:
+            continue
+        out.append({
+            "silo_id": _silo_int(row["silo_id"]),
+            "round": int(row["round"]),
+            "decision": row["decision"],
+            "text": text,
+        })
+    out.sort(key=lambda e: (e["silo_id"], e["round"]))
+    return out
+
+
+def _cross_validate_series(per_silo: list[dict], stat_series: dict,
+                           explanations: list[dict], decision_grid: dict) -> str | None:
+    """Returns a failure reason, or None if everything agrees. Checks that
+    the new data matches what the pre-existing fields already serve:
+    non-null stat count == per_silo n_rounds for every silo, and every
+    explanation's (silo, round) exists in decision_grid with the same
+    decision (grid severities are compared via DECISION_SEVERITY)."""
+    n_rounds_by_silo = {e["silo_id"]: e["n_rounds"] for e in per_silo}
+    for s in stat_series["silos"]:
+        for field in _STAT_SERIES_FIELDS:
+            n_nonnull = sum(v is not None for v in s[field])
+            if n_nonnull != n_rounds_by_silo.get(s["silo_id"]):
+                return (f"stat_series silo {s['silo_id']} {field}: {n_nonnull} non-null values "
+                        f"!= per_silo n_rounds {n_rounds_by_silo.get(s['silo_id'])}")
+    grid_rounds = {r: i for i, r in enumerate(decision_grid["rounds"])}
+    grid_by_silo = {s["silo_id"]: s["severities"] for s in decision_grid["silos"]}
+    for e in explanations:
+        idx = grid_rounds.get(e["round"])
+        sev = grid_by_silo.get(e["silo_id"], [None] * len(grid_rounds))[idx] if idx is not None else None
+        if sev is None or sev != DECISION_SEVERITY.get(e["decision"]):
+            return (f"explanation (silo {e['silo_id']}, round {e['round']}, decision "
+                    f"{e['decision']!r}) not matched by decision_grid (severity {sev})")
+    return None
+
+
 def _build_run_summary(run_dir: Path, run_tag: str) -> tuple[dict | None, str | None]:
     """Returns (summary, failure_reason). summary is None iff any required
     artifact is missing, or the decision log fails to produce a grid (e.g.
@@ -204,11 +272,19 @@ def _build_run_summary(run_dir: Path, run_tag: str) -> tuple[dict | None, str | 
         entry.update(stats_means.get(silo, {}))
         per_silo.append(entry)
 
+    stat_series = _stat_series(client_stats_path)
+    explanations = _explanations(decision_rows)
+    mismatch = _cross_validate_series(per_silo, stat_series, explanations, decision_grid)
+    if mismatch:
+        return None, f"{run_dir.name}: series cross-validation failed: {mismatch}"
+
     summary = {
         "run_tag": run_tag,
         "decision_log": decision_log.name,
         "per_silo": per_silo,
         "decision_grid": decision_grid,
+        "stat_series": stat_series,
+        "explanations": explanations,
     }
     return summary, None
 
