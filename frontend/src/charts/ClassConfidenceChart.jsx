@@ -18,14 +18,9 @@ function ConfTooltip({ active, payload }) {
 }
 
 export default function ClassConfidenceChart({ probs }) {
-  // KNOWN ISSUE (pre-existing, reproduced on both dev and prod builds, not
-  // a build-specific bug): with 9 classes and softmax outputs spanning down
-  // to ~1e-17, Recharts renders only 8 of 9 bar shapes -- the smallest-value
-  // class silently has no Cell/path in the DOM, though its y-axis label and
-  // tooltip position are unaffected. Rounding the values to collapse several
-  // to exactly 0 was tried and made it WORSE (only 1 shape rendered instead
-  // of 8), so that is not the fix -- reverted. Filed as a follow-up rather
-  // than shipping a guessed workaround; see the session's final-QA report.
+  // Softmax outputs span down to ~1e-17, so some bars are sub-pixel and
+  // Recharts drops them. minPointSize gives every bar a 2px floor without
+  // touching the data: labels and tooltip still show the true probability.
   const data = Object.entries(probs)
     .map(([name, prob]) => ({ name, prob }))
     .sort((a, b) => b.prob - a.prob);
@@ -43,7 +38,7 @@ export default function ClassConfidenceChart({ probs }) {
         />
         <YAxis type="category" dataKey="name" width={90} stroke={BORDER_HI} tick={{ fill: TEXT_MUTED, fontSize: 12 }} />
         <Tooltip content={<ConfTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-        <Bar dataKey="prob" barSize={18} isAnimationActive={false}>
+        <Bar dataKey="prob" barSize={18} minPointSize={2} isAnimationActive={false}>
           {data.map((d) => (
             <Cell key={d.name} fill={familyColor(d.name)} />
           ))}
