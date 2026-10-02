@@ -41,15 +41,19 @@ results/**/*.log
 # spent test_global.parquet test set) -- must stay tracked.
 !results/inspection/*.csv
 !results/inspection/best_rounds_manifest.json
-!results/shap/**/eval_rows_sidecar.npz
 # ...and these two: served live by GET /faithfulness/*.png and rendered
 # by the Faithfulness page -- not illustrative like the other figures.
 !results/figures/deletion_curve.png
 !results/figures/insertion_curve.png
 # Startup-critical for the SERVED model only (configs/backend.yaml model.tag):
-# the backend refuses to start without these. Deliberately scoped to the one
-# tag -- not results/shap/**, which would also un-ignore every other tag's
-# and round_wise/'s global_shap.npz.
-!results/shap/fedavg_a0.5_s42/streamed_pool.npz
+# these two stay tracked. The backend also needs streamed_pool.npz and
+# eval_rows_sidecar.npz, but those are untracked -- see below and README.md.
+# Deliberately scoped to the one tag -- not results/shap/**, which would also
+# un-ignore every other tag's and round_wise/'s global_shap.npz.
 !results/shap/fedavg_a0.5_s42/global_shap.npz
 !results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt
+
+# Demo data -- untracked and ignored; regenerated locally via the commands in
+# README.md ("Reproducing the demo data"), not redistributed.
+results/shap/**/streamed_pool.npz
+results/shap/**/eval_rows_sidecar.npz

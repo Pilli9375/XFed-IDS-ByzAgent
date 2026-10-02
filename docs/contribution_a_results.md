@@ -176,6 +176,12 @@ This is stated as an **open pattern, with no mechanism proposed**. Three analyse
 
 ---
 
+## Test-set access note
+
+**Test-set access note.** The test set was evaluated exactly once, for model evaluation. Separately, raw feature values for 514 rows (a 14-row eval sidecar and a 500-row streamed SHAP pool) were read from `test_global.parquet` for display in the demo dashboard only, because SHAP values for those rows had already been computed. No metric was recomputed, no model was selected, and no reported number derives from these reads. Both reads were one-time and logged.
+
+---
+
 ## Limitations
 
 Consolidated from `PROJECT_INSTRUCTIONS.md` ("Known findings that constrain claims"), the dashboard (`app_lib/sections.py`, "Known limitations"), `docs/measurement_protocol.md` §10, and new limitations surfaced in the FedProx/verification work (§6 above and its supporting conversation). Entries stated in more than one source are merged into one row citing all sources; nothing is dropped silently.
