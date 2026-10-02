@@ -77,4 +77,5 @@ export const NAV_ICONS = {
     'M10 2a8 8 0 100 16 8 8 0 000-16zm0 3.2a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zM9 9h2v6H9V9z',
   'Client Trust Monitor':
     'M3 4h11v2H3V4zm0 5h8v2H3V9zm0 5h5v2H3v-2zm13-6l1.4 1.4L13 13.8l-2.4-2.4L12 10l1 1 3-3z',
+  'Alert Stream': 'M10 2a5 5 0 00-5 5v3l-1.5 3h13L15 10V7a5 5 0 00-5-5zm-2 13a2 2 0 004 0H8z',
 };

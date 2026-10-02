@@ -130,6 +130,16 @@ class PredictRequest(BaseModel):
         default=False,
         description="Set True only by the traffic simulator. Any other caller leaves this False so an incidental /predict call does not appear in GET /alerts.",
     )
+    # Set by backend/simulator.py when the row it just posted happens to be
+    # one of the 500 in results/shap/<tag>/streamed_pool.npz (it reads that
+    # file's sample_id array directly to know). Re-validated against
+    # app.state.streamed_pool below before being trusted -- an unknown or
+    # stale id here is silently ignored (shap_available stays false), never
+    # taken on the caller's word alone.
+    shap_sample_id: int | None = Field(
+        default=None,
+        description="This row's test_global.parquet position, if the caller knows it's in the streamed SHAP pool. Ignored by the model; re-validated server-side.",
+    )
 
 
 class PredictResponse(BaseModel):
@@ -148,15 +158,38 @@ class Alert(BaseModel):
     predicted_family: str
     confidence: float
     true_family: str | None
-    # Always False here: the only precomputed SHAP artifact is a fixed
-    # 14-row curated set (see GET /shap/{sample_id}) that carries no link
-    # back to test_global.parquet rows -- confirmed in Step 0, and this is
-    # exactly the scope collision that was routed to planning rather than
-    # papered over with a fake link, a sample drawn from the 14, or a live
-    # SHAP computation (forbidden -- /shap never computes). Every alert this
-    # buffer ever holds will have shap_available=False until that collision
-    # is actually resolved upstream.
+    # True iff this row's test_global.parquet position is one of the 500 in
+    # results/shap/<tag>/streamed_pool.npz (Step 7) -- server-validated
+    # against app.state.streamed_pool, not taken on the request's word.
+    # False for the other ~99.9% of streamed rows and for any non-simulator
+    # caller (record_alert callers that never pass shap_sample_id). Still
+    # never a live SHAP computation, never a fake link, never sampled from
+    # the original 14 -- /shap never computes, this only widened the
+    # precomputed pool it can serve from.
     shap_available: bool
+    # sample_id to pass to GET /shap/{sample_id} when shap_available is
+    # true. Null whenever shap_available is false.
+    shap_sample_id: int | None = None
+
+
+class ExplainFeature(BaseModel):
+    name: str
+    raw_value: float
+    # Signed SHAP contribution to the PREDICTED class (not ground truth) --
+    # positive raises the likelihood of predicted_family, negative lowers it.
+    shap_value: float
+
+
+class ExplainResponse(BaseModel):
+    sample_id: int
+    tag: str
+    # Precomputed offline (tools/build_explanations.py, Step 8) -- never
+    # generated at request time, no model in this process. Usability aid
+    # only, per PROJECT_INSTRUCTIONS.md: never a novelty claim.
+    sentence: str
+    predicted_family: str
+    confidence: float
+    top_features: list[ExplainFeature]
 
 
 class ShapResponse(BaseModel):
@@ -234,6 +267,63 @@ def _load_shap_arrays(loaded: LoadedModel, cfg_paths: dict) -> dict[str, np.ndar
     return arrays
 
 
+def _load_streamed_shap_pool(loaded: LoadedModel, cfg_paths: dict) -> dict:
+    """Loads results/shap/<tag>/<shap_streamed_pool_filename>.npz (Step 7,
+    tools/build_shap_streamed_pool.py) fully into memory once, closes the
+    file, and builds a sample_id -> row-index lookup dict so GET
+    /shap/{sample_id} does an O(1) dict lookup, never a scan, per request.
+    Required, not optional -- same fail-loud posture as the sidecar above:
+    if it's missing, run that script by hand first."""
+    shap_dir = resolve_path(cfg_paths, "shap_dir")
+    pool_path = shap_dir / loaded.tag / cfg_paths["shap_streamed_pool_filename"]
+    if not pool_path.exists():
+        raise RuntimeError(
+            f"Streamed SHAP pool {pool_path} does not exist for tag={loaded.tag}. "
+            f"Run `python -m tools.build_shap_streamed_pool --tag {loaded.tag}` first -- "
+            f"this backend never computes it itself."
+        )
+    with np.load(pool_path) as npz:
+        arrays = {k: npz[k].copy() for k in npz.files}
+    required = {"shap_values", "sample_id", "raw_values", "eval_families", "additivity_max_diff"}
+    missing = required - arrays.keys()
+    if missing:
+        raise RuntimeError(f"{pool_path} is missing expected array(s) {missing}.")
+
+    index = {int(sid): i for i, sid in enumerate(arrays["sample_id"])}
+    if len(index) != len(arrays["sample_id"]):
+        raise RuntimeError(f"{pool_path}'s sample_id array contains duplicate row positions.")
+    arrays["index"] = index
+
+    log.info(
+        "loaded streamed SHAP pool %s: %d rows, sample_id range=[%d, %d]",
+        pool_path, len(arrays["sample_id"]), int(arrays["sample_id"].min()), int(arrays["sample_id"].max()),
+    )
+    return arrays
+
+
+def _load_explanations(loaded: LoadedModel, cfg_paths: dict) -> dict[int, dict]:
+    """Loads results/explanations/<tag>/sentences.json (Step 8,
+    tools/build_explanations.py) fully into memory once, keyed by int
+    sample_id -- same dict-lookup-only posture as the SHAP pools above, no
+    model or subprocess anywhere in this path. Required, not optional: if
+    it's missing, run that script by hand first."""
+    explanations_dir = resolve_path(cfg_paths, "explanations_dir")
+    path = explanations_dir / loaded.tag / cfg_paths["explanations_filename"]
+    if not path.exists():
+        raise RuntimeError(
+            f"Explanations file {path} does not exist for tag={loaded.tag}. "
+            f"Run `python -m tools.build_explanations --tag {loaded.tag}` first -- "
+            f"this backend never generates sentences itself."
+        )
+    payload = json.loads(path.read_text())
+    rows = {int(sid): row for sid, row in payload["rows"].items()}
+    log.info(
+        "loaded explanations %s: %d rows (%d excluded at generation time), model=%s",
+        path, len(rows), payload.get("n_excluded", 0), payload.get("model", "?"),
+    )
+    return rows
+
+
 def _csv_records_json(path) -> list:
     """Read once, normalize to JSON-native types via pandas' own encoder
     (handles numpy dtypes and NaN->null), return already-parsed records."""
@@ -271,6 +361,8 @@ async def lifespan(app: FastAPI):
 
     app.state.loaded = loaded
     app.state.shap_arrays = _load_shap_arrays(loaded, cfg_paths)
+    app.state.streamed_pool = _load_streamed_shap_pool(loaded, cfg_paths)
+    app.state.explanations = _load_explanations(loaded, cfg_paths)
     app.state.agreement_json, app.state.parity_json = _load_cached_endpoints(cfg_paths)
 
     # Contribution B: ByzAgent trust panel. Built once here, cached as a
@@ -401,6 +493,15 @@ def predict(request: PredictRequest) -> PredictResponse:
     confidence = float(probs[class_idx])
     probabilities = {name: float(p) for name, p in zip(loaded.class_names, probs)}
 
+    # Re-validated against the actually-loaded pool, never taken on the
+    # request's word -- an id the caller claims but that isn't really in
+    # app.state.streamed_pool (stale, wrong tag, made up) silently falls
+    # back to shap_available=False rather than serving/claiming SHAP that
+    # doesn't exist for it.
+    shap_sample_id = None
+    if request.shap_sample_id is not None and request.shap_sample_id in app.state.streamed_pool["index"]:
+        shap_sample_id = request.shap_sample_id
+
     # Opt-in: only a caller that explicitly asks (the simulator) produces an
     # alert -- Benign included, per the 9-class family requirement (never a
     # binary attack/no-attack flag). The React frontend, manual debugging
@@ -412,7 +513,8 @@ def predict(request: PredictRequest) -> PredictResponse:
             predicted_family=family,
             confidence=confidence,
             true_family=request.true_family,
-            shap_available=False,
+            shap_available=shap_sample_id is not None,
+            shap_sample_id=shap_sample_id,
         )
         with app.state.alert_lock:
             app.state.alert_buffer.append(alert)
@@ -463,26 +565,80 @@ def hotswap_revert() -> HotSwapInfo:
 
 @app.get("/shap/{sample_id}", response_model=ShapResponse)
 def shap(sample_id: int) -> ShapResponse:
+    """Positional over the curated 14 ([0,13]) first; anything outside that
+    range is looked up in the streamed pool's sample_id array (Step 7) by
+    its actual test_global.parquet row position. 404 only if it's in
+    neither -- this is why the curated range always wins even in the
+    astronomically unlikely case a streamed row's real position also fell
+    inside [0,13]: the priority order itself is the whole disambiguation."""
     loaded: LoadedModel = app.state.loaded
     arrays = app.state.shap_arrays
-    n_samples = arrays["shap_values"].shape[0]
+    n_curated = arrays["shap_values"].shape[0]
 
-    if sample_id < 0 or sample_id >= n_samples:
+    if 0 <= sample_id < n_curated:
+        return ShapResponse(
+            sample_id=sample_id,
+            tag=loaded.tag,
+            eval_family=str(arrays["eval_families"][sample_id]),
+            feature_names=loaded.feature_cols,
+            class_names=loaded.class_names,
+            shap_values=arrays["shap_values"][sample_id].tolist(),
+            additivity_max_diff=float(arrays["additivity_max_diff"]),
+            raw_values=arrays["raw_values"][sample_id].tolist(),
+            base_values=arrays["base_values"].tolist(),
+        )
+
+    pool = app.state.streamed_pool
+    idx = pool["index"].get(sample_id)
+    if idx is None:
         raise HTTPException(
             status_code=404,
-            detail=f"sample_id must be in [0, {n_samples - 1}], got {sample_id}.",
+            detail=f"sample_id {sample_id} is not in the curated set [0,{n_curated - 1}] "
+                    f"or the {len(pool['index'])}-row streamed pool.",
         )
 
     return ShapResponse(
         sample_id=sample_id,
         tag=loaded.tag,
-        eval_family=str(arrays["eval_families"][sample_id]),
+        eval_family=str(pool["eval_families"][idx]),
         feature_names=loaded.feature_cols,
         class_names=loaded.class_names,
-        shap_values=arrays["shap_values"][sample_id].tolist(),
-        additivity_max_diff=float(arrays["additivity_max_diff"]),
-        raw_values=arrays["raw_values"][sample_id].tolist(),
+        shap_values=pool["shap_values"][idx].tolist(),
+        # Per-row here (streamed_pool.npz stores one per row), unlike the
+        # curated set's single batch-wide scalar above.
+        additivity_max_diff=float(pool["additivity_max_diff"][idx]),
+        raw_values=pool["raw_values"][idx].tolist(),
+        # base_values is a property of the model + background, not the row --
+        # the streamed pool reuses the SAME background as the curated set
+        # (get_federated_global_background(), fixed seed 777), so reusing
+        # arrays["base_values"] here is correct, not a placeholder.
         base_values=arrays["base_values"].tolist(),
+    )
+
+
+@app.get("/explain/{sample_id}", response_model=ExplainResponse)
+def explain(sample_id: int) -> ExplainResponse:
+    """Dict lookup only -- no model, no subprocess, no network call.
+    Step 8's whole point: results/explanations/<tag>/sentences.json was
+    generated OFFLINE (tools/build_explanations.py) for exactly the same
+    514-row set GET /shap/{sample_id} serves. 404 if sample_id isn't in
+    that precomputed set -- same boundary as /shap, not a superset or a
+    fallback to live generation."""
+    loaded: LoadedModel = app.state.loaded
+    row = app.state.explanations.get(sample_id)
+    if row is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"sample_id {sample_id} has no precomputed explanation. "
+                    f"Only rows in the precomputed SHAP set (curated + streamed pool) are covered.",
+        )
+    return ExplainResponse(
+        sample_id=sample_id,
+        tag=loaded.tag,
+        sentence=row["sentence"],
+        predicted_family=row["predicted_family"],
+        confidence=row["confidence"],
+        top_features=[ExplainFeature(**f) for f in row["top_features"]],
     )
 
 

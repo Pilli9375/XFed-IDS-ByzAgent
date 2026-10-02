@@ -20,6 +20,13 @@ paths:
   # itself; if this file is missing for the configured tag, run that script
   # by hand first.
   shap_sidecar_filename: eval_rows_sidecar.npz
+  # Larger SHAP pool for streamed simulator alerts, built OFFLINE by
+  # tools/build_shap_streamed_pool.py (500 rows, stratified across the 7
+  # headline families, each with an explicit sample_id = its row position
+  # in test_global.parquet). Read at startup exactly like the two above.
+  # backend/simulator.py also reads this file's sample_id array directly
+  # (not through the API) to know which streamed rows to tag.
+  shap_streamed_pool_filename: streamed_pool.npz
   agreement_metrics: results/inspection/agreement_metrics.csv
   per_silo_agreement: results/inspection/per_silo_agreement.csv
   round_wise_agreement: results/inspection/round_wise_agreement.csv
@@ -53,6 +60,15 @@ paths:
   deletion_auc: results/inspection/deletion_auc.csv
   insertion_auc: results/inspection/insertion_auc.csv
   figures_dir: results/figures
+
+  # GET /explain/{sample_id} -- Step 8, LLM explanation layer. Pregenerated
+  # OFFLINE by tools/build_explanations.py (one sentence per row of the
+  # SAME 514-row set /shap already serves: 14 curated + 500 streamed).
+  # Read at startup exactly like the SHAP artifacts above; the backend
+  # never calls an LLM itself. Resolved per-request as
+  # explanations_dir/<tag>/explanations_filename.
+  explanations_dir: results/explanations
+  explanations_filename: sentences.json
 
 model:
   # Which (algo, alpha, seed) run this backend serves. Must match a "tag"

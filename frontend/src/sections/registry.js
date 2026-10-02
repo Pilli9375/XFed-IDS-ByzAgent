@@ -106,4 +106,18 @@ export const SECTIONS = [
       '<code>client_stats.jsonl</code> already on disk. Nothing on this page is retrained or recomputed.',
     group: 'trust',
   },
+  {
+    key: 'alert-stream',
+    path: '/alert-stream',
+    navLabel: 'Alert Stream',
+    icon: NAV_ICONS['Alert Stream'],
+    eyebrow: 'Analyst tools',
+    title: 'Alert Stream',
+    lede:
+      'Alerts recorded by the traffic simulator, which replays held-out test flows through the ' +
+      'live model. Open an alert to see its precomputed SHAP explanation, when one exists — ' +
+      'a small fixed subset of streamed rows has one, the rest do not, and nothing is computed ' +
+      'on demand. An operational view: <b>not</b> a result of either research contribution.',
+    group: 'analyst',
+  },
 ];

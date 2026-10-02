@@ -11,9 +11,8 @@ import Stat from '../components/Stat';
 import Subhead from '../components/Subhead';
 import ShapContributionsChart from '../charts/ShapContributionsChart';
 import { buildEvalRowLabels } from '../lib/detect';
+import { buildShapView } from '../lib/shap';
 import { ACCENT, ALERT, TEXT_FAINT, WARN } from '../theme/tokens';
-
-const TOP_K = 10;
 
 const RAW_COLUMNS = [
   { key: 'feature', label: 'Feature', render: (r) => r.feature },
@@ -139,22 +138,17 @@ function ExplainBody({ rows }) {
 function ExplainRight({ row, featureNames, classNames, className }) {
   const classIdx = classNames.indexOf(className);
 
-  const { chartData, baseValue, reconstructed } = useMemo(() => {
-    const svRow = row.shap_values.map((f) => f[classIdx]);
-    const base = row.base_values[classIdx];
-    const order = svRow.map((_, i) => i).sort((a, b) => Math.abs(svRow[b]) - Math.abs(svRow[a]));
-    const topIdx = order.slice(0, TOP_K);
-    const restSum = order.slice(TOP_K).reduce((s, i) => s + svRow[i], 0);
-
-    const data = topIdx.map((i) => ({ name: featureNames[i], value: svRow[i], raw: row.raw_values[i] }));
-    data.push({ name: `Other ${featureNames.length - TOP_K} features (sum)`, value: restSum, raw: null });
-
-    return {
-      chartData: data,
-      baseValue: base,
-      reconstructed: base + svRow.reduce((a, b) => a + b, 0),
-    };
-  }, [row, classIdx, featureNames]);
+  const { chartData, baseValue, reconstructed } = useMemo(
+    () =>
+      buildShapView({
+        shapValues: row.shap_values,
+        rawValues: row.raw_values,
+        baseValues: row.base_values,
+        featureNames,
+        classIdx,
+      }),
+    [row, classIdx, featureNames],
+  );
 
   const rawTableRows = chartData
     .filter((d) => d.raw != null)

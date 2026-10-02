@@ -111,3 +111,17 @@ export async function postHotswapRevert() {
   }
   return res.json();
 }
+
+// Newest-first ring buffer of recorded alerts: [{ timestamp, predicted_family,
+// confidence, true_family, shap_available, shap_sample_id }]. Read-only --
+// nothing in this frontend ever sets record_alert.
+export function getAlerts() {
+  return getJSON('/alerts');
+}
+
+// Precomputed one-sentence analyst aid for a row in the precomputed SHAP set
+// (curated + streamed pool). 404 outside that set -- callers only ask when
+// an alert says shap_available.
+export function getExplain(sampleId) {
+  return getJSON(`/explain/${sampleId}`);
+}

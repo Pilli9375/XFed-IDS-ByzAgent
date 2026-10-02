@@ -353,6 +353,14 @@ h3 {
   grid-template-columns: 1fr 1.6fr;
   gap: 1.25rem;
 }
+/* Alert Stream: feed on the left, per-alert detail panel on the right. Same
+   rule as above -- a named class so it joins the shared collapse breakpoint. */
+.xf-grid-alerts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: 1.25rem;
+  align-items: start;
+}
 /* Grid tracks default to min-width: auto, sized by content -- defensively
    let the explicit fr sizing win instead of a child's own intrinsic width
    (matters for anything measuring its container, like Recharts'
@@ -360,15 +368,24 @@ h3 {
 .xf-grid-2 > *,
 .xf-grid-3 > *,
 .xf-grid-4 > *,
-.xf-grid-explain > * {
+.xf-grid-explain > *,
+.xf-grid-alerts > * {
   min-width: 0;
 }
 @media (max-width: 900px) {
   .xf-grid-2,
   .xf-grid-3,
   .xf-grid-4,
-  .xf-grid-explain {
+  .xf-grid-explain,
+  .xf-grid-alerts {
     grid-template-columns: 1fr;
+  }
+}
+/* The alert panel's chart needs ~500px (170px axis labels + plot); below
+   this the feed + panel split leaves the plot area ~150px, so stack. */
+@media (max-width: 1100px) {
+  .xf-grid-alerts {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -802,4 +819,125 @@ h3 {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-hi);
+}
+
+/* ---- Alert Stream ---------------------------------------------------------
+   Deliberately plain/neutral: no accent bar, no callout tones, dashed frame
+   for the analyst-aid block -- it must not read as part of Contribution A's
+   explanation-parity narrative. */
+.xf-alert-list {
+  max-height: 560px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.xf-alert-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-stack);
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+.xf-alert-row:last-child {
+  border-bottom: 0;
+}
+.xf-alert-row:hover {
+  background: var(--surface-hi);
+}
+.xf-alert-row.selected {
+  background: var(--surface-hi);
+  box-shadow: inset 3px 0 0 var(--border-hi);
+}
+.xf-alert-row .xf-pill {
+  margin-right: 0;
+}
+.xf-alert-time {
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  min-width: 5.2rem;
+}
+.xf-alert-conf {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.xf-alert-truth {
+  color: var(--text-faint);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xf-alert-panel {
+  min-width: 0;
+}
+.xf-alert-panel--empty {
+  border: 1px dashed var(--border-hi);
+  border-radius: 12px;
+  padding: 1.2rem 1.3rem;
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  background: var(--surface);
+}
+.xf-alert-nosnap {
+  margin-top: 0.8rem;
+  border: 1px dashed var(--border-hi);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  background: var(--surface);
+}
+.xf-alert-summary {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+.xf-alert-summary__family {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tone, var(--text));
+}
+.xf-alert-summary__meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+.xf-analyst-aid {
+  margin-top: 0.8rem;
+  border: 1px dashed var(--border-hi);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem 1rem 1.1rem;
+  background: var(--surface);
+}
+.xf-analyst-aid__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+.xf-analyst-aid__sentence {
+  margin: 0 0 0.6rem 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+.xf-analyst-aid__note {
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--text-faint);
 }

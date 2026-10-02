@@ -3,6 +3,7 @@ import { useBackendStatus } from './api/useBackendStatus';
 import HotSwapBanner from './components/HotSwapBanner';
 import Footer from './layout/Footer';
 import Sidebar from './layout/Sidebar';
+import AlertStream from './sections/AlertStream';
 import ClientTrustMonitor from './sections/ClientTrustMonitor';
 import Detect from './sections/Detect';
 import Explain from './sections/Explain';
@@ -23,6 +24,7 @@ const SECTION_COMPONENTS = {
   'client-trust-monitor': ClientTrustMonitor,
   faithfulness: Faithfulness,
   'methods-limits': MethodsLimits,
+  'alert-stream': AlertStream,
 };
 
 export default function App() {

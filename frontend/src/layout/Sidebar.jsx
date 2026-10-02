@@ -65,6 +65,7 @@ function BackendStatus({ status }) {
 export default function Sidebar({ status }) {
   const sections = SECTIONS.filter((s) => s.group === 'sections');
   const trust = SECTIONS.filter((s) => s.group === 'trust');
+  const analyst = SECTIONS.filter((s) => s.group === 'analyst');
 
   return (
     <aside className="xf-sidebar">
@@ -83,6 +84,9 @@ export default function Sidebar({ status }) {
 
         <div className="xf-navlabel">Contribution B</div>
         <NavGroup items={trust} />
+
+        <div className="xf-navlabel">Analyst tools</div>
+        <NavGroup items={analyst} />
       </div>
 
       <div className="xf-sidebar-footer">
