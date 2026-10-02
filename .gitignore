@@ -57,3 +57,7 @@ results/**/*.log
 # README.md ("Reproducing the demo data"), not redistributed.
 results/shap/**/streamed_pool.npz
 results/shap/**/eval_rows_sidecar.npz
+
+# Local working documents -- not part of the repo
+XFED_PLAYBOOK.md
+PHASE2_OPENING_PROMPT.md
