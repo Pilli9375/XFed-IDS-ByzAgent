@@ -361,6 +361,13 @@ h3 {
   gap: 1.25rem;
   align-items: start;
 }
+/* Client Trust Monitor stat small-multiples: 5 panels, 2 per row. A named
+   class (not an inline gridTemplateColumns) so it joins the shared collapse. */
+.xf-grid-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
 /* Grid tracks default to min-width: auto, sized by content -- defensively
    let the explicit fr sizing win instead of a child's own intrinsic width
    (matters for anything measuring its container, like Recharts'
@@ -369,7 +376,8 @@ h3 {
 .xf-grid-3 > *,
 .xf-grid-4 > *,
 .xf-grid-explain > *,
-.xf-grid-alerts > * {
+.xf-grid-alerts > *,
+.xf-grid-stats > * {
   min-width: 0;
 }
 @media (max-width: 900px) {
@@ -377,7 +385,8 @@ h3 {
   .xf-grid-3,
   .xf-grid-4,
   .xf-grid-explain,
-  .xf-grid-alerts {
+  .xf-grid-alerts,
+  .xf-grid-stats {
     grid-template-columns: 1fr;
   }
 }
@@ -940,4 +949,12 @@ h3 {
   font-size: 0.76rem;
   line-height: 1.55;
   color: var(--text-faint);
+}
+
+/* Verbatim LLM explanation text -- never truncated, wrapped as-is. */
+.xf-explain-text {
+  color: var(--text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

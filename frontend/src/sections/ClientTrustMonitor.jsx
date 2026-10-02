@@ -9,6 +9,7 @@ import SectionHeader from '../components/SectionHeader';
 import Subhead from '../components/Subhead';
 import CleanVsAttackLiftChart from '../charts/CleanVsAttackLiftChart';
 import DecisionGridHeatmap from '../charts/DecisionGridHeatmap';
+import StatSmallMultiples from '../charts/StatSmallMultiples';
 import { buildCleanVsAttackRows, formatConditionLabel } from '../lib/trust';
 import { ALERT, POSITIVE, TEXT_FAINT, WARN } from '../theme/tokens';
 
@@ -51,6 +52,138 @@ export default function ClientTrustMonitor({ eyebrow, title, lede }) {
       {status.state === 'loading' && <Callout tone={TEXT_FAINT}>Loading GET /trust…</Callout>}
       {status.state === 'error' && <Callout tone={ALERT}>Could not load GET /trust: {status.error}</Callout>}
       {status.state === 'ok' && <TrustBody data={status.data} />}
+    </>
+  );
+}
+
+const DECISION_TONE = { trust: POSITIVE, downweight: WARN, quarantine: ALERT };
+
+function siloOptionLabel(s, malicious) {
+  return `silo ${s}${malicious.includes(s) ? ' (malicious)' : ''}`;
+}
+
+// Ports trust_monitor.py View 4. The Streamlit original picked ONE run via a
+// radio; here both runs render side by side so an attack-side explanation is
+// never shown without its clean-run companion. Text is rendered verbatim.
+function ExplanationLookup({ condition, nSilos, nondeterminismNotice }) {
+  const malicious = condition.true_malicious_silos;
+  const rounds = condition.attack.stat_series.rounds;
+  const [silo, setSilo] = useState(0);
+  const [round, setRound] = useState(rounds[0]);
+  const find = (side) => side.explanations.find((e) => e.silo_id === silo && e.round === round);
+  const sides = [
+    ['Attack condition', condition.attack],
+    ['Clean run (no attack)', condition.clean],
+  ];
+
+  return (
+    <>
+      <Subhead
+        title="Explanation for one decision"
+        lede="The agent's actual natural-language rationale for a chosen (silo, round).
+          Explanation fidelity — whether a cited stat genuinely matches the decision — was
+          independently measured, not assumed; see <code>docs/contribution_b_results.md</code> §8 and
+          the reasoning-vs-outcome audit in <code>results/agents/PHASE3_SUMMARY.md</code> before
+          treating any one explanation below as self-evidently correct."
+      />
+      <div style={{ display: 'flex', gap: 'var(--sp-md)', flexWrap: 'wrap' }}>
+        <div>
+          <div className="xf-field-label">Silo</div>
+          <select className="xf-select" value={silo} onChange={(e) => setSilo(Number(e.target.value))}>
+            {Array.from({ length: nSilos }, (_, s) => (
+              <option key={s} value={s}>
+                {siloOptionLabel(s, malicious)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <div className="xf-field-label">Round</div>
+          <select className="xf-select" value={round} onChange={(e) => setRound(Number(e.target.value))}>
+            {rounds.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div style={{ height: 'var(--sp-sm)' }} />
+      {/* Verbatim from GET /trust, shown next to the LLM text it qualifies. */}
+      <Callout tone={WARN}>{nondeterminismNotice}</Callout>
+      <div style={{ height: 'var(--sp-sm)' }} />
+      <div className="xf-grid-2">
+        {sides.map(([label, side]) => {
+          const exp = find(side);
+          return (
+            <div className="xf-chart-card" key={label} data-explanation-side={label}>
+              <div className="xf-caption" style={{ marginTop: 0, marginBottom: '0.6rem' }}>
+                {label} — decision log: <code>{side.decision_log}</code> (current-round decisions)
+              </div>
+              {exp ? (
+                <>
+                  <Pills
+                    items={[
+                      [exp.decision, DECISION_TONE[exp.decision] ?? TEXT_FAINT],
+                      [
+                        `silo ${silo}, round ${round}${
+                          malicious.includes(silo)
+                            ? ' — malicious under this condition'
+                            : ' — not malicious under this condition'
+                        }`,
+                        TEXT_FAINT,
+                      ],
+                    ]}
+                  />
+                  <div style={{ height: 'var(--sp-sm)' }} />
+                  <div className="xf-explain-text">
+                    <b>Explanation:</b> {exp.text}
+                  </div>
+                </>
+              ) : (
+                <div className="xf-caption">No decision logged for that (silo, round) in this run.</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+// Ports trust_monitor.py View 5 (plots.stat_small_multiples). Clean and
+// attack are drawn together in every panel.
+function StatTrend({ condition, nSilos }) {
+  const malicious = condition.true_malicious_silos;
+  const [silo, setSilo] = useState(0);
+  return (
+    <>
+      <Subhead
+        title="Behavioral stat trend"
+        lede="The 5 stats fed to the agent, over rounds, for one silo — this is the raw input the
+          decisions above were made from."
+      />
+      <div>
+        <div className="xf-field-label">Silo</div>
+        <select className="xf-select" value={silo} onChange={(e) => setSilo(Number(e.target.value))}>
+          {Array.from({ length: nSilos }, (_, s) => (
+            <option key={s} value={s}>
+              {siloOptionLabel(s, malicious)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="xf-caption">
+        Grey = clean run (no attack); coloured = attack condition (red when this silo is truly
+        malicious). Both are drawn in every panel.
+      </div>
+      <div style={{ height: 'var(--sp-sm)' }} />
+      <StatSmallMultiples
+        cleanStats={condition.clean.stat_series}
+        attackStats={condition.attack.stat_series}
+        siloId={silo}
+        malicious={malicious.includes(silo)}
+      />
     </>
   );
 }
@@ -184,7 +317,7 @@ function TrustBody({ data }) {
       <div className="xf-grid-2">
         <div className="xf-chart-card">
           <div className="xf-caption" style={{ marginTop: 0, marginBottom: '0.6rem' }}>
-            Attack condition — {formatConditionLabel(condition)}
+            Attack condition — {formatConditionLabel(condition)} — decision log: {condition.attack.decision_log}
           </div>
           <DecisionGridHeatmap
             grid={condition.attack.decision_grid}
@@ -193,7 +326,7 @@ function TrustBody({ data }) {
         </div>
         <div className="xf-chart-card">
           <div className="xf-caption" style={{ marginTop: 0, marginBottom: '0.6rem' }}>
-            Clean run (no attack) — same silos, same decision log ({condition.clean.decision_log})
+            Clean run (no attack) — same silos — decision log: {condition.clean.decision_log}
           </div>
           <DecisionGridHeatmap
             grid={condition.clean.decision_grid}
@@ -215,6 +348,14 @@ function TrustBody({ data }) {
       </div>
       <div style={{ height: 'var(--sp-sm)' }} />
       <DataTable columns={LIFT_COLUMNS} rows={rows} getRowKey={(r) => r.silo} />
+
+      <Rule />
+
+      <ExplanationLookup condition={condition} nSilos={nSilos} nondeterminismNotice={nondeterminismNotice} />
+
+      <Rule />
+
+      <StatTrend condition={condition} nSilos={nSilos} />
 
       <Rule />
 
