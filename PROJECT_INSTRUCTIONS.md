@@ -90,6 +90,9 @@ ByzAgent Phase 4 is early on purpose: it is the only real finding in that track.
 - **Family-level conflict detection** over raw-label — the raw-label approach silently destroyed 58,307 learnable rows.
 - **Streamlit practical ceiling reached** — Phase 1 is at the limit of what Streamlit does well.
 
+Canonical source for Contribution A numbers: docs/contribution_a_results.md.
+Where it disagrees with this file or app_lib/sections.py, it wins.
+
 ---
 
 ## Headline numbers (state these exactly)
