@@ -125,7 +125,7 @@ def _load_global_class_weights(model_cfg: dict, path: Path) -> np.ndarray:
 def select_target_silo(manifest: dict, alpha: str, seed: int, family: str) -> int:
     """ENGINEERING CHOICE for the live Phase-2 system, NOT a research
     finding -- must never appear in or near the explanation-parity
-    (Contribution A) narrative. Signed off explicitly: routes a
+    (explanation check) narrative. Signed off explicitly: routes a
     confirmed sample to whichever of the 10 existing silos ALREADY has the
     highest Dirichlet-drawn share of this family (manifest.json's own
     dirichlet_proportions_train, already computed at partition time -- no
@@ -136,7 +136,7 @@ def select_target_silo(manifest: dict, alpha: str, seed: int, family: str) -> in
     one silo's local metrics before/after and see the effect) without
     touching the other 9 silos' frozen, hash-verified base partitions at
     all. It says nothing about explanation parity, agreement, or any
-    Contribution A measurement.
+    explanation-check measurement.
     """
     tag = f"a{alpha}_s{seed}"
     cfg = manifest.get("configs", {}).get(tag)

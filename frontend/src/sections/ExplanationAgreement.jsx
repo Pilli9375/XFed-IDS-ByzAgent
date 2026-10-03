@@ -23,7 +23,7 @@ import {
 import { ACCENT, ALERT, POSITIVE, TEXT_FAINT, VIOLET, WARN } from '../theme/tokens';
 
 // Bot/WebAttack near-duplication was tested, not confirmed -- see
-// PROJECT_INSTRUCTIONS.md "Known findings" and [[feedback_claim_sourcing_hierarchy]].
+// PROJECT_INSTRUCTIONS.md "Findings that limit what can be claimed" and [[feedback_claim_sourcing_hierarchy]].
 const CAVEAT_FAMILIES = new Set(['Bot', 'WebAttack']);
 
 const PER_FAMILY_COLUMNS = [

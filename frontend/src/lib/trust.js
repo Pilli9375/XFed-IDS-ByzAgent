@@ -1,4 +1,4 @@
-// Client-side helpers for the Client Trust Monitor (Contribution B).
+// Client-side helpers for the Client Trust Monitor (trust check).
 // GET /trust already does the hard part -- pairing clean+attack runs and
 // excluding anything that isn't a real pair, with a reason -- so there's no
 // pairing logic to reimplement here. The one thing this file does compute

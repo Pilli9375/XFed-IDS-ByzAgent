@@ -365,7 +365,7 @@ async def lifespan(app: FastAPI):
     app.state.explanations = _load_explanations(loaded, cfg_paths)
     app.state.agreement_json, app.state.parity_json = _load_cached_endpoints(cfg_paths)
 
-    # Contribution B: ByzAgent trust panel. Built once here, cached as a
+    # Trust check: ByzAgent trust panel. Built once here, cached as a
     # rendered JSON string exactly like agreement/parity above -- GET /trust
     # does zero I/O and zero recomputation per request.
     app.state.trust_json = json.dumps(build_trust_snapshot(cfg_paths, resolve_path))
@@ -663,7 +663,7 @@ def alerts() -> list[Alert]:
 
 @app.get("/trust")
 def trust() -> Response:
-    """ByzAgent trust panel (Contribution B). See backend/trust.py for the
+    """ByzAgent trust panel (trust check). See backend/trust.py for the
     pairing rule (every condition is clean+attack together or not rendered
     at all) and the decision-variance / nondeterminism-notice sourcing."""
     return Response(content=app.state.trust_json, media_type="application/json")

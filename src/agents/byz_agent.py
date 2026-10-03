@@ -1,4 +1,4 @@
-"""LLM-based per-round Byzantine-robust trust agent. ByzAgent Contribution B,
+"""LLM-based per-round Byzantine-robust trust agent. ByzAgent trust check,
 Phase 3 (current-round path) + Phase 4 (rolling-history path).
 
 ONE Ollama call per round, batched across every client in that round (never

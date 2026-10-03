@@ -14,14 +14,14 @@ against the test set) -- so this script runs the identical computation
 ONCE, offline, and persists the result.
 
 This is a deliberate, logged, one-time read of data/processed/test_global.parquet
-after Contribution A closed -- the test set is otherwise spent and every
+after the explanation check closed -- the test set is otherwise spent and every
 other path in this project (backend/model_loader.py:load_and_verify(), every
 GET /trust and GET /agreement path) is built to never touch it. Run this
 script by hand, read its log output, and keep it -- that log is the audit
 trail for this one exception.
 
 Writes to a NEW file, results/shap/<tag>/eval_rows_sidecar.npz. Never opens
-global_shap.npz for writing -- Contribution A's SHAP artifacts are read-only
+global_shap.npz for writing -- the explanation check's SHAP artifacts are read-only
 and this script does not change that.
 
 Reuses app_lib.loaders' canonical functions (get_fixed_eval_rows,

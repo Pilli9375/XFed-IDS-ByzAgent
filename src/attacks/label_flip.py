@@ -1,4 +1,4 @@
-"""Label-flip poisoning attack. ByzAgent Contribution B, Phase 0.
+"""Label-flip poisoning attack. ByzAgent trust check, Phase 0.
 
 PoisonedClient wraps the output of the EXISTING loader (load_silo() /
 load_silo_for_client()) -- it does not fork or reimplement client training.

@@ -8,7 +8,7 @@ import { useHotSwapStatus } from '../api/useHotSwapStatus';
 // was computed against. A viewer who doesn't know that reads a stale
 // number as if it described live behavior. Silence here is the failure
 // mode this component exists to prevent -- see the Step 2 design note:
-// "A dashboard showing Contribution A's reported metrics next to a
+// "A dashboard showing the explanation check's reported metrics next to a
 // silently-swapped model is the worst outcome this feature can produce."
 export default function HotSwapBanner() {
   const { status, revert } = useHotSwapStatus();

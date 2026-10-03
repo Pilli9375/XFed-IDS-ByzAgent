@@ -1,4 +1,4 @@
-"""Client Trust Monitor -- Contribution B / ByzAgent panel.
+"""Client Trust Monitor -- trust check (ByzAgent) panel.
 
 Visualizes ByzAgent's already-logged per-round trust decisions
 (agent_decisions*.jsonl) and behavioral stats (client_stats.jsonl).
@@ -35,7 +35,7 @@ def _mode_options(condition_key: str) -> dict[str, str]:
 
 def render_trust_monitor() -> None:
     theme.section_header(
-        "Contribution B",
+        "Trust check (ByzAgent)",
         "Client Trust Monitor",
         "ByzAgent's per-round trust decisions (trust / downweight / "
         "quarantine) for each of the 10 federation silos, read directly "

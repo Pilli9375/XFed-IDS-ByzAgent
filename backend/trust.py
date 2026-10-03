@@ -1,9 +1,9 @@
 """Builds the GET /trust snapshot (ByzAgent trust panel) once at startup.
 
-Contribution B (defenses/ByzAgent), kept visibly separate from Contribution
-A's /agreement and /parity: different response shape (a list of clean/attack
+The trust check (defenses/ByzAgent), kept visibly separate from the
+explanation check's /agreement and /parity: different response shape (a list of clean/attack
 condition pairs plus a decision-variance section, not a bag of CSV-shaped
-row arrays) and none of Contribution A's metric field names
+row arrays) and none of the explanation check's metric field names
 (kendall_weighted_tau, jaccard_at_*, tau_w, fleet_parity, silo_deviation,
 flagged, family_eligible) appear anywhere here.
 

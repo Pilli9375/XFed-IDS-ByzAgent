@@ -1,4 +1,4 @@
-"""Loaders for the Client Trust Monitor panel (Contribution B / ByzAgent).
+"""Loaders for the Client Trust Monitor panel (trust check / ByzAgent).
 
 Reads only pre-existing decision and behavioral-stat artifacts already on
 disk under results/federated/ and results/attacks/ -- no retraining, no

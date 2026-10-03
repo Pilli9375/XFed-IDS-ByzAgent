@@ -2,7 +2,7 @@ import Rule from '../components/Rule';
 import SectionHeader from '../components/SectionHeader';
 import Subhead from '../components/Subhead';
 
-// Source: PROJECT_INSTRUCTIONS.md, "Known findings that constrain claims"
+// Source: PROJECT_INSTRUCTIONS.md, "Findings that limit what can be claimed"
 // (not app_lib/sections.py -- sections.py's own Known-limitations block is
 // thinner than what this project's claims actually require; see the
 // decision note in this file's git history / session report for why
@@ -16,10 +16,10 @@ import Subhead from '../components/Subhead';
 // canonical, fuller write-up PROJECT_INSTRUCTIONS.md's own bullet compresses
 // -- not a competing number, marked as its own sourced addendum below.
 //
-// Excluded: PROJECT_INSTRUCTIONS.md's "Streamlit practical ceiling reached"
-// -- a Phase 1 dashboard/engineering note about the old Streamlit app, not a
-// measurement or claims limitation. docs/contribution_a_results.md excludes
-// this same item from its own Limitations table for the same reason.
+// Excluded: the Phase 1 Streamlit practical-ceiling note (no longer in
+// PROJECT_INSTRUCTIONS.md) -- an engineering note about the old Streamlit app,
+// not a measurement or claims limitation. docs/contribution_a_results.md
+// excludes this same item from its own Limitations table for the same reason.
 export default function MethodsLimits({ eyebrow, title, lede }) {
   return (
     <>
@@ -27,7 +27,7 @@ export default function MethodsLimits({ eyebrow, title, lede }) {
       <Rule />
 
       <Subhead title="Known limitations" />
-      <div className="xf-source-note">Source: PROJECT_INSTRUCTIONS.md, "Known findings that constrain claims"</div>
+      <div className="xf-source-note">Source: PROJECT_INSTRUCTIONS.md, "Findings that limit what can be claimed"; CPU-vs-GPU and family-level conflict items: configs/hotswap.yaml, data/README.md</div>
 
       <ul className="xf-limitations-list">
         <li>

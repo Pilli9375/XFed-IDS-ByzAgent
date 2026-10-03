@@ -1,8 +1,8 @@
 # configs/agent.yaml
-# ByzAgent -- Contribution B, Phase 3. LLM-based per-round trust-decision
+# ByzAgent -- trust check, Phase 3. LLM-based per-round trust-decision
 # agent for federated/xfed_federated/server_app.py. Deliberately a SEPARATE
 # file from configs/model.yaml / configs/attack.yaml / configs/defense.yaml:
-# Contribution B stays visibly distinct from Contribution A, same convention
+# The trust check stays visibly distinct from the explanation check, same convention
 # those two files already established.
 #
 # Consumed by server_app.py's main() ONLY when configs/defense.yaml has

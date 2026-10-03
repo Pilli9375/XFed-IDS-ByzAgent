@@ -1,4 +1,4 @@
-"""Per-client behavioral statistics. ByzAgent Contribution B, Phase 1.
+"""Per-client behavioral statistics. ByzAgent trust check, Phase 1.
 
 Five stats, computed server-side once per round, before aggregation
 discards each client's individual reply:

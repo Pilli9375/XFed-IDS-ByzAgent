@@ -1,6 +1,6 @@
-# Contribution B — Results
+# Trust check (ByzAgent) — Results
 
-**This is the canonical narrative write-up of Contribution B (ByzAgent: LLM-based
+**This is the canonical narrative write-up of the trust check (ByzAgent: LLM-based
 Byzantine-robustness for non-IID federated IDS).** It consolidates six
 engineer-facing phase summaries — `results/attacks/PHASE0_SUMMARY.md`,
 `results/monitoring/PHASE1_SUMMARY.md`, `results/defenses/PHASE2_SUMMARY.md`,
@@ -14,11 +14,11 @@ back to its source file.
 
 ---
 
-## 1. What Contribution B is, and what it is not
+## 1. What the trust check is, and what it is not
 
-Contribution B asks whether a Byzantine-robust aggregation mechanism can
+The trust check asks whether a Byzantine-robust aggregation mechanism can
 detect and mitigate a label-flipping attack in the same non-IID federated
-IDS setting Contribution A studies (Dirichlet-partitioned CICIDS2017,
+IDS setting the explanation check studies (Dirichlet-partitioned CICIDS2017,
 alpha=0.5, 10 silos), and whether an LLM-based trust agent (**ByzAgent**) can
 do this while also producing a natural-language rationale for its decisions.
 
@@ -903,7 +903,7 @@ this document.** Root `pyproject.toml` used to route `flwr run`'s default
 app target (a bare `flwr run` invocation from the repo root) at
 `src/federated/` — an early, much smaller prototype (`server_app.py`/`client_app.py`)
 that never implements best-by-validation checkpoint selection. Every number
-in this document, and every number in Contribution A, was produced by the
+in this document, and every number in the explanation check, was produced by the
 separate, independent app in `federated/` (invoked as `flwr run federated
 local-simulation`, which resolves entirely through `federated/pyproject.toml`
 and never reads root `pyproject.toml` at all — confirmed both by reading

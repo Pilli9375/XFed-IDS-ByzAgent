@@ -14,7 +14,7 @@ algorithm is reused directly from tools/local_shap_pipeline.py (the same
 code that built the original 14-row eval set) rather than reimplemented.
 
 Writes results/shap/<tag>/streamed_pool.npz -- a NEW file. Does not open
-global_shap.npz or eval_rows_sidecar.npz for writing; Contribution A's SHAP
+global_shap.npz or eval_rows_sidecar.npz for writing; the explanation check's SHAP
 artifacts and the Step 6 eval sidecar are both untouched.
 
 sample_id in the output is each row's POSITION in test_global.parquet (its

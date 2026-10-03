@@ -259,7 +259,7 @@ def silo_heatmap(matrix: pd.DataFrame, alpha: float, seed: int) -> go.Figure:
     return _base_layout(fig, 420)
 
 
-# --- Client Trust Monitor (Contribution B / ByzAgent) -----------------------
+# --- Client Trust Monitor (trust check / ByzAgent) -----------------------
 # Decision severity: 0=trust, 1=downweight, 2=quarantine. Fixed 3-color scale
 # (not a continuous colorbar) since these are categories, not a magnitude.
 

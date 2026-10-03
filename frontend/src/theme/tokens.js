@@ -57,7 +57,7 @@ export const MONO_STACK =
 // Spacing scale -- 4px base.
 export const SP = { xs: '0.25rem', sm: '0.5rem', md: '1rem', lg: '1.5rem', xl: '2.25rem', '2xl': '3.5rem' };
 
-// --- Client Trust Monitor (Contribution B / ByzAgent) -----------------------
+// --- Client Trust Monitor (trust check / ByzAgent) -----------------------
 // Decision severity: 0=trust, 1=downweight, 2=quarantine.
 export const DECISION_COLORS = { 0: POSITIVE, 1: WARN, 2: ALERT };
 export const DECISION_NAME_BY_SEVERITY = { 0: 'trust', 1: 'downweight', 2: 'quarantine' };

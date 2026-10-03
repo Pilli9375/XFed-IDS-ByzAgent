@@ -1,18 +1,18 @@
 # configs/defense.yaml
-# ByzAgent -- Contribution B, Phase 2. Robust-aggregation baseline selection
+# ByzAgent -- trust check, Phase 2. Robust-aggregation baseline selection
 # for federated/xfed_federated/server_app.py. Deliberately a SEPARATE file
-# from configs/model.yaml and configs/attack.yaml: Contribution B stays
-# visibly distinct from Contribution A (plain FedAvg), same convention
+# from configs/model.yaml and configs/attack.yaml: The trust check stays
+# visibly distinct from the explanation check (plain FedAvg), same convention
 # attack.yaml already established.
 #
 # Consumed by server_app.py's main(). RESTING STATE below (strategy:
 # fedavg, num_malicious_nodes: 0) has zero effect on the existing clean
-# FedAvg pipeline -- every locked Contribution A / Phase 0 / Phase 1 result
+# FedAvg pipeline -- every locked explanation-check / Phase 0 / Phase 1 result
 # is reproducible byte-for-byte regardless of this file's contents when left
 # at this resting state.
 
 defense:
-  # fedavg      -- plain FedAvg (Contribution A / Phase 0 / Phase 1 baseline).
+  # fedavg      -- plain FedAvg (explanation check / Phase 0 / Phase 1 baseline).
   # multikrum   -- PRIMARY Krum-family headline comparison (01_Planning,
   #                Phase 2 go-ahead). num_nodes_to_select = n_silos -
   #                num_malicious_nodes, computed at runtime in server_app.py

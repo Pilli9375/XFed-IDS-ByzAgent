@@ -2,9 +2,9 @@ import { NAV_ICONS } from '../theme/tokens';
 
 // Nav order, section identity, and header copy -- ported verbatim from the
 // theme.section_header(eyebrow, title, lede) calls in app_lib/sections.py
-// and app_lib/trust_monitor.py. Group 'trust' is Contribution B (ByzAgent);
+// and app_lib/trust_monitor.py. Group 'trust' is the trust check (ByzAgent);
 // group 'sections' is everything else. Kept as two visibly separate nav
-// groups so Contribution A (explanation parity) and Contribution B (trust
+// groups so the explanation check (explanation parity) and the trust check (trust
 // monitor) never read as one narrative -- see PHASE2_OPENING_PROMPT.md's
 // hard constraint.
 export const SECTIONS = [
@@ -98,7 +98,7 @@ export const SECTIONS = [
     path: '/client-trust-monitor',
     navLabel: 'Client Trust Monitor',
     icon: NAV_ICONS['Client Trust Monitor'],
-    eyebrow: 'Contribution B',
+    eyebrow: 'Trust check (ByzAgent)',
     title: 'Client Trust Monitor',
     lede:
       'ByzAgent’s per-round trust decisions (trust / downweight / quarantine) for each of the ' +

@@ -832,8 +832,8 @@ h3 {
 
 /* ---- Alert Stream ---------------------------------------------------------
    Deliberately plain/neutral: no accent bar, no callout tones, dashed frame
-   for the analyst-aid block -- it must not read as part of Contribution A's
-   explanation-parity narrative. */
+   for the analyst-aid block -- it must not read as part of the explanation
+   check's narrative. */
 .xf-alert-list {
   max-height: 560px;
   overflow-y: auto;

@@ -1,7 +1,7 @@
 # xfed-ids
 
 Explanation parity under non-IID federation for network intrusion detection
-(Contribution A), plus a demo dashboard (FastAPI backend + React frontend).
+(explanation check), plus a demo dashboard (FastAPI backend + React frontend).
 Canonical write-up: [`docs/contribution_a_results.md`](docs/contribution_a_results.md).
 
 ## Reproducing the demo data

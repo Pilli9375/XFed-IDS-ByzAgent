@@ -82,7 +82,7 @@ export default function Sidebar({ status }) {
         <div className="xf-navlabel">Sections</div>
         <NavGroup items={sections} />
 
-        <div className="xf-navlabel">Contribution B</div>
+        <div className="xf-navlabel">Trust check (ByzAgent)</div>
         <NavGroup items={trust} />
 
         <div className="xf-navlabel">Analyst tools</div>

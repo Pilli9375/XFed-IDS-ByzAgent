@@ -1,12 +1,12 @@
 # configs/attack.yaml
-# ByzAgent -- Contribution B. Label-flip poisoning attack for the federated
+# ByzAgent -- trust check. Label-flip poisoning attack for the federated
 # pipeline in src/federated/. Deliberately a SEPARATE file from
-# configs/model.yaml: Contribution B stays visibly distinct from Contribution
-# A (the clean federated baseline) in repo, slides, and report.
+# configs/model.yaml: The trust check stays visibly distinct from the explanation
+# check (the clean federated baseline) in repo, slides, and report.
 #
 # Read by src/attacks/label_flip.py. Consumed from src/federated/client_app.py
 # with zero effect on the existing pipeline when enabled: false -- that branch
-# is not entered at all, so every locked Contribution A result
+# is not entered at all, so every locked explanation-check result
 # (results/aggregated/federated_headline.csv etc.) is reproducible byte-for-
 # byte regardless of this file's contents.
 
