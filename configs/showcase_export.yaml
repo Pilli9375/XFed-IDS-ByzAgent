@@ -1,0 +1,100 @@
+# Config for tools/export_showcase_data.py (static showcase site data export).
+# Read-only on everything under results/ and docs/; writes only to output_dir.
+
+output_dir: site/public/data
+
+alphas: [0.1, 0.5, 5.0]
+seeds: [42, 1337, 2024]
+k: 10
+n_features: 82            # for the chance-level Jaccard formula (tools/agreement_metrics.py::chance_jaccard)
+eligible_column: family_eligible
+rounds_wise: [5, 10, 15, 20]
+final_window: 5           # "final-5-round mean"
+
+paths:
+  agreement_metrics: results/inspection/agreement_metrics.csv
+  agreement_metrics_fedprox: results/inspection/agreement_metrics_fedprox_mu0.0005.csv
+  best_rounds_manifest: results/inspection/best_rounds_manifest.json
+  best_rounds_manifest_fedprox: results/inspection/best_rounds_manifest_fedprox_mu0.0005.json
+  instability_floor: results/inspection/centralized_instability_floor.csv
+  round_wise_agreement: results/inspection/round_wise_agreement.csv
+  round_wise_metadata: results/inspection/round_wise_agreement_metadata.json
+  parity_monitor: results/inspection/parity_monitor.csv
+  parity_monitor_metadata: results/inspection/parity_monitor_metadata.json
+  centralized_headline: results/aggregated/centralized_headline.csv
+  xgboost_headline: results/aggregated/xgboost_headline.csv
+  federated_headline: results/aggregated/federated_headline.csv
+  federated_dir: results/federated
+  attacks_dir: results/attacks
+  streamed_pool: results/shap/fedavg_a0.5_s42/streamed_pool.npz
+  sentences: results/explanations/fedavg_a0.5_s42/sentences.json
+  contribution_a: docs/contribution_a_results.md
+  contribution_b: docs/contribution_b_results.md
+  project_instructions: CLAUDE.md
+
+headline_metric_row: "macro-F1 (7 headline)"
+
+# ByzAgent decision files. attack_tag None => clean condition. Each seed's clean
+# and attacked conditions are always exported together.
+byzagent:
+  - seed: 42
+    conditions:
+      - {name: clean,           run: fedavg_a0.5_s42,                                   file: agent_decisions.jsonl,                      attack: null}
+      - {name: f3_sudden,       run: fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5,    file: agent_decisions.jsonl,                      attack: a0.5_s42_f3_sudden_silos0-3-5}
+      - {name: f2_sudden,       run: fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3,      file: agent_decisions.jsonl,                      attack: a0.5_s42_f2_sudden_silos0-3}
+      - {name: f3_gradual,      run: fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5,   file: agent_decisions_phase4_current_round.jsonl, attack: a0.5_s42_f3_gradual_silos0-3-5}
+  - seed: 1337
+    conditions:
+      - {name: clean,           run: fedavg_a0.5_s1337,                                 file: agent_decisions_multiseed.jsonl,            attack: null}
+      - {name: f3_sudden,       run: fedavg_a0.5_s1337_poisoned_f3_sudden_silos0-3-5,  file: agent_decisions_multiseed.jsonl,            attack: a0.5_s1337_f3_sudden_silos0-3-5}
+  - seed: 2024
+    conditions:
+      - {name: clean,           run: fedavg_a0.5_s2024,                                 file: agent_decisions_multiseed.jsonl,            attack: null}
+      - {name: f3_sudden,       run: fedavg_a0.5_s2024_poisoned_f3_sudden_silos0-3-5,  file: agent_decisions_multiseed.jsonl,            attack: a0.5_s2024_f3_sudden_silos0-3-5}
+
+# Reference FedAvg runs (seed 42) for baselines recovery_fraction anchors.
+baseline_reference:
+  clean: fedavg_a0.5_s42
+  f3: fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5
+  f2: fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3
+
+baselines:
+  - {strategy: multikrum,      label: Multi-Krum,        role: primary,   kind: krum,
+     runs: {f3: multikrum_f3_a0.5_s42_poisoned_f3_sudden_silos0-3-5, f2: multikrum_f2_a0.5_s42_poisoned_f2_sudden_silos0-3, clean: multikrum_f3_a0.5_s42}}
+  - {strategy: trimmedmean,    label: FedTrimmedAvg,     role: primary,   kind: trim,
+     runs: {f3: trimmedmean_f3_a0.5_s42_poisoned_f3_sudden_silos0-3-5, f2: trimmedmean_f2_a0.5_s42_poisoned_f2_sudden_silos0-3, clean: trimmedmean_f3_a0.5_s42}}
+  - {strategy: krumclassical,  label: Classical Krum,    role: secondary, kind: krum,
+     runs: {f3: krumclassical_f3_a0.5_s42_poisoned_f3_sudden_silos0-3-5, f2: krumclassical_f2_a0.5_s42_poisoned_f2_sudden_silos0-3, clean: krumclassical_f3_a0.5_s42}}
+baseline_attack_configs:
+  f3: a0.5_s42_f3_sudden_silos0-3-5
+  f2: a0.5_s42_f2_sudden_silos0-3
+
+replay:
+  source_label: streamed   # sentences.json rows with source == this (the 500-row streamed pool)
+  # Raw feature values are never exported (dataset is not redistributed).
+
+# Locked recovery-fraction anchors (docs/contribution_b_results.md §4; scripts/phase2_analysis.py ANCHORS).
+# Final-5-round mean val macro-F1, locked to 4 decimals in PHASE0_SUMMARY.md. The doc's recovery_fraction
+# values are computed with these locked anchors, so the export uses them (not unrounded re-derivations).
+locked_anchors:
+  f3: {clean_final5mean: 0.9513, poisoned_fedavg_final5mean: 0.8746}
+  f2: {clean_final5mean: 0.9513, poisoned_fedavg_final5mean: 0.8787}
+
+bootstrap:
+  alpha: "0.1"
+  cluster_cols: [seed, silo]
+  metrics: [jaccard_at_10, kendall_weighted_tau]
+  # n_boot / rng seed are read from tools/chat04_closeout.py (N_BOOT, RNG_SEED) -- not redefined here.
+
+kl_partial:
+  path: results/inspection/size_matched_heterogeneity.csv
+  alphas: ["0.1", "0.5", "5.0"]
+  covariates: [entropy, kl_from_global]
+  control: log_size
+  # Values the doc reports (docs/contribution_a_results.md §5): (alpha, covariate, metric)
+  reported_in_doc:
+    - ["0.1", kl_from_global, jaccard_at_10]
+    - ["0.5", kl_from_global, jaccard_at_10]
+    - ["0.5", kl_from_global, kendall_weighted_tau]
+    - ["0.5", entropy, jaccard_at_10]
+    - ["0.5", entropy, kendall_weighted_tau]
