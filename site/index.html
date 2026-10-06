@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XFed-IDS-ByzAgent</title>
+    <meta name="description" content="Ten organizations train one intrusion detector without sharing a single packet. Then the system asks two questions most federated systems never ask: do they agree on why traffic is an attack, and is any of them poisoning the model?" />
+    <meta name="theme-color" content="#F6F0E4" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=Schibsted+Grotesk:wght@400..700&family=Atkinson+Hyperlegible+Mono:wght@300..700&family=Alegreya:ital,wght@1,400;1,500&display=swap" />
+    <script>
+      // Decide before first paint whether the intro loader runs (once per session, never under reduced motion).
+      (function () {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var seen = false;
+        try { seen = sessionStorage.getItem('xfed-loader-seen') === '1'; } catch (e) {}
+        if (!reduce && !seen) document.documentElement.classList.add('with-loader');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

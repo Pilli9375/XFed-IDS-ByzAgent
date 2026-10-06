@@ -28,6 +28,10 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 
+# Showcase site
+site/node_modules/
+site/dist/
+
 # results/ -- track what can't be cheaply regenerated, ignore the rest
 results/**/*.npz
 results/**/*.png
