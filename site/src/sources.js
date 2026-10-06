@@ -16,13 +16,14 @@ export function pick(sourceList, match) {
 export const ghUrl = (path) => BLOB + path;
 
 // Which source entry backs each displayed number. Where the computing file is
-// git-ignored (results/aggregated/*.csv, flip_log.csv, streamed_pool.npz), the
-// link goes to the tracked canonical file in the same source list instead.
+// git-ignored (flip_log.csv, streamed_pool.npz), the link goes to the tracked
+// file in the same source list instead.
 export const SRC = {
   flows: ['headline', 'data/processed/clean_log.json'],
   classes: ['headline', 'data/processed/clean_log.json'],
   orgs: ['headline', 'data/processed/partitions/manifest.json'],
-  macroF1: ['headline', 'docs/contribution_a_results.md'],
+  centralF1: ['headline', 'results/aggregated/centralized_headline.csv'],
+  macroF1: ['headline', 'results/aggregated/federated_headline.csv'],
   servedModel: ['headline', 'results/inspection/best_rounds_manifest.json'],
   agreement: ['agreement', 'results/inspection/agreement_metrics.csv'],
   floor: ['agreement', 'results/inspection/centralized_instability_floor.csv'],

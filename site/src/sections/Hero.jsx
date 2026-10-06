@@ -71,7 +71,7 @@ export default function Hero({ play, count }) {
         </div>
         <div>
           <div className="mono">{f3(d.centralF1)}</div>
-          <div className="lbl">{hero.stats.f1} · <Src href={src('macroF1')} /></div>
+          <div className="lbl">{hero.stats.f1} · <Src href={src('centralF1')} /></div>
         </div>
         <div>
           <div className="mono">{d.nClasses}</div>
