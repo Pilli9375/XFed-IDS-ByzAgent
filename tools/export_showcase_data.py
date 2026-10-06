@@ -9,6 +9,7 @@ No raw feature rows are exported (the dataset is not redistributed): replay_aler
 only top-k feature names and SHAP values, plus the precomputed analyst sentence.
 
 Run from project root:  python tools/export_showcase_data.py
+Only some files:        python tools/export_showcase_data.py --only headline story
 """
 from __future__ import annotations
 
@@ -61,6 +62,18 @@ def load_jsonl(rel: str) -> list[dict]:
 
 def alpha_key(a) -> str:
     return str(float(a))
+
+
+def doc_range(spec: dict) -> dict:
+    """Read a low–high range that exists only as prose in a canonical doc. Fails loudly if the
+    sentence is missing or appears more than once, so a doc edit can't silently change the site."""
+    import re
+    text = (ROOT / spec["path"]).read_text(encoding="utf-8")
+    hits = re.findall(spec["pattern"], text)
+    assert len(hits) == 1, f"{spec['path']}: expected exactly one match for {spec['pattern']!r}, got {len(hits)}"
+    lo, hi = (int(x) for x in hits[0])
+    m = re.search(spec["pattern"], text)
+    return {"low": lo, "high": hi, "approx": True, "quoted": m.group(0), "section": spec["section"], "source": spec["path"]}
 
 
 def tag(kind: str, alpha, seed) -> str:
@@ -126,7 +139,18 @@ def export_headline(cfg, out_dir):
     n_rows = el.groupby("alpha").size()
     manifest = load_json(P["best_rounds_manifest"])
     demo = next(m for m in manifest if m["tag"] == "fedavg_a0.5_s42")
+    clean_log = load_json(P["clean_log"])
+    partitions = load_json(P["partitions_manifest"])
     body = {
+        "dataset": {
+            "flows_after_cleaning": clean_log["n_end"],
+            "flows_after_cleaning_source": f"{P['clean_log']} (n_end)",
+            "family_counts_post_clean": clean_log["family_counts_post_clean"],
+            "n_traffic_classes": len(clean_log["family_counts_post_clean"]),
+            "n_traffic_classes_source": f"{P['clean_log']} (number of family_counts_post_clean keys)",
+            "n_organizations": partitions["n_silos"],
+            "n_organizations_source": f"{P['partitions_manifest']} (n_silos)",
+        },
         "centralized_mlp_macro_f1_headline": agg_row(P["centralized_headline"]),
         "xgboost_macro_f1_headline": agg_row(P["xgboost_headline"]),
         "fedavg_macro_f1_headline_by_alpha": {alpha_key(r.alpha): {"n": r.n, "mean": r["mean"], "std": r["std"], "min": r["min"], "max": r["max"]} for _, r in fed.iterrows()},
@@ -150,7 +174,8 @@ def export_headline(cfg, out_dir):
     }
     return write_json(out_dir, "headline.json",
                       [P["centralized_headline"], P["xgboost_headline"], P["federated_headline"], P["agreement_metrics"],
-                       P["instability_floor"], P["best_rounds_manifest"], "tools/agreement_metrics.py (chance formula)", P["contribution_a"]], body)
+                       P["instability_floor"], P["best_rounds_manifest"], "tools/agreement_metrics.py (chance formula)", P["contribution_a"],
+                       P["clean_log"], P["partitions_manifest"]], body)
 
 
 # ---------------------------------------------------------------- agreement by alpha / round
@@ -317,11 +342,14 @@ def export_byzagent(cfg, out_dir):
             conds[c["name"]] = {"run": c["run"], "run_file": path, "attack": attack, "true_malicious_silos": mal,
                                 "decision_counts": tally, "decisions": decisions}
         seeds_out[str(blk["seed"])] = conds
+    trend = doc_range(cfg["doc_figures"]["trend_claim_error_range"])
+    src.append(trend["source"])
     body = {
         "alpha": 0.5,
         "n_silos": 10,
         "n_rounds": 20,
         "decision_labels": ["trust", "downweight", "quarantine"],
+        "trend_claim_error_range_pct": trend,
         "by_seed": seeds_out,
         "locked_claim": ("Both effects are present. A real compositional confound saturates some silos' flag rates independent of any attack; "
                          "real attack-responsive detection is also present and becomes visible where silos are not already saturated. "
@@ -468,6 +496,39 @@ def export_replay(cfg, out_dir):
     return write_json(out_dir, "replay_alerts.json", [P["streamed_pool"], P["sentences"], P["contribution_a"]], body)
 
 
+# ---------------------------------------------------------------- story (landing page N-00)
+def export_story(cfg, out_dir):
+    """One (alpha, seed) slice for the landing-page story: per-silo training composition and
+    per-silo Jaccard@10, copied row for row. Values shown from the other exports (org decisions,
+    first alert, macro-F1) are not duplicated here; `pointers` says where the site reads them."""
+    P, sc = cfg["paths"], cfg["story"]
+    a, s = sc["alpha"], sc["seed"]
+    comp_path = P["silo_family_composition"].format(alpha=a, seed=s)
+    comp = pd.read_csv(ROOT / comp_path).sort_values("silo")
+    ag = pd.read_csv(ROOT / P["per_silo_agreement"])
+    ag = ag[(ag.alpha == a) & (ag.seed == s)].sort_values("silo")
+    assert comp.silo.tolist() == ag.silo.tolist(), (comp.silo.tolist(), ag.silo.tolist())
+    body = {
+        "alpha": a,
+        "seed": s,
+        "composition": {
+            "source": comp_path,
+            "note": sc["composition_note"],
+            "note_source": P["multiseed_summary"],
+            "columns": comp.columns.tolist(),
+            "rows": comp.to_dict(orient="records"),
+        },
+        "per_silo_agreement": {
+            "source": P["per_silo_agreement"],
+            "filter": {"alpha": a, "seed": s},
+            "aggregation": "median over family_eligible rows of agreement_metrics.csv per (alpha, seed, silo) (tools/per_silo_breakdown.py)",
+            "rows": ag.to_dict(orient="records"),
+        },
+        "pointers": sc["pointers"],
+    }
+    return write_json(out_dir, "story.json", [comp_path, P["per_silo_agreement"], "tools/per_silo_breakdown.py", P["multiseed_summary"]], body)
+
+
 # ---------------------------------------------------------------- CI and KL partial (re-run committed scripts, read-only)
 def export_ci(cfg, out_dir):
     import sys
@@ -527,16 +588,23 @@ def export_kl_partial(cfg, out_dir):
     return write_json(out_dir, "kl_partial.json", ["tools/plot_entropy_kl_partial_correlation.py::partial_corr", kc["path"], cfg["paths"]["contribution_a"]], body)
 
 
+EXPORTERS = {
+    "headline": export_headline, "agreement_by_alpha": export_agreement_by_alpha, "agreement_by_round": export_agreement_by_round,
+    "parity": export_parity, "fedprox": export_fedprox, "byzagent": export_byzagent, "baselines": export_baselines,
+    "replay": export_replay, "ci": export_ci, "kl_partial": export_kl_partial, "story": export_story,
+}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default=str(CFG_PATH))
+    ap.add_argument("--only", nargs="+", choices=sorted(EXPORTERS), help="run only these exporters (default: all)")
     args = ap.parse_args()
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     out_dir = ROOT / cfg["output_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
-    for fn in (export_headline, export_agreement_by_alpha, export_agreement_by_round, export_parity, export_fedprox,
-               export_byzagent, export_baselines, export_replay, export_ci, export_kl_partial):
-        p = fn(cfg, out_dir)
+    for name in args.only or EXPORTERS:
+        p = EXPORTERS[name](cfg, out_dir)
         print(f"wrote {p.relative_to(ROOT)}  ({p.stat().st_size:,} bytes)")
 
 
