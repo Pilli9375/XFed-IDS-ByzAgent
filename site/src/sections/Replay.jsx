@@ -9,6 +9,7 @@ import Reveal from '../components/Reveal.jsx';
 
 const TICK_MS = 1700;
 const FEED = 7;
+const FADE = 0.023; // per older row; the oldest of 7 sits at 0.86, keeping every status ≥4.5:1
 
 // Alerts stream in stored order (replay_alerts.json `alerts`, seq 0..n-1). Never shuffled or filtered.
 export default function Replay() {
@@ -105,7 +106,7 @@ export default function Replay() {
                         <button
                           type="button"
                           className={`fitem${cur ? ' cur' : ''}${i === rpi ? (rpi % 2 ? ' inA' : ' inB') : ''}`}
-                          style={{ opacity: 1 - (rpi - i) * 0.1 }}
+                          style={{ opacity: 1 - (rpi - i) * FADE }}
                           aria-pressed={cur}
                           onClick={() => { setPin(i); setRun(false); }}
                         >

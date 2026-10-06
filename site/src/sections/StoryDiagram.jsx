@@ -139,8 +139,8 @@ export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinit
             else if (b === 5) val = f3(S.jac[i]);
             else if (bad) val = copy.poisoned;
             const valColor = b === 5
-              ? (S.jac[i] < S.lowJaccard ? 'var(--terracotta)' : 'var(--plum)')
-              : (bad ? 'var(--terracotta)' : 'var(--cocoa)');
+              ? (S.jac[i] < S.lowJaccard ? 'var(--terracotta-text)' : 'var(--plum)')
+              : (bad ? 'var(--terracotta-text)' : 'var(--cocoa)');
             return (
               <Fragment key={`o${i}`}>
                 <div className="halo" style={{
@@ -159,8 +159,8 @@ export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinit
                 </div>
                 <div className="lab mono" style={{
                   left: g.ox - g.ux * lr, top: g.oy - g.uy * lr, fontSize: 11 * ts,
-                  color: bad ? 'var(--terracotta)' : 'var(--muted)',
-                  opacity: b >= 1 ? (b === 7 ? 0.45 : 1) : 0, transition: tr('opacity .6s'),
+                  color: bad ? 'var(--terracotta-text)' : 'var(--muted)',
+                  opacity: b >= 1 ? 1 : 0, transition: tr('opacity .6s'), // labels stay full strength in step 7 (AA); circles and edges still dim
                 }}>
                   {copy.org(i)}
                   <span className="v" style={{ fontSize: (b === 5 ? 15 : 11) * ts, color: valColor }}>{val}</span>
