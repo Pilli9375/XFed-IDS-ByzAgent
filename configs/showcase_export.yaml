@@ -31,6 +31,11 @@ paths:
   contribution_a: docs/contribution_a_results.md
   contribution_b: docs/contribution_b_results.md
   project_instructions: CLAUDE.md
+  clean_log: data/processed/clean_log.json
+  partitions_manifest: data/processed/partitions/manifest.json
+  per_silo_agreement: results/inspection/per_silo_agreement.csv
+  silo_family_composition: results/inspection/silo_family_composition_a{alpha}_s{seed}.csv
+  multiseed_summary: results/agents/MULTISEED_VALIDATION_SUMMARY.md
 
 headline_metric_row: "macro-F1 (7 headline)"
 
@@ -72,6 +77,26 @@ baseline_attack_configs:
 replay:
   source_label: streamed   # sentences.json rows with source == this (the 500-row streamed pool)
   # Raw feature values are never exported (dataset is not redistributed).
+
+# Landing-page story (N-00). Composition and per-silo agreement are copied from
+# the two CSVs below for one (alpha, seed). The pointers tell the site which
+# rows of the other exports to show; the site looks the values up there.
+story:
+  alpha: 0.5
+  seed: 1337
+  composition_note: "Per-silo family composition, train-only (val_mask-excluded)."
+  pointers:
+    byzagent: {file: byzagent_decisions.json, seed: "1337", condition: f3_sudden, featured_silo: 5, featured_round: 6}
+    alert: {file: replay_alerts.json, seq: 0}
+    macro_f1: {file: headline.json, key: fedavg_macro_f1_headline_by_alpha, alpha: "0.5", stat: mean}
+
+# Figures that exist only as prose in the canonical docs. Read with the regex
+# below so the number on the site comes from the doc text, not from this file.
+doc_figures:
+  trend_claim_error_range:
+    path: docs/contribution_b_results.md
+    section: "§8, hand-validation of Phase 4's trend-error figure"
+    pattern: "adjusted error-rate range of ≈(\\d+)–(\\d+)%"
 
 # Locked recovery-fraction anchors (docs/contribution_b_results.md §4; scripts/phase2_analysis.py ANCHORS).
 # Final-5-round mean val macro-F1, locked to 4 decimals in PHASE0_SUMMARY.md. The doc's recovery_fraction

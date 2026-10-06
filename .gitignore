@@ -28,6 +28,11 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 
+# Showcase site (design/ is the local mockup, not committed)
+site/node_modules/
+site/dist/
+site/design/
+
 # results/ -- track what can't be cheaply regenerated, ignore the rest
 results/**/*.npz
 results/**/*.png
@@ -41,6 +46,8 @@ results/**/*.log
 # spent test_global.parquet test set) -- must stay tracked.
 !results/inspection/*.csv
 !results/inspection/best_rounds_manifest.json
+# Headline macro-F1 tables: the showcase site links its macro-F1 numbers here.
+!results/aggregated/*_headline.csv
 # ...and these two: served live by GET /faithfulness/*.png and rendered
 # by the Faithfulness page -- not illustrative like the other figures.
 !results/figures/deletion_curve.png

@@ -146,7 +146,7 @@ raw features (514 already-explained rows, for demo display) are documented in
 - train_loss is the only strong attack signal (33.8×–154.3×); geometry stats
   are weak-to-null; val_accuracy inverts (malicious clients score higher on a
   Benign-heavy validation set).
-- Krum excluded a malicious silo 0% of the time; Multi-Krum's f=2 "success"
+- Multi-Krum excluded a malicious silo 0% of the time (classical Krum's exclusions are chance-level: it keeps 1 of 10 every round); Multi-Krum's f=2 "success"
   was a compositional artifact. Defending with nobody attacking costs Krum
   −22.7pp, Multi-Krum −4.9pp, trimmed-mean −1.6pp.
 - Locked ByzAgent claim (use verbatim): "Both effects are present. A real

@@ -14,6 +14,18 @@
       "port": 5173
     },
     {
+      "name": "showcase-dev",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["site/node_modules/vite/bin/vite.js", "site", "--port", "5180", "--strictPort"],
+      "port": 5180
+    },
+    {
+      "name": "showcase-preview",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["site/node_modules/vite/bin/vite.js", "preview", "site", "--port", "4180", "--strictPort"],
+      "port": 4180
+    },
+    {
       "name": "react-preview",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
       "runtimeArgs": ["frontend/node_modules/vite/bin/vite.js", "preview", "frontend", "--port", "4173", "--strictPort"],
