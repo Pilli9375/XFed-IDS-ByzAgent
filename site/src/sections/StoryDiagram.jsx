@@ -169,7 +169,7 @@ export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinit
             );
           })}
 
-          {!below && (
+          {!below && (cardOn || !isStatic) && (
             <Card step={b} style={{
               left: G.CX, top: G.CY, opacity: cardOn ? 1 : 0,
               transform: `translate(-50%, -50%) scale(${cardOn ? 1 : 0.92})`,
