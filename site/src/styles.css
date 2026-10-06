@@ -178,7 +178,7 @@ em.em { font-style: italic; }
 .story { max-width: 1280px; margin: 0 auto; padding: 40px var(--gutter) 96px; }
 .story-in { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; border-top: 1px solid var(--line); padding-top: 56px; }
 .story-steps { flex: 1 1 340px; min-width: 0; max-width: 420px; }
-.story-kicker { margin: 0 0 22px; font-size: 12px; color: var(--muted); }
+.story-kicker { margin: 0 0 22px; font-size: 12px; font-weight: 400; color: var(--muted); }
 .steps { display: flex; flex-direction: column; gap: 4px; }
 .step {
   display: flex; gap: 16px; width: 100%; text-align: left; background: none; border: 0;
@@ -204,11 +204,25 @@ em.em { font-style: italic; }
 .story.pinned .pin { min-height: 100vh; padding-top: 92px; padding-bottom: 24px; }
 .story.pinned .story-in { padding-top: 32px; flex-wrap: nowrap; }
 .story.pinned .story-steps { flex: 0 0 380px; max-width: none; }
-.story.pinned .story-fig { flex: 1 1 0; min-width: 0; }
+.story.pinned .story-fig { flex: 1 1 0; min-width: 0; padding-top: 18px; } /* org 0's label sits just above the diagram box */
 .story.pinned .story-kicker { margin-bottom: 14px; }
 .story.pinned .step { padding: 11px 0; }
 .story.pinned .step .ttl { font-size: 19px; }
 .story.pinned .step.on .ttl { font-size: 28px; }
+/* shorter laptop screens: same content, tighter rhythm so the pinned frame fits */
+@media (max-height: 820px) {
+  .story.pinned .pin { padding-top: 82px; padding-bottom: 12px; }
+  .story.pinned .story-in { padding-top: 18px; }
+  .story.pinned .story-kicker { margin-bottom: 8px; }
+  .story.pinned .step { padding: 6px 0; gap: 12px; }
+  .story.pinned .step .num { padding-top: 4px; }
+  .story.pinned .step .ttl { font-size: 17px; }
+  .story.pinned .step.on .ttl { font-size: 23px; }
+  .story.pinned .step .d { margin-top: 6px; font-size: 14px; line-height: 1.5; }
+  .story.pinned .step .m { margin-top: 6px; font-size: 15px; line-height: 1.35; }
+  .story.pinned .segs { margin-top: 12px; }
+  .story.pinned .story-foot { margin-top: 8px; }
+}
 
 /* list layout (reduced motion, narrow screens) */
 .story-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 56px; }
@@ -218,7 +232,7 @@ em.em { font-style: italic; }
 .story-list h3 { margin: 0; font-weight: 400; font-size: 26px; line-height: 1.1; }
 .story-list .d { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
 .story-list .m { margin: 10px 0 0; font-size: 17px; line-height: 1.4; color: var(--muted); }
-.story-list .fig { margin-top: 20px; }
+.story-list .fig { margin-top: 20px; padding-top: 18px; }
 @media (max-width: 560px) {
   .story { padding: 24px 16px 72px; }
   .story-in { padding-top: 40px; gap: 32px; }

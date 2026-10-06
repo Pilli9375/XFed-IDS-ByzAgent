@@ -78,11 +78,19 @@ function StoryPinned({ sectionRef }) {
       },
     });
     stRef.current = st;
-    const fit = () => setMaxH(window.innerHeight - 92 - 33 - 24 - 64);
+    // height budget for the diagram: viewport minus everything above it in the pinned frame and the foot below
+    const fit = () => {
+      const pin = pinRef.current;
+      const fig = pin.querySelector('.dg-outer');
+      const foot = pin.querySelector('.story-foot');
+      const above = fig.getBoundingClientRect().top - pin.getBoundingClientRect().top;
+      const footH = foot.getBoundingClientRect().height + parseFloat(getComputedStyle(foot).marginTop);
+      setMaxH(Math.max(260, window.innerHeight - above - footH - 16));
+    };
     fit();
     window.addEventListener('resize', fit);
     // fonts change the layout height above the story; recompute pin positions once they land
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    document.fonts?.ready.then(() => { fit(); ScrollTrigger.refresh(); });
     return () => { window.removeEventListener('resize', fit); st.kill(); stRef.current = null; };
   }, []);
 
@@ -99,7 +107,7 @@ function StoryPinned({ sectionRef }) {
     <div ref={pinRef} className="pin">
       <div className="story-in">
         <div className="story-steps">
-          <p className="story-kicker mono">{copy.kicker}</p>
+          <h2 className="story-kicker mono">{copy.kicker}</h2>
           <div className="steps">
             {STEPS.map((s, i) => {
               const k = i + 1;
@@ -125,7 +133,7 @@ function StoryPinned({ sectionRef }) {
           </div>
         </div>
         <figure className="story-fig" style={{ margin: 0 }} aria-label={copy.diagramLabel(Math.max(1, b), STEPS[Math.max(1, b) - 1].t)}>
-          <StoryDiagram step={b} maxH={maxH} forceNarrow={false} />
+          <StoryDiagram step={b} maxH={maxH} forceNarrow={false} overlay />
           <Foot />
         </figure>
       </div>
@@ -139,10 +147,10 @@ export default function Story() {
   const roomy = useMedia('(min-width: 1000px) and (min-height: 640px)');
   const pinned = !reduced && roomy;
   return (
-    <section id="story" ref={ref} className={`story${pinned ? ' pinned' : ''}`} aria-label={copy.kicker}>
+    <section id="story" ref={ref} className={`story${pinned ? ' pinned' : ''}`}>
       {pinned ? <StoryPinned sectionRef={ref} /> : (
         <div className="story-in" style={{ display: 'block' }}>
-          <p className="story-kicker mono">{copy.kicker}</p>
+          <h2 className="story-kicker mono">{copy.kicker}</h2>
           <StoryList />
           <Foot />
         </div>

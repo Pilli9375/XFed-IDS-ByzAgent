@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { story as copy } from '../copy.js';
 import { d } from '../data.js';
 import { f3 } from '../format.js';
@@ -73,11 +73,12 @@ function srText(b) {
  * cardBelow / legendBelow: render those outside the scaled box (small screens).
  * maxH: optional height budget for the scaled box (pinned layout).
  */
-export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinity, forceNarrow }) {
+export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinity, forceNarrow, overlay = false }) {
   const outer = useRef(null);
   const [w, setW] = useState(0);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = outer.current;
+    setW(el.getBoundingClientRect().width); // measure before first paint so the box never renders unscaled
     const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
@@ -86,7 +87,7 @@ export default function StoryDiagram({ step: b, isStatic = false, maxH = Infinit
   const narrow = forceNarrow ?? (w > 0 && w < 600);
   const G = narrow ? GEOM.narrow : GEOM.wide;
   const k = w ? Math.min(1, w / G.W, maxH / G.H) : 1;
-  const below = narrow || k < 0.75;
+  const below = !overlay && (narrow || k < 0.75); // pinned frame keeps the card on the diagram so nothing moves
   const ts = Math.max(1, 0.85 / k); // keep labels legible when the box shrinks
   const geo = geometry(G);
   const featured = S.featuredSilo;
