@@ -28,9 +28,10 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 
-# Showcase site
+# Showcase site (design/ is the local mockup, not committed)
 site/node_modules/
 site/dist/
+site/design/
 
 # results/ -- track what can't be cheaply regenerated, ignore the rest
 results/**/*.npz
