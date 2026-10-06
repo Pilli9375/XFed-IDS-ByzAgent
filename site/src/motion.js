@@ -75,9 +75,13 @@ export function scrollToY(y) {
 export function scrollToId(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  const y = el.getBoundingClientRect().top + window.scrollY;
-  if (lenis) lenis.scrollTo(y, { duration: 1.2 });
-  else el.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth' });
+  if (lenis) {
+    // Sections above can change height mid-scroll (lazy data arriving); land, then correct once.
+    lenis.scrollTo(el, {
+      duration: 1.2,
+      onComplete: () => { if (lenis && Math.abs(el.getBoundingClientRect().top) > 2) lenis.scrollTo(el, { duration: 0.35 }); },
+    });
+  } else el.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth' });
   // move keyboard focus to the section without scrolling again
   if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
   el.focus({ preventScroll: true });
