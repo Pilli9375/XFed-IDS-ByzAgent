@@ -32,6 +32,8 @@
   --f-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
   --f-note: 'Alegreya', Georgia, serif;
   --gutter: 6%;
+  /* paper grain: static cocoa-tinted fractal noise; alpha = noise x 0.06, so no pixel exceeds 0.06 */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .13 0 0 0 0 .11 1 0 0 0 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='.06'/%3E%3C/svg%3E");
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -66,7 +68,7 @@ em.em { font-style: italic; }
 .dark .srcs { color: var(--dark-muted); }
 .dark .srcs a { color: var(--brass); }
 
-.page { position: relative; background: var(--cream); color: var(--cocoa); }
+.page { position: relative; background-color: var(--cream); background-image: var(--grain); color: var(--cocoa); }
 .wrap { max-width: 1280px; margin: 0 auto; }
 
 /* ---------- reveal ---------- */
@@ -165,6 +167,7 @@ em.em { font-style: italic; }
 .hero-scrim {
   position: absolute; inset: 0;
   background:
+    var(--grain), /* on top, so the hero keeps the same paper as the page around it */
     linear-gradient(180deg, var(--cream) 0, rgb(var(--cream-rgb) / 0) 12%),
     linear-gradient(270deg, var(--cream) 0, rgb(var(--cream-rgb) / 0) 9%),
     linear-gradient(0deg, var(--cream) 0, var(--cream) 30%, rgb(var(--cream-rgb) / 0) 52%),
@@ -412,7 +415,7 @@ em.em { font-style: italic; }
 .trust > .curtain { background: var(--cocoa); }
 .trust > .wrap { position: relative; }
 .limits-sec { position: relative; isolation: isolate; background: var(--cocoa-2); }
-.curtain-cream { background-color: var(--cream); }
+.curtain-cream { background-color: var(--cream); background-image: var(--grain); }
 .limits-sec > .limits { position: relative; }
 .trust .kicker { color: var(--terracotta-light); }
 .trust .h2.big { font-size: clamp(38px, 5.8vw, 64px); line-height: 1.02; max-width: 920px; }
