@@ -6,7 +6,7 @@ import { Fmt, geometry } from './layout';
 import { RAW } from './data';
 import { Tx } from './Text';
 
-export type OrgState = { scale: number; fill: string; stroke: string; opacity: number; dy: number; pie: number; pieOpacity: number };
+export type OrgState = { scale: number; fill: string; stroke: string; opacity: number; dx?: number; dy: number; pie: number; pieOpacity: number };
 export type Label = { name: string; value?: string; valueColor?: string; nameColor?: string; opacity: number; dy?: number };
 export type Dot = { org: number; p: number; color: string; inward: boolean; opacity: number };
 
@@ -49,7 +49,7 @@ export const Network: React.FC<Props> = ({ fmt, orgs, labels, edge, edgeOpacity 
         {g.orgs.map((o, i) => {
           const st = orgs[i];
           const r = o.r * st.scale;
-          const x0 = o.x + o.ux * o.r; const y0 = o.y + o.uy * o.r + st.dy;
+          const x0 = o.x + (st.dx ?? 0) + o.ux * o.r; const y0 = o.y + o.uy * o.r + st.dy;
           const x1 = g.hub.x - o.ux * g.hub.r; const y1 = g.hub.y - o.uy * g.hub.r;
           const p = edge[i];
           if (p <= 0 || r <= 0) return null;
@@ -67,7 +67,7 @@ export const Network: React.FC<Props> = ({ fmt, orgs, labels, edge, edgeOpacity 
         {halo && halo.opacity > 0 && (() => {
           const o = g.orgs[halo.org];
           const pad = fmt === 'tall' ? 22 : 18;
-          return <circle cx={o.x} cy={o.y + orgs[halo.org].dy} r={(o.r + pad) * halo.scale} fill="none" stroke={C.brass} strokeWidth={3} opacity={halo.opacity} />;
+          return <circle cx={o.x + (orgs[halo.org].dx ?? 0)} cy={o.y + orgs[halo.org].dy} r={(o.r + pad) * halo.scale} fill="none" stroke={C.brass} strokeWidth={3} opacity={halo.opacity} />;
         })()}
 
         {g.orgs.map((o, i) => {
@@ -75,22 +75,23 @@ export const Network: React.FC<Props> = ({ fmt, orgs, labels, edge, edgeOpacity 
           const r = o.r * st.scale;
           if (r <= 0.01) return null;
           const cy = o.y + st.dy;
+          const cx = o.x + (st.dx ?? 0);
           let acc = 0;
           const total = RAW.comp[i].total;
           return (
             <g key={`o${i}`} opacity={st.opacity}>
-              <circle cx={o.x} cy={cy} r={r} fill={st.fill} />
+              <circle cx={cx} cy={cy} r={r} fill={st.fill} />
               {st.pieOpacity > 0 && st.pie > 0 && (
                 <g opacity={st.pieOpacity}>
                   {RAW.comp[i].slices.map((v, s) => {
                     const a0 = acc; acc += (v / total) * 360;
                     const lim = st.pie * 360;
                     if (v === 0 || a0 >= lim) return null;
-                    return <path key={s} d={arc(o.x, cy, r, a0, Math.min(acc, lim))} fill={PIE[s]} />;
+                    return <path key={s} d={arc(cx, cy, r, a0, Math.min(acc, lim))} fill={PIE[s]} />;
                   })}
                 </g>
               )}
-              <circle cx={o.x} cy={cy} r={r} fill="none" stroke={st.stroke} strokeWidth={sw} />
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={st.stroke} strokeWidth={sw} />
             </g>
           );
         })}
@@ -117,7 +118,7 @@ export const Network: React.FC<Props> = ({ fmt, orgs, labels, edge, edgeOpacity 
         const w = Math.max(L.name.length * nameSize * 0.62, (L.value?.length ?? 0) * valueSize * 0.62);
         const ext = (h / 2) * Math.abs(o.uy) + (w / 2) * Math.abs(o.ux);
         const d = o.r * Math.max(st.scale, 0.001) + (fmt === 'tall' ? 16 : 12) + ext;
-        const cx = o.x - o.ux * d;
+        const cx = o.x + (st.dx ?? 0) - o.ux * d;
         const cy = o.y - o.uy * d + st.dy + (L.dy ?? 0);
         return (
           <div key={`l${i}`} style={{

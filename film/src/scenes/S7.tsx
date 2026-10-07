@@ -3,7 +3,7 @@
 import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from 'remotion';
 import { C, F } from '../theme';
-import { bf, spring, on, seg, easeInOut, TL } from '../motion';
+import { bf, spring, on, TL } from '../motion';
 import { useFmt } from '../layout';
 import { N, COPY } from '../data';
 import { Tag, Body } from '../ui';
@@ -41,7 +41,7 @@ export const S7Proof: React.FC = () => {
   const wide = fmt === 'wide';
   const wipe = spring(f, 0, 'wipe');
   const tDash = b(E.dash); const tReplay = b(E.replay); const tMiss = b(E.miss);
-  const k = (a: number, z: number) => easeInOut(seg(f, a, z));
+  const k = (a: number, _z?: number) => spring(f, a, 'drift'); // camera moves are springs
   const caption = (t: string, top: number, color: string = C.darkMuted, left = wide ? 115 : 64) => (
     <div style={{ position: 'absolute', left, top, ...monoStyle(wide ? 28 : 32, color) }}>{t}</div>
   );
@@ -68,12 +68,12 @@ export const S7Proof: React.FC = () => {
       <AbsoluteFill style={{ background: C.cream }}>
         {wide ? (
           <>
-            <Shot file="dashboard_trust_grid_desktop.png" full={[3840, 2160]} src={[576, 58, 2880, 1334]} scale={1824 / 2880} x={48} y={48} push={0.97 + 0.03 * p} origin="0 0" />
+            <Shot file="dashboard_trust_grid_desktop.png" full={[3840, 2160]} src={[576, 58, 2880, 1334]} scale={1824 / 2880} x={48} y={48} push={0.95 + 0.05 * p} origin="0 0" />
             {caption('the running dashboard · FastAPI + React', 48 + 1334 * (1824 / 2880) + 22, C.muted, 48)}
           </>
         ) : (
           <>
-            <Shot file="dashboard_trust_grid_desktop.png" full={[3840, 2160]} src={[614, 614, 1383, 768]} scale={984 / 1383} x={48} y={620} push={0.97 + 0.03 * p} origin="0 0" />
+            <Shot file="dashboard_trust_grid_desktop.png" full={[3840, 2160]} src={[614, 614, 1383, 768]} scale={984 / 1383} x={48} y={620} push={0.95 + 0.05 * p} origin="0 0" />
             {caption('the running dashboard · FastAPI + React', 620 + 768 * (984 / 1383) + 24, C.muted, 48)}
           </>
         )}

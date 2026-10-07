@@ -3,7 +3,8 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { C, F } from '../theme';
-import { bf, spring, on, TL } from '../motion';
+import { bf, spring, on, camera, TL } from '../motion';
+import { focus } from './S1to4';
 import { useFmt, Fmt } from '../layout';
 import { N, RAW, COPY } from '../data';
 import { Network } from '../Network';
@@ -35,12 +36,20 @@ export const S5Agree: React.FC = () => {
     value: on(f, b(E.values + i * E.valueStep)) ? N[`jac${i}`] : undefined,
     valueColor: low(i) && drop > 0.01 ? C.terracottaText : C.plum,
   }));
+  const F_ = focus(fmt);
+  const cam = camera(f, S, [
+    { beat: 48, s: 1.02, ...F_.hub },
+    { beat: 50, s: 1.05, ...F_.toward(0, 0.2) },
+    { beat: 52, s: 1.05, ...F_.toward(2, 0.3) },
+    { beat: 54, s: 1.04, ...F_.hub },
+    { beat: 56, s: 1.09, ...F_.between(4, 7, 0.55) },
+  ]);
   const caption = `Orgs ${RAW.lows.join(' and ')}, with little or no Benign traffic, share only ${N.jacLow}. The middle org sits at ${N.jacMedian}.`;
   const showCap = on(f, b(E.drop));
   return (
     <AbsoluteFill>
       <Bg color={C.cream} />
-      <Network fmt={fmt} width={width} height={height} orgs={orgs} labels={labels} edge={st.edge} hub={st.hub} />
+      <Network fmt={fmt} width={width} height={height} orgs={orgs} labels={labels} edge={st.edge} hub={st.hub} camera={cam} />
       <Col fmt={fmt} slot="top">
         <Tag fmt={fmt} style={{ marginBottom: 22 }}>{`Jaccard@10 per org · α = ${N.storyAlpha} · seed ${N.storySeed}`}</Tag>
         <Question fmt={fmt} p={spring(f, 0, 'type')} />
@@ -84,10 +93,24 @@ const AlphaChart: React.FC<{ f: number; fmt: Fmt }> = ({ f, fmt }) => {
   const ci = spring(f, b(E.ci), 'type');
   const labels = COPY.explain.alphas as { key: string; label: string }[];
   const noteX = wide ? 1060 : 64;
+  const cam = camera(f, S, wide ? [
+    { beat: 58, s: 1.0, fx: 960, fy: 600 },
+    { beat: 60, s: 1.015, fx: 980, fy: 560 },
+    { beat: 62, s: 1.03, fx: 760, fy: 700 },
+    { beat: 64, s: 1.06, fx: X(flo), fy: ys[2] },
+    { beat: 66, s: 1.05, fx: X(flo) + 80, fy: ys[2] + 40 },
+  ] : [
+    { beat: 58, s: 1.0, fx: 540, fy: 960 },
+    { beat: 60, s: 1.015, fx: 540, fy: 900 },
+    { beat: 62, s: 1.03, fx: 420, fy: 1100 },
+    { beat: 64, s: 1.06, fx: X(flo), fy: ys[2] },
+    { beat: 66, s: 1.05, fx: X(flo) + 40, fy: ys[2] + 60 },
+  ]);
   const noteY = wide ? 900 : 1300;
   return (
     <AbsoluteFill>
       <Bg color={C.cream} />
+      <AbsoluteFill style={{ transformOrigin: `${cam.fx}px ${cam.fy}px`, transform: `scale(${cam.scale})` }}>
       <Col fmt={fmt} slot="top" style={{ width: wide ? 1200 : undefined }} top={wide ? 90 : undefined}>
         <Tag fmt={fmt} style={{ marginBottom: 22 }}>{`median Jaccard@10 · seeds ${N.agreeSeeds}`}</Tag>
         <Question fmt={fmt} p={1} />
@@ -153,6 +176,7 @@ const AlphaChart: React.FC<{ f: number; fmt: Fmt }> = ({ f, fmt }) => {
       <div style={{ position: 'absolute', left: noteX, top: noteY, width: wide ? 760 : 952, opacity: on(f, b(E.ci)) }}>
         <Note fmt={fmt} color={C.inkSoft} style={{ fontSize: s.note + 4 }}><Tx>{`directional, not significant at α = ${N.ciAlpha}`}</Tx></Note>
       </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

@@ -3,7 +3,8 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { C, F } from '../theme';
-import { bf, spring, on, mix, TL } from '../motion';
+import { bf, spring, on, mix, camera, TL } from '../motion';
+import { focus } from './S1to4';
 import { useFmt } from '../layout';
 import { COPY } from '../data';
 import { Network } from '../Network';
@@ -27,6 +28,16 @@ export const S8Close: React.FC = () => {
   const hub = lit
     ? { scale: 1 + 0.4 * p, fill: C.plum, stroke: C.plum, text: COPY.story.hub.checks as string, color: C.cream }
     : st.hub;
+  const F_ = focus(fmt);
+  // one still beat for the silence, then a push in on the hub as it turns plum, then a slow drift
+  const cam = camera(f, S, [
+    { beat: 108, s: 1.0, ...F_.hub },
+    { beat: 109, s: 1.08, ...F_.hub },
+    { beat: 111, s: 1.06, ...F_.toward(8, 0.25) },
+    { beat: 113, s: 1.1, ...F_.hub },
+    { beat: 115, s: 1.04, ...F_.toward(2, 0.35) },
+    { beat: 116.5, s: 1.12, ...F_.toward(6, 0.25) },
+  ]);
   const names = (COPY.footer.members as [string, string][]).map((m) => m[0]);
   const kicker = (COPY.hero.kicker as string).split('·').pop()!.trim(); // "VIT-AP 2026"
   const title = spring(f, b(E.title), 'type');
@@ -48,7 +59,7 @@ export const S8Close: React.FC = () => {
   return (
     <AbsoluteFill>
       <Bg color={C.cream} />
-      <Network fmt={fmt} width={width} height={height} orgs={orgs} labels={st.labels} edge={st.edge} edgeOpacity={mix(0.5, 0.25, dim)} hub={hub} />
+      <Network fmt={fmt} width={width} height={height} orgs={orgs} labels={st.labels} edge={st.edge} edgeOpacity={mix(0.5, 0.25, dim)} hub={hub} camera={cam} />
       {wide ? (
         <Col fmt={fmt} slot="top" top={250}>
           {Title}

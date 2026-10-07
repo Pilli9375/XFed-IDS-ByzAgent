@@ -10,7 +10,7 @@ const DATA = path.join(ROOT, '..', 'site', 'public', 'data');
 const j = (f) => JSON.parse(readFileSync(path.join(DATA, f), 'utf8'));
 const { registry } = build({
   story: j('story.json'), headline: j('headline.json'), agreement: j('agreement_by_alpha.json'), ci: j('ci.json'),
-  baselines: j('baselines.json'), byz: j('byzagent_decisions.json'), replay: j('replay_alerts.json'),
+  baselines: j('baselines.json'), byz: j('byzagent_decisions.json'), replay: j('replay_alerts.json'), fedprox: j('fedprox_vs_fedavg.json'),
 });
 mkdirSync(path.join(ROOT, 'out'), { recursive: true });
 writeFileSync(path.join(ROOT, 'out', 'numbers.json'), JSON.stringify(registry, null, 2));

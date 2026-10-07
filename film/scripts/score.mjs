@@ -138,12 +138,12 @@ for (let bar = 0; bar < BARS.length; bar++) {
   if (bar >= 2 && !closing) tones.forEach((n, k) => piano(tb + k * 0.012, voice(n, midi('F#3')), 0.11, -0.3 + 0.3 * k));
 
   // pulse: eighths in light chapters, quarters (lower) in the trust chapter
-  if (b0 + 4 <= E.s1.underline) continue;
+  if (b0 + 4 <= E.s1.hub) continue;
   const steps = inTrust ? 4 : 8;
   const order = [0, 2, 1, 2, 0, 2, 1, 2];
   for (let s = 0; s < steps; s++) {
     const beat = b0 + s * (4 / steps);
-    if (beat < E.s1.underline) continue;
+    if (beat < E.s1.hub) continue; // the pulse enters with the hub, after the burst
     if (beat >= E.s8.silence) break;
     const name = tones[order[s % order.length]];
     const m = voice(name, inTrust ? midi('B3') : midi('D4'));
@@ -152,24 +152,30 @@ for (let bar = 0; bar < BARS.length; bar++) {
   }
 }
 
-// hook: three notes as the lines set
-marimba(at(E.s1.line1), midi('D4'), 0.55, -0.2);
-marimba(at(E.s1.line2), midi('F#4'), 0.55, 0);
-marimba(at(E.s1.line3), midi('A4'), 0.6, 0.2);
-piano(at(E.s1.line3), midi('D3'), 0.18, 0);
+// hook: one marimba note per word as it slams in, a low chord under "traffic."
+const HOOK_NOTES = ['D4', 'F#4', 'A3', 'D4', 'F#4', 'A4', 'D5'];
+E.s1.words.forEach((w, i) => marimba(at(w), midi(HOOK_NOTES[i]), i === 6 ? 0.68 : 0.56, -0.3 + i * 0.1, 0.45)); // short decay: each word is its own hit
+piano(at(E.s1.words[6]), midi('D3'), 0.16, 0); marimba(at(E.s1.words[6]), midi('D2'), 0.5, 0, 0.5); click(at(E.s1.words[6]), 0.35);
 
 // ---------------------------------------------------------------- data-reveal SFX
 const CL = 0.16;
-click(at(E.s1.kicker), CL * 0.8, 0.1);
-for (let i = 0; i < 10; i++) click(at(E.s2.orgPop + i * E.s2.orgStep), CL, -0.6 + i * 0.13);
-for (let i = 0; i < 10; i++) click(at(E.s2.dotsIn + i * E.s2.dotStep + E.s2.dotTravel), CL * 0.55, -0.4 + i * 0.08);
-marimba(at(E.s2.out), midi('D5'), 0.18, 0.2); marimba(at(E.s2.out + 0.5), midi('F#5'), 0.16, 0.3); marimba(at(E.s2.out + 1), midi('A5'), 0.15, 0.4);
+click(at(E.s1.kicker), CL * 0.6, 0.1);
+// the ten organizations burst out of the last word
+for (let i = 0; i < 10; i++) click(at(E.s1.burst + i * E.s1.burstStep), CL * 2.6, -0.6 + i * 0.13);
+marimba(at(E.s1.burst), midi('A2'), 1.0, 0, 0.9); click(at(E.s1.burst), 0.4);
+marimba(at(E.s1.hub), midi('D3'), 0.35, 0, 1.2);
+// update waves: soft clicks as inward dots reach the hub; a rising arpeggio as the model goes back out
+for (const w of E.s2.waves) {
+  if (w.in) for (let i = 0; i < 10; i++) click(at(w.at + i * E.s2.dotStep + E.s2.dotTravel * 0.8), CL * 0.5, -0.4 + i * 0.08);
+  else { click(at(w.at), CL * 1.6, 0.2); marimba(at(w.at), midi('D3'), 0.55, 0, 0.8); marimba(at(w.at), midi('D5'), 0.34, 0.2); marimba(at(w.at + 0.5), midi('F#5'), 0.26, 0.3); marimba(at(w.at + 1), midi('A5'), 0.22, 0.4); }
+}
 click(at(E.s3.org0), CL); click(at(E.s3.org4), CL);
 // alert slam: low wood hit
 marimba(at(E.s4.alert), midi('D2'), 0.9, 0, 1.2); click(at(E.s4.alert), 0.3);
 // count-up ticks, bright landing note
 for (let k = 0; k < 12; k++) click(at(E.s4.number + k * (E.s4.countBeats / 12)), CL * 0.45, 0.3);
 marimba(at(E.s4.number + E.s4.countBeats), midi('A5'), 0.6, 0.1); marimba(at(E.s4.number + E.s4.countBeats), midi('D5'), 0.4, -0.1); click(at(E.s4.number + E.s4.countBeats), 0.3);
+for (let k = 0; k < 3; k++) { click(at(E.s4.seeds + k * E.s4.seedStep), CL); marimba(at(E.s4.seeds + k * E.s4.seedStep), midi(['A4', 'C#5', 'E5'][k]), 0.2, 0.2); }
 for (let i = 0; i < 10; i++) click(at(E.s5.values + i * E.s5.valueStep), CL, -0.6 + i * 0.13);
 marimba(at(E.s5.drop), midi('B2'), 0.45, 0, 1.2); marimba(at(E.s5.drop), midi('D3'), 0.35, 0, 1.2);
 click(at(E.s5.bar5), CL); click(at(E.s5.bar05), CL); click(at(E.s5.bar01), CL * 0.9); marimba(at(E.s5.bar01), midi('F#3'), 0.25, 0);

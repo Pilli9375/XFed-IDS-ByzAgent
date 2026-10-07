@@ -16,7 +16,7 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const OTHER = ['Bot', 'BruteForce', 'Heartbleed', 'Infiltration', 'WebAttack'];
 const STATE_ORDER = ['trust', 'downweight', 'quarantine'];
 
-export function build({ story, headline, agreement, ci, baselines, byz, replay }) {
+export function build({ story, headline, agreement, ci, baselines, byz, replay, fedprox }) {
   const reg = [];
   const N = {};
   const put = (id, text, file, key, raw) => {
@@ -70,6 +70,29 @@ export function build({ story, headline, agreement, ci, baselines, byz, replay }
   put('f1nWord', word(f1.n), 'headline.json', `${pf.key}["${pf.alpha}"].n`, f1.n);
   put('f1n', String(f1.n), 'headline.json', `${pf.key}["${pf.alpha}"].n`, f1.n);
   const f1Raw = f1[pf.stat];
+
+  // per-seed FedAvg test macro-F1 at the story alpha (best-by-validation round). The headline file
+  // only stores mean/std/min/max; the per-seed values live in fedprox_vs_fedavg.json. They must
+  // reproduce the headline stats exactly, or the film refuses to build.
+  const alphaNum = Number(pf.alpha);
+  const seedRows = fedprox.rows.filter((r) => r.alpha === alphaNum);
+  const perSeed = seedRows.map((r) => ({ seed: r.seed, v: r.fedavg.test_macro_f1_headline }));
+  if (perSeed.length !== f1.n) throw new Error('per-seed FedAvg rows != headline n');
+  const mean = perSeed.reduce((s, p) => s + p.v, 0) / perSeed.length;
+  const pstd = Math.sqrt(perSeed.reduce((s, p) => s + (p.v - mean) ** 2, 0) / perSeed.length);
+  const close = (a, b) => Math.abs(a - b) < 1e-12;
+  if (!close(mean, f1.mean) || !close(pstd, f1.std) || !close(Math.min(...perSeed.map((p) => p.v)), f1.min) || !close(Math.max(...perSeed.map((p) => p.v)), f1.max)) {
+    throw new Error('per-seed FedAvg values do not reproduce headline mean/std/min/max');
+  }
+  perSeed.forEach((p) => put(`f1Seed${p.seed}`, f3(p.v), 'fedprox_vs_fedavg.json', `rows[alpha=${pf.alpha},seed=${p.seed}].fedavg.test_macro_f1_headline`, p.v));
+  // scale endpoints for the per-seed strip: the range of macro-F1, not a result
+  put('axis0', '0', '(scale)', 'macro-F1 range lower bound', 0);
+  put('axis1', '1', '(scale)', 'macro-F1 range upper bound', 1);
+  // zoom window of the per-seed strip: chosen to contain every per-seed value, not a result
+  const ZOOM = [0.8, 1.0];
+  if (perSeed.some((p) => p.v < ZOOM[0] || p.v > ZOOM[1]) || f1.mean - f1.std < ZOOM[0]) throw new Error('per-seed values fall outside the zoom window');
+  put('zoomLo', ZOOM[0].toFixed(2), '(scale)', 'zoom window lower bound', ZOOM[0]);
+  put('zoomHi', ZOOM[1].toFixed(2), '(scale)', 'zoom window upper bound', ZOOM[1]);
 
   // ---- per-org agreement (seed 1337, alpha 0.5)
   const pa = story.per_silo_agreement;
@@ -178,6 +201,6 @@ export function build({ story, headline, agreement, ci, baselines, byz, replay }
   return {
     N,
     registry: reg,
-    raw: { comp, jac, lows: lows.map((p) => p.silo), mal, gA, gB, featSilo: fs, featRound: call.round, nRounds: nR, nSilos: byz.n_silos, agree, floor, chance, ci: [ciJ.ci95_low, ciJ.ci95_high], f1: f1Raw, mkx },
+    raw: { perSeed, f1Std: f1.std, comp, jac, lows: lows.map((p) => p.silo), mal, gA, gB, featSilo: fs, featRound: call.round, nRounds: nR, nSilos: byz.n_silos, agree, floor, chance, ci: [ciJ.ci95_low, ciJ.ci95_high], f1: f1Raw, mkx },
   };
 }

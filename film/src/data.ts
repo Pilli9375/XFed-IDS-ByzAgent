@@ -6,6 +6,7 @@ import ci from '../../site/public/data/ci.json';
 import baselines from '../../site/public/data/baselines.json';
 import byz from '../../site/public/data/byzagent_decisions.json';
 import replay from '../../site/public/data/replay_alerts.json';
+import fedprox from '../../site/public/data/fedprox_vs_fedavg.json';
 import { build } from './numbers.js';
 import { story as siteStory, footer as siteFooter, trust as siteTrust, replay as siteReplay, explain as siteExplain, hero as siteHero } from '../../site/src/copy.js';
 
@@ -13,6 +14,8 @@ type Built = {
   N: Record<string, string>;
   registry: { id: string; text: string; file: string; key: string; raw: unknown }[];
   raw: {
+    perSeed: { seed: number; v: number }[];
+    f1Std: number;
     comp: { total: number; slices: number[] }[];
     jac: number[];
     lows: number[];
@@ -32,7 +35,7 @@ type Built = {
   };
 };
 
-const built = build({ story, headline, agreement, ci, baselines, byz, replay }) as unknown as Built;
+const built = build({ story, headline, agreement, ci, baselines, byz, replay, fedprox }) as unknown as Built;
 export const N = built.N;
 export const RAW = built.raw;
 export const REGISTRY = built.registry;
