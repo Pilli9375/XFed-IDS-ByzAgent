@@ -129,6 +129,55 @@
     "raw": 3
   },
   {
+    "id": "f1Seed42",
+    "text": "0.975",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=42].fedavg.test_macro_f1_headline",
+    "raw": 0.9753310761756105
+  },
+  {
+    "id": "f1Seed1337",
+    "text": "0.987",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=1337].fedavg.test_macro_f1_headline",
+    "raw": 0.986559260219992
+  },
+  {
+    "id": "f1Seed2024",
+    "text": "0.860",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=2024].fedavg.test_macro_f1_headline",
+    "raw": 0.8604800708264585
+  },
+  {
+    "id": "axis0",
+    "text": "0",
+    "file": "(scale)",
+    "key": "macro-F1 range lower bound",
+    "raw": 0
+  },
+  {
+    "id": "axis1",
+    "text": "1",
+    "file": "(scale)",
+    "key": "macro-F1 range upper bound",
+    "raw": 1
+  },
+  {
+    "id": "zoomLo",
+    "text": "0.80",
+    "file": "(scale)",
+    "key": "zoom window lower bound",
+    "raw": 0.8
+  },
+  {
+    "id": "zoomHi",
+    "text": "1.00",
+    "file": "(scale)",
+    "key": "zoom window upper bound",
+    "raw": 1
+  },
+  {
     "id": "jac0",
     "text": "0.538",
     "file": "story.json",
