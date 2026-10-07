@@ -208,3 +208,37 @@ Saved to `film/public/assets/` with a `captures.json` (URL, viewport, timestamp,
 `film/out/xfed_film_16x9.mp4` · `xfed_film_9x16.mp4` · `hero_loop.mp4` / `.webm` · `poster.jpg`
 (frame from S5 at b64, the α chart with the note) · `contact.png` · `film/docs/review_log.md` ·
 copies to `site/public/film/`.
+
+---
+
+## As built (changes since Gate 1, with Pilli's decisions applied)
+
+- **S4** shows "± 0.057 std across 3 seeds" under 0.941 (decision 1). "3" and "three" both come from
+  `headline.json · fedavg_macro_f1_headline_by_alpha["0.5"].n`.
+- **S7** retimed so the dashboard gets about 2.5 s (decision 2):
+  - b96 site story
+  - b98–102 dashboard, 2.4 s
+  - b102 alert #000, with the ring on "Jump to a miss" at b104
+  - b105 #076
+- **S7 dashboard (decision 2).** The backend and React dashboard ran. The alert simulator was
+  **not** started, because it reads `test_global.parquet`. The one dashboard frame is the Client
+  Trust Monitor's per-round decision grids (seed 1337, live from `GET /trust`). It sits on a cream mat
+  with a 48 px margin, no frame and no shadow, under the caption "the running dashboard · FastAPI + React".
+- **#076 (decision 3)** is cropped to the verdict and SHAP panel. The analyst note is not in any
+  frame; every replay capture is clipped above `.rp-note`.
+- **S1:** on beat 6 the site's hero kicker "FEDERATED INTRUSION DETECTION · VIT-AP 2026" sets
+  (critique round 2: that beat was empty). Hook type is 156 px.
+- **Glyphs.** None of the self-hosted font files has α, →, ∝, ✕ or ✓.
+  - α is set from Alegreya italic's Greek subset (the only file that contains it).
+  - → is drawn as a path.
+  - "circle area ∝ training rows" reads "circle area scales with training rows".
+  - ✕ and ✓ appear only inside real screenshots.
+  - `Text.tsx` throws if a missing glyph reaches the screen.
+- **S6:**
+  - Org 0's note reads "Org 0 barely moves." with 0.05 → 0.10 in the flag-rate column.
+  - The stamp reads "Multi-Krum excluded / 0% / of poisoned orgs, though it was given the true
+    attacker count / seed 42 · α = 0.5" (from `baselines.json` caveats: oracle f).
+- **9:16:** the trust grid labels and the detail text are 30 px, below the 34 px target in the
+  style guide. Each 9:16 frame holds two 20-round grids; this is the largest size that fits.
+- **Mastering:** linear gain plus a look-ahead limiter, giving −14.0 LUFS and −2.5 dBTP. The
+  loudness range of 2.9 LU comes from the steady pulse, not from compression.
