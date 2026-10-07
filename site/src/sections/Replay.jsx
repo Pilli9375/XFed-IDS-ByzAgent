@@ -3,7 +3,7 @@ import { replay, sources as sourcesLabel } from '../copy.js';
 import { d, loadLarge, src } from '../data.js';
 import { conf4, pad3, signed2 } from '../format.js';
 import { useInView } from '../motion.js';
-import Rich from '../components/Rich.jsx';
+import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
 
@@ -70,13 +70,13 @@ export default function Replay() {
   return (
     <section id="replay" ref={secRef} className="replay dark" aria-labelledby="replay-title">
       <div className="wrap">
-        <Reveal className="rp-head">
+        <div className="rp-head">
           <div>
-            <p className="kicker mono">{replay.kicker}</p>
-            <h2 id="replay-title" className="h2 disp"><Rich parts={replay.title} /></h2>
+            <Wipe className="kicker mono">{replay.kicker}</Wipe>
+            <SplitHeading id="replay-title" className="h2 disp" parts={replay.title} />
           </div>
-          <p className="rp-pill mono">{replay.pill}</p>
-        </Reveal>
+          <Reveal as="p" className="rp-pill mono">{replay.pill}</Reveal>
+        </div>
 
         <div ref={bodyRef} className={`rp-body rv${seen ? ' in' : ''}`}>
           {!alerts ? (

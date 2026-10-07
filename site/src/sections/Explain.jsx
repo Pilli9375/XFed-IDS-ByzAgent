@@ -3,7 +3,7 @@ import { explain } from '../copy.js';
 import { d, src } from '../data.js';
 import { f3 } from '../format.js';
 import { useInView } from '../motion.js';
-import Rich from '../components/Rich.jsx';
+import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 import Src from '../components/Src.jsx';
 
 export default function Explain() {
@@ -20,11 +20,11 @@ export default function Explain() {
   return (
     <section id="explain" className="explain" aria-labelledby="explain-title">
       <div className="explain-in">
-        <div ref={aRef} className={`explain-a rv${seenA ? ' in' : ''}`}>
-          <p className="kicker mono">{explain.kicker}</p>
-          <h2 id="explain-title" className="h2 disp"><Rich parts={explain.title} emClass="plum" /></h2>
-          <p className="body">{explain.body(d)} <Src href={src('macroF1')} /></p>
-          <p className="margin note">{explain.margin}</p>
+        <div ref={aRef} className="explain-a">
+          <Wipe className="kicker mono">{explain.kicker}</Wipe>
+          <SplitHeading id="explain-title" className="h2 disp" parts={explain.title} emClass="plum" />
+          <p className={`body rv${seenA ? ' in' : ''}`}>{explain.body(d)} <Src href={src('macroF1')} /></p>
+          <p className={`margin note rv${seenA ? ' in' : ''}`} style={{ transitionDelay: '.1s' }}>{explain.margin}</p>
         </div>
 
         <div ref={bRef} className={`explain-b rv${seenB ? ' in' : ''}`}>

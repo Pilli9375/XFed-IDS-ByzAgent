@@ -6,6 +6,7 @@ import { prefersReduced, useInView } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
+import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 
 const LABELS = ['trust', 'downweight', 'quarantine'];
 const GLYPH = ['', '–', '×'];
@@ -13,6 +14,8 @@ const DEC_COLOR = ['var(--olive)', 'var(--brass)', 'var(--terracotta-light)'];
 const DEFAULT_SEED = '1337';
 const CLEAN = 'clean';
 const ATTACK = 'f3_sudden';
+// header reveals trigger only once they are above ~70% of the viewport, i.e. after the curtain has risen
+const AFTER_CURTAIN = '0px 0px -30% 0px';
 
 // byzagent_decisions.json -> per seed: a/b = [silo][round-1] -> decision record, exactly as stored
 function shape(byz) {
@@ -221,11 +224,9 @@ export default function Trust() {
   return (
     <section id="trust" ref={secRef} className="trust dark" aria-labelledby="trust-title">
       <div className="wrap">
-        <Reveal>
-          <p className="kicker mono">{trust.kicker}</p>
-          <h2 id="trust-title" className="h2 big disp"><Rich parts={trust.title} /></h2>
-          <p className="lede">{trust.body}</p>
-        </Reveal>
+        <Wipe className="kicker mono" rootMargin={AFTER_CURTAIN}>{trust.kicker}</Wipe>
+        <SplitHeading id="trust-title" className="h2 big disp" parts={trust.title} rootMargin={AFTER_CURTAIN} />
+        <Reveal as="p" className="lede">{trust.body}</Reveal>
 
         <Cards />
 

@@ -3,6 +3,7 @@ import { story as copy, sources as sourcesLabel } from '../copy.js';
 import { d, src, srcAttack, srcByz } from '../data.js';
 import { ScrollTrigger, scrollToY, useInView, useMedia, useReducedMotion } from '../motion.js';
 import Src from '../components/Src.jsx';
+import SplitHeading from '../components/SplitHeading.jsx';
 import StoryDiagram from './StoryDiagram.jsx';
 
 const STEPS = copy.steps;
@@ -107,7 +108,7 @@ function StoryPinned({ sectionRef }) {
     <div ref={pinRef} className="pin">
       <div className="story-in">
         <div className="story-steps">
-          <h2 className="story-kicker mono">{copy.kicker}</h2>
+          <SplitHeading className="story-kicker mono" parts={copy.kicker} />
           <div className="steps">
             {STEPS.map((s, i) => {
               const k = i + 1;
@@ -150,7 +151,7 @@ export default function Story() {
     <section id="story" ref={ref} className={`story${pinned ? ' pinned' : ''}`}>
       {pinned ? <StoryPinned sectionRef={ref} /> : (
         <div className="story-in" style={{ display: 'block' }}>
-          <h2 className="story-kicker mono">{copy.kicker}</h2>
+          <SplitHeading className="story-kicker mono" parts={copy.kicker} />
           <StoryList />
           <Foot />
         </div>
