@@ -1,0 +1,115 @@
+[
+  {
+    "file": "dashboard_trust_desktop.png",
+    "url": "http://localhost:5173/client-trust-monitor",
+    "captured_at": "2026-10-07T06:51:38.941Z",
+    "git_commit": "933d9bb",
+    "section": "React dashboard, Client Trust Monitor (live FastAPI /trust)",
+    "viewport": "1920x1080@2x"
+  },
+  {
+    "file": "dashboard_trust_grid_desktop.png",
+    "url": "http://localhost:5173/client-trust-monitor",
+    "captured_at": "2026-10-07T06:51:40.381Z",
+    "git_commit": "933d9bb",
+    "section": "React dashboard, Client Trust Monitor, per-round decision grids",
+    "viewport": "1920x1080@2x"
+  },
+  {
+    "file": "site_story_desktop.png",
+    "url": "http://localhost:4180/",
+    "captured_at": "2026-10-07T07:07:45.277Z",
+    "git_commit": "933d9bb",
+    "section": "story (pinned, step 6)",
+    "viewport": "1920x1080@2x"
+  },
+  {
+    "file": "site_story_mobile.png",
+    "url": "http://localhost:4180/",
+    "captured_at": "2026-10-07T07:07:50.515Z",
+    "git_commit": "933d9bb",
+    "section": "story list, step 3",
+    "viewport": "390x844@3x"
+  },
+  {
+    "file": "site_replay_000_desktop.png",
+    "url": "http://localhost:4180/",
+    "clip": {
+      "x": 320,
+      "y": 140.015625,
+      "width": 1250,
+      "height": 365
+    },
+    "captured_at": "2026-10-07T07:07:52.349Z",
+    "git_commit": "933d9bb",
+    "section": "replay, alert #000 paused",
+    "alert_seq": 0,
+    "jump_button_in_clip": {
+      "x": 378.671875,
+      "y": 25,
+      "width": 120.328125,
+      "height": 36
+    }
+  },
+  {
+    "file": "site_replay_076_desktop.png",
+    "url": "http://localhost:4180/",
+    "clip": {
+      "x": 870,
+      "y": 146.015625,
+      "width": 724,
+      "height": 361
+    },
+    "captured_at": "2026-10-07T07:07:53.393Z",
+    "git_commit": "933d9bb",
+    "section": "replay after \"Jump to a miss\", #076, SHAP panel + verdict (analyst note excluded)",
+    "alert_seq": 76
+  },
+  {
+    "file": "site_replay_000_mobile.png",
+    "url": "http://localhost:4180/",
+    "clip": {
+      "x": 16,
+      "y": 124.375,
+      "width": 358,
+      "height": 347
+    },
+    "captured_at": "2026-10-07T07:07:55.233Z",
+    "git_commit": "933d9bb",
+    "section": "replay, alert #000 paused",
+    "alert_seq": 0
+  },
+  {
+    "file": "site_replay_bar_mobile.png",
+    "url": "http://localhost:4180/",
+    "clip": {
+      "x": 21,
+      "y": 149.375,
+      "width": 348,
+      "height": 129
+    },
+    "captured_at": "2026-10-07T07:07:55.591Z",
+    "git_commit": "933d9bb",
+    "section": "replay feed controls, paused on #000",
+    "jump_button_in_clip": {
+      "x": 215.671875,
+      "y": 12,
+      "width": 120.328125,
+      "height": 36
+    }
+  },
+  {
+    "file": "site_replay_076_mobile.png",
+    "url": "http://localhost:4180/",
+    "clip": {
+      "x": 8,
+      "y": 136.375,
+      "width": 374,
+      "height": 409
+    },
+    "captured_at": "2026-10-07T07:07:56.688Z",
+    "git_commit": "933d9bb",
+    "section": "replay after \"Jump to a miss\", #076, SHAP panel + verdict (analyst note excluded)",
+    "alert_seq": 76
+  }
+]
