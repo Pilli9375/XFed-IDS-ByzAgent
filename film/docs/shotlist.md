@@ -242,3 +242,10 @@ copies to `site/public/film/`.
   style guide. Each 9:16 frame holds two 20-round grids; this is the largest size that fits.
 - **Mastering:** linear gain plus a look-ahead limiter, giving −14.0 LUFS and −2.5 dBTP. The
   loudness range of 2.9 LU comes from the steady pulse, not from compression.
+- **Round 5 (planning-chat review):**
+  - S1 is now word slams (beats 0, 1, 2, 2.5, 3, 3.5, 4) plus the network burst on beat 5. The hub
+    is on beat 6 and the edges from beat 6.5.
+  - S2's update waves: in on beats 10, 16 and 20; out on 14, 18 and 22.
+  - S4 adds the per-seed strip and zoom on beats 44–46.
+  - S6's caption and legend arrive on beat 74.
+  - Camera keys in every diagram chapter. Full details are in `review_log.md`, round 5.
