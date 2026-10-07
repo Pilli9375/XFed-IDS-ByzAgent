@@ -67,6 +67,12 @@ export function startSmoothScroll() {
   };
 }
 
+// Hold the page still while a modal is open (Lenis listens to wheel on window).
+export function holdScroll(on) {
+  document.documentElement.style.overflow = on ? 'hidden' : '';
+  if (lenis) { if (on) lenis.stop(); else lenis.start(); }
+}
+
 export function scrollToY(y) {
   if (lenis) lenis.scrollTo(y, { duration: 1.2 });
   else window.scrollTo({ top: y, behavior: prefersReduced() ? 'auto' : 'smooth' });

@@ -25,6 +25,8 @@
   --blush: #F3D9CC;
 
   --ease: cubic-bezier(.2, .7, .2, 1);
+  /* damped spring (zeta 0.68): ~5% overshoot, settled at the end; used for slams and arrivals */
+  --spring-t: linear(0, 0.042, 0.145, 0.28, 0.425, 0.565, 0.691, 0.798, 0.884, 0.949, 0.996, 1.026, 1.044, 1.053, 1.054, 1.051, 1.044, 1.037, 1.029, 1.022, 1.015, 1.01, 1.005, 1.002, 1, 0.998, 0.997, 0.997, 0.997, 0.997, 0.998, 0.998, 1);
   --f-disp: 'Brygada 1918', Georgia, serif;
   --f-body: 'Schibsted Grotesk', system-ui, sans-serif;
   --f-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
@@ -176,6 +178,34 @@ em.em { font-style: italic; }
 .cta { display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 28px; border-radius: 999px; text-decoration: none; font-weight: 500; }
 .cta-solid { background: var(--plum); color: var(--cream); }
 .cta-line { border: 1px solid var(--cocoa); }
+.cta-film { gap: 12px; padding: 0 24px 0 10px; background: transparent; border: 0; cursor: pointer; }
+.cta-film .play {
+  display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--terracotta); color: var(--cream); padding-left: 2px; transition: transform .45s var(--spring-t);
+}
+.cta-film:hover .play { transform: scale(1.12); }
+
+/* ---------- film dialog ---------- */
+.film-dlg {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 72px 16px 24px; border: 0;
+  background: var(--cocoa-2); color: var(--cream); overflow: hidden;
+}
+.film-dlg[open] { display: flex; align-items: center; justify-content: center; animation: dlg-in .5s var(--ease) both; }
+.film-dlg::backdrop { background: var(--cocoa-2); }
+.film-vid {
+  display: block; width: min(100%, calc((100dvh - 96px) * 16 / 9), 1600px); aspect-ratio: 16 / 9;
+  background: #000; border-radius: 10px; animation: vid-in .8s var(--spring-t) both;
+}
+.film-close {
+  position: absolute; top: 16px; right: 16px; height: 44px; padding: 0 20px; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--cream); border: 1px solid var(--dark-line); font-size: 14px;
+}
+.film-close:hover { border-color: var(--cream); }
+.film-dlg :focus-visible { outline-color: var(--brass); }
+@media (max-width: 560px) { .film-vid::cue { font-size: 14px; } }
+@keyframes dlg-in { from { clip-path: inset(100% 0 0 0) } to { clip-path: inset(0) } }
+@keyframes vid-in { from { transform: translateY(40px) scale(.96) } to { transform: none } }
+
 .hero-stats { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 72px; border-top: 1px solid var(--line); padding-top: 24px; }
 .hero-stats .mono { font-size: 34px; }
 .hero-stats .lbl { font-size: 13px; color: var(--muted); }

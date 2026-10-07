@@ -1,0 +1,18 @@
+WEBVTT
+
+NOTE
+The film has no narration; every word is on screen. These cues describe the
+score. Times come from film/src/timeline.json (100 BPM, 0.6 s per beat):
+thump at the 0% stamp = beat 90, silence = beats 108-109, close = beat 109.
+
+00:00:00.000 --> 00:00:04.800
+[instrumental score: marimba and soft piano, no narration]
+
+00:00:54.000 --> 00:00:55.800
+[low thump]
+
+00:01:04.800 --> 00:01:05.400
+[silence]
+
+00:01:05.400 --> 00:01:10.805
+[closing piano chord]

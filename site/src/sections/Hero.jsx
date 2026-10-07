@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { hero } from '../copy.js';
 import { d, src } from '../data.js';
 import { f3, int } from '../format.js';
@@ -6,6 +6,7 @@ import { prefersReduced, useMedia } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
 import HeroFilm from '../components/HeroFilm.jsx';
+import FilmDialog from '../components/FilmDialog.jsx';
 
 // Count-up of the flow count once the loader has gone (1.8 s, ease-out cubic).
 function useCount(target, start) {
@@ -31,6 +32,8 @@ export default function Hero({ play, count }) {
   const done = n === d.flows;
   // below 740 px the badge wraps under the lede; the loop then sits in the space beside it
   const compact = useMedia('(max-width: 740px)');
+  const [film, setFilm] = useState(false);
+  const closeFilm = useCallback(() => setFilm(false), []);
   return (
     <section id="top" className={`hero${play ? ' go' : ''}`} aria-labelledby="hero-title">
       {!compact && <HeroFilm start={count} />}
@@ -60,7 +63,12 @@ export default function Hero({ play, count }) {
       <div className="hero-ctas fu fu3">
         <a className="cta cta-solid btn" href="#replay">{hero.ctaReplay} <span className="arr" aria-hidden="true">→</span></a>
         <a className="cta cta-line btn" href="#explain">{hero.ctaFindings} <span className="arr" aria-hidden="true">↓</span></a>
+        <button type="button" id="film-btn" className="cta cta-film btn" data-cursor-label="play" aria-haspopup="dialog" onClick={() => setFilm(true)}>
+          <span className="play" aria-hidden="true"><svg viewBox="0 0 10 12" width="10" height="12"><path d="M0 0L10 6L0 12Z" fill="currentColor" /></svg></span>
+          {hero.ctaFilm}
+        </button>
       </div>
+      <FilmDialog open={film} onClose={closeFilm} labelledBy="film-btn" />
 
       <div className="hero-stats fu fu3">
         <div>
