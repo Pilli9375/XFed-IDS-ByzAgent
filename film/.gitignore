@@ -1,0 +1,14 @@
+node_modules/
+# regenerated: npm run fonts (byte-identical copies of site/public/fonts), npm run score
+public/fonts/
+public/audio/
+# renders: keep only the deliverables that are not also copied into site/public/film
+out/*
+!out/xfed_film_9x16.mp4
+!out/poster.jpg
+!out/contact.png
+!out/beats.json
+!out/numbers.json
+
+# Remotion agent skills (restore with: npx skills experimental_install)
+.claude/
