@@ -11,6 +11,7 @@ import Trust from './sections/Trust.jsx';
 import Replay from './sections/Replay.jsx';
 import Limits from './sections/Limits.jsx';
 import Footer from './sections/Footer.jsx';
+import Cursor from './components/Cursor.jsx';
 
 // 'loading' (counter running) -> 'leaving' (panel sliding up, hero plays) -> 'done'
 const initialPhase = () => (document.documentElement.classList.contains('with-loader') ? 'loading' : 'done');
@@ -37,6 +38,7 @@ export default function App() {
         <Limits />
       </main>
       <Footer />
+      <Cursor />
     </div>
   );
 }

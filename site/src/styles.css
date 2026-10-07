@@ -87,6 +87,27 @@ em.em { font-style: italic; }
 @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 .pulse { animation: pulse 1.6s ease-in-out infinite; }
 
+/* ---------- cursor (fine pointers only; the native cursor stays) ---------- */
+.cursor { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.cursor.on { opacity: 1; }
+.cursor-shape {
+  position: absolute; left: 0; top: 0; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--cocoa); border: 1.5px solid transparent; transform: translate(-50%, -50%);
+  transition: width .55s var(--spring-t), height .55s var(--spring-t), background-color .2s, border-color .2s, transform .3s var(--spring-t);
+}
+.cursor.ring .cursor-shape { width: 46px; height: 46px; background: transparent; border-color: var(--cocoa); }
+.cursor.press .cursor-shape { transform: translate(-50%, -50%) scale(.82); }
+.cursor-lbl {
+  position: absolute; left: 22px; top: 18px; padding: 4px 9px; border-radius: 999px; white-space: nowrap;
+  font-size: 11px; line-height: 1.2; background: var(--cocoa); color: var(--cream);
+  opacity: 0; transform: translate(-6px, -4px) scale(.7); transform-origin: 0 0; transition: opacity .15s, transform .45s var(--spring-t);
+}
+.cursor.lbl .cursor-lbl { opacity: 1; transform: none; }
+.cursor.on-dark .cursor-shape { background: var(--cream); }
+.cursor.on-dark.ring .cursor-shape { background: transparent; border-color: var(--cream); }
+.cursor.on-dark .cursor-lbl { background: var(--cream); color: var(--cocoa); }
+.tgrid-scroll[data-cursor='drag'] { cursor: grab; }
+
 /* ---------- loader ---------- */
 .loader {
   position: fixed; inset: 0; z-index: 50; background: var(--cocoa); color: var(--cream);

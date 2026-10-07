@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { trust, sources as sourcesLabel } from '../copy.js';
 import { d, loadLarge, src, srcAttack, srcByz } from '../data.js';
 import { f2, f3, pctWhole, pp, signed2 } from '../format.js';
-import { AFTER_CURTAIN, prefersReduced, useCurtain, useInView } from '../motion.js';
+import { AFTER_CURTAIN, prefersReduced, useCurtain, useDragScroll, useInView } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
@@ -59,6 +59,8 @@ function Cards() {
 
 function Grid({ T, seed, tr, sel, setSel }) {
   const cellRefs = useRef({});
+  const scrollRef = useRef(null);
+  useDragScroll(scrollRef);
   const nR = d.nRounds;
   const nS = d.nSilos;
   const key = (side, silo, round) => `${side}-${silo}-${round}`;
@@ -119,7 +121,7 @@ function Grid({ T, seed, tr, sel, setSel }) {
   const [kh, nh] = count('b', (s) => !T.mal.includes(s));
 
   return (
-    <div className="tgrid-scroll">
+    <div ref={scrollRef} className="tgrid-scroll">
       <div className="tgrid">
         <div className="thead mono">
           <div className="c-lab" style={{ border: 0 }} />

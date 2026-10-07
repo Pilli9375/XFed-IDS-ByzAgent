@@ -96,6 +96,38 @@ export function useRefreshOnResize() {
   }, []);
 }
 
+// Mouse drag scrolls a horizontally overflowing box (the trust grid on narrow windows).
+// Only while it overflows is it marked data-cursor="drag", which the custom cursor reads.
+export function useDragScroll(ref) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const mark = () => {
+      if (el.scrollWidth > el.clientWidth + 1) el.dataset.cursor = 'drag';
+      else delete el.dataset.cursor;
+    };
+    mark();
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(mark) : null;
+    if (ro) { ro.observe(el); if (el.firstElementChild) ro.observe(el.firstElementChild); }
+    let x0 = 0; let s0 = 0; let down = false;
+    const onDown = (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || !el.dataset.cursor) return;
+      down = true; x0 = e.clientX; s0 = el.scrollLeft;
+    };
+    const onMove = (e) => { if (down) el.scrollLeft = s0 - (e.clientX - x0); };
+    const onUp = () => { down = false; };
+    el.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      if (ro) ro.disconnect();
+      el.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+  }, [ref]);
+}
+
 // ---- smooth scrolling ---------------------------------------------------------
 let lenis = null;
 
