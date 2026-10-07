@@ -38,7 +38,7 @@ function shape(byz) {
 
 function Cards() {
   const ref = useRef(null);
-  const seen = useInView(ref);
+  const seen = useInView(ref, { rootMargin: AFTER_CURTAIN });
   const cards = [
     { k: trust.cards.multiKrum, v: pctWhole(d.multiKrumExclusion), cls: 'v1 slam', dot: true, href: src('multiKrum') },
     { k: trust.cards.krumCost, v: pp(d.krumCleanCost), cls: 'v2 slam', href: src('krumCost') },
