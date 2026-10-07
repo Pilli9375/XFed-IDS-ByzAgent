@@ -201,7 +201,7 @@ em.em { font-style: italic; }
 .hero-row { position: relative; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-end; margin-top: 44px; }
 .hero-lede { position: relative; flex: 1 1 460px; margin: 0; font-size: 20px; line-height: 1.55; max-width: 640px; color: var(--ink-soft); }
 .hero-lede .note { font-size: 22px; }
-.badge { position: relative; width: 150px; height: 150px; flex: 0 0 150px; }
+.badge { position: relative; width: 150px; height: 150px; flex: 0 0 150px; border-radius: 50%; background: var(--cream) var(--grain); } /* paper disc: the film's lines pass behind it */
 .badge svg { position: absolute; inset: 0; animation: spin 22s linear infinite; }
 .badge text { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 3px; fill: var(--cocoa); }
 .badge .core { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--terracotta); color: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 20px; }
