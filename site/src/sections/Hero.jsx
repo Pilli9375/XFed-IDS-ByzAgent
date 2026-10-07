@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { hero } from '../copy.js';
 import { d, src } from '../data.js';
 import { f3, int } from '../format.js';
-import { prefersReduced } from '../motion.js';
+import { prefersReduced, useMedia } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
+import HeroFilm from '../components/HeroFilm.jsx';
 
 // Count-up of the flow count once the loader has gone (1.8 s, ease-out cubic).
 function useCount(target, start) {
@@ -28,10 +29,11 @@ function useCount(target, start) {
 export default function Hero({ play, count }) {
   const n = useCount(d.flows, count);
   const done = n === d.flows;
+  // below 740 px the badge wraps under the lede; the loop then sits in the space beside it
+  const compact = useMedia('(max-width: 740px)');
   return (
     <section id="top" className={`hero${play ? ' go' : ''}`} aria-labelledby="hero-title">
-      <div className="orb orb-a" aria-hidden="true" />
-      <div className="orb orb-b" aria-hidden="true" />
+      {!compact && <HeroFilm start={count} />}
 
       <p className="hero-kicker mono fu">{hero.kicker}</p>
       <h1 id="hero-title" className="disp">
@@ -44,6 +46,7 @@ export default function Hero({ play, count }) {
       </h1>
 
       <div className="hero-row">
+        {compact && <HeroFilm start={count} />}
         <p className="hero-lede fu fu1"><Rich parts={hero.lede} /></p>
         <div className="badge fu fu2" aria-hidden="true">
           <svg viewBox="0 0 150 150" width="150" height="150">

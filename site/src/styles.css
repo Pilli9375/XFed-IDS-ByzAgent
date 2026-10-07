@@ -2,6 +2,7 @@
 
 :root {
   --cream: #F6F0E4;
+  --cream-rgb: 246 240 228;
   --sand: #ECE3D1;
   --line: #DCD0BA;
   --cocoa: #2B211C;
@@ -124,10 +125,23 @@ em.em { font-style: italic; }
 
 /* ---------- hero ---------- */
 .hero { position: relative; overflow: hidden; max-width: 1280px; margin: 0 auto; padding: 96px var(--gutter); }
-.orb { position: absolute; border-radius: 50%; filter: blur(30px); pointer-events: none; }
-.orb-a { right: -120px; top: 40px; width: 560px; height: 560px; background: radial-gradient(circle, rgba(58, 40, 92, .30), rgba(58, 40, 92, 0) 65%); animation: drift 16s ease-in-out infinite alternate; }
-.orb-b { right: 180px; top: 280px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(168, 95, 63, .26), rgba(168, 95, 63, 0) 65%); animation: drift 21s ease-in-out infinite alternate; }
-@keyframes drift { 0% { transform: translate(0, 0) scale(1) } 50% { transform: translate(60px, -40px) scale(1.08) } 100% { transform: translate(-30px, 30px) scale(.96) } }
+/* film loop behind the headline; the scrim keeps every text box on (near) solid cream */
+.hero-film { position: absolute; inset: 0; pointer-events: none; }
+.hero-film video {
+  position: absolute; top: 37%; right: -12%; width: 66%; aspect-ratio: 16 / 9; transform: translateY(-50%);
+  object-fit: cover; filter: brightness(1.01); /* loop background #F3EEE2 -> page cream */
+}
+.hero-scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, var(--cream) 0, rgb(var(--cream-rgb) / 0) 12%),
+    linear-gradient(270deg, var(--cream) 0, rgb(var(--cream-rgb) / 0) 9%),
+    linear-gradient(0deg, var(--cream) 0, var(--cream) 30%, rgb(var(--cream-rgb) / 0) 52%),
+    linear-gradient(90deg, var(--cream) 0, rgb(var(--cream-rgb) / .94) 36%, rgb(var(--cream-rgb) / .62) 60%, rgb(var(--cream-rgb) / 0) 82%);
+}
+.hero-row > .hero-film { inset: auto -8px -14px auto; width: 280px; height: 158px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%); mask-image: linear-gradient(90deg, transparent, #000 30%); }
+.hero-row > .hero-film video { position: static; width: 100%; height: 100%; transform: none; }
+.hero-row > .hero-film .hero-scrim { display: none; }
 .hero-kicker { position: relative; margin: 0 0 28px; font-size: 13px; color: var(--plum); letter-spacing: .06em; }
 .hero h1 {
   position: relative; margin: 0; font-weight: 400; font-size: clamp(44px, 8.4vw, 104px);
@@ -151,7 +165,7 @@ em.em { font-style: italic; }
 .hero.go .fu3 { animation-delay: .65s; }
 .hero.go .underl { animation: draw 1s .9s var(--ease) both; }
 .hero-row { position: relative; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-end; margin-top: 44px; }
-.hero-lede { flex: 1 1 460px; margin: 0; font-size: 20px; line-height: 1.55; max-width: 640px; color: var(--ink-soft); }
+.hero-lede { position: relative; flex: 1 1 460px; margin: 0; font-size: 20px; line-height: 1.55; max-width: 640px; color: var(--ink-soft); }
 .hero-lede .note { font-size: 22px; }
 .badge { position: relative; width: 150px; height: 150px; flex: 0 0 150px; }
 .badge svg { position: absolute; inset: 0; animation: spin 22s linear infinite; }
