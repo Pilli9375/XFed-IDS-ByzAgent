@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { trust, sources as sourcesLabel } from '../copy.js';
 import { d, loadLarge, src, srcAttack, srcByz } from '../data.js';
 import { f2, f3, pctWhole, pp, signed2 } from '../format.js';
-import { prefersReduced, useInView } from '../motion.js';
+import { AFTER_CURTAIN, prefersReduced, useCurtain, useInView } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
@@ -14,8 +14,6 @@ const DEC_COLOR = ['var(--olive)', 'var(--brass)', 'var(--terracotta-light)'];
 const DEFAULT_SEED = '1337';
 const CLEAN = 'clean';
 const ATTACK = 'f3_sudden';
-// header reveals trigger only once they are above ~70% of the viewport, i.e. after the curtain has risen
-const AFTER_CURTAIN = '0px 0px -30% 0px';
 
 // byzagent_decisions.json -> per seed: a/b = [silo][round-1] -> decision record, exactly as stored
 function shape(byz) {
@@ -187,7 +185,9 @@ function Detail({ T, seed, sel }) {
 
 export default function Trust() {
   const secRef = useRef(null);
+  const curtainRef = useRef(null);
   const gridRef = useRef(null);
+  useCurtain(secRef, curtainRef);
   const near = useInView(secRef, { rootMargin: '1200px 0px', threshold: 0 });
   const gridSeen = useInView(gridRef, { threshold: 0.18 });
   const [data, setData] = useState(null);
@@ -223,10 +223,11 @@ export default function Trust() {
 
   return (
     <section id="trust" ref={secRef} className="trust dark" aria-labelledby="trust-title">
+      <div ref={curtainRef} className="curtain" aria-hidden="true" />
       <div className="wrap">
         <Wipe className="kicker mono" rootMargin={AFTER_CURTAIN}>{trust.kicker}</Wipe>
         <SplitHeading id="trust-title" className="h2 big disp" parts={trust.title} rootMargin={AFTER_CURTAIN} />
-        <Reveal as="p" className="lede">{trust.body}</Reveal>
+        <Reveal as="p" className="lede" rootMargin={AFTER_CURTAIN} style={{ transitionDelay: '.35s' }}>{trust.body}</Reveal>
 
         <Cards />
 

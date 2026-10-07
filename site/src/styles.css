@@ -385,7 +385,14 @@ em.em { font-style: italic; }
 
 /* ---------- trust (dark) ---------- */
 .dark { color: var(--cream); }
-.trust { background: var(--cocoa); padding: 128px var(--gutter); border-radius: 28px 28px 0 0; }
+.trust { position: relative; isolation: isolate; padding: 128px var(--gutter); }
+/* curtains: the panel is the section's background, so it can rise and widen on its own */
+.curtain { position: absolute; inset: 0; border-radius: 28px 28px 0 0; transform-origin: 50% 0; will-change: transform; }
+.trust > .curtain { background: var(--cocoa); }
+.trust > .wrap { position: relative; }
+.limits-sec { position: relative; isolation: isolate; background: var(--cocoa-2); }
+.curtain-cream { background-color: var(--cream); }
+.limits-sec > .limits { position: relative; }
 .trust .kicker { color: var(--terracotta-light); }
 .trust .h2.big { font-size: clamp(38px, 5.8vw, 64px); line-height: 1.02; max-width: 920px; }
 .trust .h2 em { color: var(--terracotta-light); }
@@ -456,7 +463,8 @@ em.em { font-style: italic; }
 .claim-f { margin: 14px 0 0; font-size: 13px; color: var(--dark-muted); }
 .tstatus { margin-top: 26px; font-size: 13px; color: var(--dark-muted); min-height: 240px; }
 @media (max-width: 560px) {
-  .trust { padding: 88px 16px; border-radius: 22px 22px 0 0; }
+  .trust { padding: 88px 16px; }
+  .curtain { border-radius: 22px 22px 0 0; }
   .tcard .v.v1 { font-size: 52px; }
   .tcard .v.v2 { font-size: 44px; }
   .tgrid-sec { margin-top: 72px; padding-top: 48px; }
@@ -466,7 +474,7 @@ em.em { font-style: italic; }
 }
 
 /* ---------- replay (darkest) ---------- */
-.replay { background: var(--cocoa-2); padding: 112px var(--gutter) 128px; }
+.replay { position: relative; background: var(--cocoa-2); padding: 112px var(--gutter) 128px; }
 .rp-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 24px; }
 .replay .kicker { color: var(--brass); }
 .replay .h2 { font-size: clamp(38px, 5.4vw, 60px); }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { startSmoothScroll, useAnchorScroll } from './motion.js';
+import { startSmoothScroll, useAnchorScroll, useRefreshOnResize } from './motion.js';
 import Loader from './sections/Loader.jsx';
 import Nav from './sections/Nav.jsx';
 import Hero from './sections/Hero.jsx';
@@ -20,6 +20,7 @@ export default function App() {
 
   useEffect(() => startSmoothScroll(), []);
   useAnchorScroll();
+  useRefreshOnResize();
 
   return (
     <div className="page">

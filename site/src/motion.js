@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
@@ -48,6 +48,52 @@ export function useInView(ref, { rootMargin = '0px', threshold = 0.18, once = tr
     return () => io.disconnect();
   }, [ref, rootMargin, threshold, once]);
   return inView;
+}
+
+// ---- section curtains ---------------------------------------------------------
+// Where the page changes colour, the next section's panel rises and widens into place,
+// scrubbed by scroll. Its header reveals use AFTER_CURTAIN so they wait for the panel.
+export const AFTER_CURTAIN = '0px 0px -35% 0px';
+
+export function useCurtain(sectionRef, panelRef) {
+  const reduced = useReducedMotion();
+  useLayoutEffect(() => {
+    if (reduced) return undefined;
+    const sec = sectionRef.current;
+    const el = panelRef.current;
+    // rise less than the section's top padding, so the panel never uncovers its own text
+    const rise = () => Math.max(24, Math.min(110, parseFloat(getComputedStyle(sec).paddingTop) - 24));
+    const narrow = () => window.innerWidth < 760;
+    const tw = gsap.fromTo(el, { y: rise, scaleX: () => (narrow() ? 0.96 : 0.9) }, {
+      y: 0,
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top 50%', scrub: 0.5, invalidateOnRefresh: true },
+    });
+    return () => {
+      if (tw.scrollTrigger) tw.scrollTrigger.kill();
+      tw.kill();
+      gsap.set(el, { clearProps: 'transform' });
+    };
+  }, [sectionRef, panelRef, reduced]);
+}
+
+// Lazy sections (trust grid, replay) change the page height after load; keep trigger positions true.
+export function useRefreshOnResize() {
+  useEffect(() => {
+    if (!('ResizeObserver' in window)) return undefined;
+    let t = 0;
+    let last = document.body.scrollHeight;
+    const ro = new ResizeObserver(() => {
+      const h = document.body.scrollHeight;
+      if (Math.abs(h - last) < 2) return;
+      last = h;
+      clearTimeout(t);
+      t = setTimeout(() => ScrollTrigger.refresh(), 150);
+    });
+    ro.observe(document.body);
+    return () => { clearTimeout(t); ro.disconnect(); };
+  }, []);
 }
 
 // ---- smooth scrolling ---------------------------------------------------------
