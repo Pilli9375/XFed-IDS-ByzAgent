@@ -542,10 +542,11 @@ em.em { font-style: italic; }
 .fitem .st { font-size: 12px; text-align: right; }
 .fitem .st.ok { color: var(--olive); }
 .fitem .st.miss { color: var(--terracotta-light); }
-@keyframes inA { from { opacity: 0; transform: translateY(-14px) } to { opacity: 1; transform: none } }
-@keyframes inB { from { opacity: 0; transform: translateY(-14px) } to { opacity: 1; transform: none } }
-.inA { animation: inA .6s var(--ease) both; }
-.inB { animation: inB .6s var(--ease) both; }
+/* newest alert drops in on the spring (no fade); two names so the animation restarts every tick */
+@keyframes inA { from { transform: translateY(-22px) scale(.97) } to { transform: none } }
+@keyframes inB { from { transform: translateY(-22px) scale(.97) } to { transform: none } }
+.inA { animation: inA .75s var(--spring-t) both; }
+.inB { animation: inB .75s var(--spring-t) both; }
 .rp-why { flex: 1.5 1 520px; min-width: 0; background: var(--cocoa); border-radius: 14px; padding: 30px; }
 .rp-why .h { margin: 0; font-size: 12px; color: var(--dark-muted); letter-spacing: .05em; }
 .rp-why .row1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 18px; margin-top: 12px; }
@@ -568,6 +569,9 @@ em.em { font-style: italic; }
 .rp-note { margin-top: 26px; border-top: 1px solid var(--dark-line); padding-top: 18px; }
 .rp-note .l { margin: 0 0 8px; font-size: 11px; color: var(--brass); }
 .rp-note .s { margin: 0; font-size: 20px; line-height: 1.45; }
+.typeout { position: relative; display: block; }
+.typeout-ghost { visibility: hidden; }
+.typeout-live { position: absolute; left: 0; top: 0; right: 0; }
 .rp-foot { margin: 22px 0 0; font-size: 12px; line-height: 1.6; color: var(--dark-muted); max-width: 900px; }
 .rp-foot a { color: var(--brass); }
 .rp-status { min-height: 480px; font-size: 13px; color: var(--dark-muted); padding: 24px 0; }

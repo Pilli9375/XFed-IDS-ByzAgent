@@ -6,6 +6,7 @@ import { useInView } from '../motion.js';
 import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
+import TypeOut from '../components/TypeOut.jsx';
 
 const TICK_MS = 1700;
 const FEED = 7;
@@ -146,7 +147,7 @@ export default function Replay() {
                 <div className="shap-dir mono" aria-hidden="true"><span>{replay.away(sel.predicted_family)}</span><span>{replay.toward(sel.predicted_family)}</span></div>
                 <div className="rp-note">
                   <p className="l mono">{replay.noteLabel}</p>
-                  <p className="s note">{sel.sentence}</p>
+                  <p className="s note"><TypeOut text={sel.sentence} /></p>
                 </div>
               </div>
             </>
