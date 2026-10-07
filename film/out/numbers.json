@@ -1,0 +1,532 @@
+[
+  {
+    "id": "nOrgsWord",
+    "text": "Ten",
+    "file": "headline.json",
+    "key": "dataset.n_organizations",
+    "raw": 10
+  },
+  {
+    "id": "storySeed",
+    "text": "1337",
+    "file": "story.json",
+    "key": "seed",
+    "raw": 1337
+  },
+  {
+    "id": "storyAlpha",
+    "text": "0.5",
+    "file": "story.json",
+    "key": "alpha",
+    "raw": 0.5
+  },
+  {
+    "id": "org0Benign",
+    "text": "95.4%",
+    "file": "story.json",
+    "key": "composition.rows[0].Benign / composition.rows[0].TOTAL",
+    "raw": [
+      401889,
+      421112
+    ]
+  },
+  {
+    "id": "org4Benign",
+    "text": "0",
+    "file": "story.json",
+    "key": "composition.rows[4].Benign",
+    "raw": 0
+  },
+  {
+    "id": "org4Total",
+    "text": "17,052",
+    "file": "story.json",
+    "key": "composition.rows[4].TOTAL",
+    "raw": 17052
+  },
+  {
+    "id": "alertSeq",
+    "text": "0",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=0].seq",
+    "raw": 0
+  },
+  {
+    "id": "alertFamily",
+    "text": "DDoS",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=0].predicted_family",
+    "raw": "DDoS"
+  },
+  {
+    "id": "alertConf",
+    "text": "0.9999",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=0].confidence",
+    "raw": 0.9999996423721313
+  },
+  {
+    "id": "alertCorrect",
+    "text": "correct",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=0].correct",
+    "raw": true
+  },
+  {
+    "id": "servedSeed",
+    "text": "42",
+    "file": "headline.json",
+    "key": "served_demo_model.seed",
+    "raw": 42
+  },
+  {
+    "id": "servedRound",
+    "text": "18",
+    "file": "headline.json",
+    "key": "served_demo_model.best_round",
+    "raw": 18
+  },
+  {
+    "id": "servedAlpha",
+    "text": "0.5",
+    "file": "headline.json",
+    "key": "served_demo_model.alpha",
+    "raw": "0.5"
+  },
+  {
+    "id": "f1Alpha",
+    "text": "0.5",
+    "file": "story.json",
+    "key": "pointers.macro_f1.alpha",
+    "raw": "0.5"
+  },
+  {
+    "id": "f1",
+    "text": "0.941",
+    "file": "headline.json",
+    "key": "fedavg_macro_f1_headline_by_alpha[\"0.5\"].mean",
+    "raw": 0.9407901357406868
+  },
+  {
+    "id": "f1Std",
+    "text": "0.057",
+    "file": "headline.json",
+    "key": "fedavg_macro_f1_headline_by_alpha[\"0.5\"].std",
+    "raw": 0.0569724958445115
+  },
+  {
+    "id": "f1nWord",
+    "text": "three",
+    "file": "headline.json",
+    "key": "fedavg_macro_f1_headline_by_alpha[\"0.5\"].n",
+    "raw": 3
+  },
+  {
+    "id": "f1n",
+    "text": "3",
+    "file": "headline.json",
+    "key": "fedavg_macro_f1_headline_by_alpha[\"0.5\"].n",
+    "raw": 3
+  },
+  {
+    "id": "f1Seed42",
+    "text": "0.975",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=42].fedavg.test_macro_f1_headline",
+    "raw": 0.9753310761756105
+  },
+  {
+    "id": "f1Seed1337",
+    "text": "0.987",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=1337].fedavg.test_macro_f1_headline",
+    "raw": 0.986559260219992
+  },
+  {
+    "id": "f1Seed2024",
+    "text": "0.860",
+    "file": "fedprox_vs_fedavg.json",
+    "key": "rows[alpha=0.5,seed=2024].fedavg.test_macro_f1_headline",
+    "raw": 0.8604800708264585
+  },
+  {
+    "id": "axis0",
+    "text": "0",
+    "file": "(scale)",
+    "key": "macro-F1 range lower bound",
+    "raw": 0
+  },
+  {
+    "id": "axis1",
+    "text": "1",
+    "file": "(scale)",
+    "key": "macro-F1 range upper bound",
+    "raw": 1
+  },
+  {
+    "id": "zoomLo",
+    "text": "0.80",
+    "file": "(scale)",
+    "key": "zoom window lower bound",
+    "raw": 0.8
+  },
+  {
+    "id": "zoomHi",
+    "text": "1.00",
+    "file": "(scale)",
+    "key": "zoom window upper bound",
+    "raw": 1
+  },
+  {
+    "id": "jac0",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[0].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac1",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[1].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac2",
+    "text": "0.484",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[2].jaccard_at_10",
+    "raw": 0.4835164835164834
+  },
+  {
+    "id": "jac3",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[3].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac4",
+    "text": "0.292",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[4].jaccard_at_10",
+    "raw": 0.2916666666666666
+  },
+  {
+    "id": "jac5",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[5].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac6",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[6].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac7",
+    "text": "0.292",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[7].jaccard_at_10",
+    "raw": 0.2916666666666666
+  },
+  {
+    "id": "jac8",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[8].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jac9",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[9].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jacMedian",
+    "text": "0.538",
+    "file": "story.json",
+    "key": "median of per_silo_agreement.rows[*].jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "jacLow",
+    "text": "0.292",
+    "file": "story.json",
+    "key": "per_silo_agreement.rows[4|7].jaccard_at_10",
+    "raw": 0.2916666666666666
+  },
+  {
+    "id": "agree_5.0",
+    "text": "0.667",
+    "file": "agreement_by_alpha.json",
+    "key": "by_alpha[\"5.0\"].median.jaccard_at_10",
+    "raw": 0.6666666666666666
+  },
+  {
+    "id": "agree_0.5",
+    "text": "0.538",
+    "file": "agreement_by_alpha.json",
+    "key": "by_alpha[\"0.5\"].median.jaccard_at_10",
+    "raw": 0.5384615384615384
+  },
+  {
+    "id": "agree_0.1",
+    "text": "0.333",
+    "file": "agreement_by_alpha.json",
+    "key": "by_alpha[\"0.1\"].median.jaccard_at_10",
+    "raw": 0.3333333333333333
+  },
+  {
+    "id": "floorLo",
+    "text": "0.429",
+    "file": "agreement_by_alpha.json",
+    "key": "instability_floor.jaccard_at_10_range[0]",
+    "raw": 0.4285714285714285
+  },
+  {
+    "id": "floorHi",
+    "text": "0.484",
+    "file": "agreement_by_alpha.json",
+    "key": "instability_floor.jaccard_at_10_range[1]",
+    "raw": 0.48351648351648346
+  },
+  {
+    "id": "chance",
+    "text": "0.065",
+    "file": "agreement_by_alpha.json",
+    "key": "chance_jaccard_at_10",
+    "raw": 0.06493506493506493
+  },
+  {
+    "id": "ciLo",
+    "text": "0.250",
+    "file": "ci.json",
+    "key": "by_metric.jaccard_at_10.ci95_low",
+    "raw": 0.25
+  },
+  {
+    "id": "ciHi",
+    "text": "0.429",
+    "file": "ci.json",
+    "key": "by_metric.jaccard_at_10.ci95_high",
+    "raw": 0.4285714285714285
+  },
+  {
+    "id": "ciAlpha",
+    "text": "0.1",
+    "file": "ci.json",
+    "key": "alpha",
+    "raw": 0.1
+  },
+  {
+    "id": "agreeSeeds",
+    "text": "42, 1337, 2024",
+    "file": "agreement_by_alpha.json",
+    "key": "by_alpha[\"0.5\"].per_seed (keys)",
+    "raw": [
+      "42",
+      "1337",
+      "2024"
+    ]
+  },
+  {
+    "id": "trustSeed",
+    "text": "1337",
+    "file": "story.json",
+    "key": "pointers.byzagent.seed",
+    "raw": "1337"
+  },
+  {
+    "id": "byzAlpha",
+    "text": "0.5",
+    "file": "byzagent_decisions.json",
+    "key": "alpha",
+    "raw": 0.5
+  },
+  {
+    "id": "mal",
+    "text": "0, 3 and 5",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.true_malicious_silos",
+    "raw": [
+      0,
+      3,
+      5
+    ]
+  },
+  {
+    "id": "flip",
+    "text": "40%",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.attack.sudden.flip_fraction",
+    "raw": 0.4
+  },
+  {
+    "id": "attackF",
+    "text": "3",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.attack.f",
+    "raw": 3
+  },
+  {
+    "id": "nSilos",
+    "text": "10",
+    "file": "byzagent_decisions.json",
+    "key": "n_silos",
+    "raw": 10
+  },
+  {
+    "id": "sumClean",
+    "text": "83 of 200 calls flagged, nobody attacking",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].clean.decisions[] (count decision != trust)",
+    "raw": [
+      83,
+      200
+    ]
+  },
+  {
+    "id": "sumAttack",
+    "text": "poisoned 29/60 flagged · honest 82/140",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.decisions[] (count decision != trust; = decision_counts)",
+    "raw": [
+      29,
+      60,
+      82,
+      140
+    ]
+  },
+  {
+    "id": "org5RateA",
+    "text": "0.00",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].clean.decisions[silo=5] flagged / 20",
+    "raw": 0
+  },
+  {
+    "id": "org5RateB",
+    "text": "0.95",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.decisions[silo=5] flagged / 20",
+    "raw": 0.95
+  },
+  {
+    "id": "org0RateA",
+    "text": "0.05",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].clean.decisions[silo=0] flagged / 20",
+    "raw": 0.05
+  },
+  {
+    "id": "org0RateB",
+    "text": "0.10",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.decisions[silo=0] flagged / 20",
+    "raw": 0.1
+  },
+  {
+    "id": "featSilo",
+    "text": "5",
+    "file": "story.json",
+    "key": "pointers.byzagent.featured_silo",
+    "raw": 5
+  },
+  {
+    "id": "featRound",
+    "text": "6",
+    "file": "story.json",
+    "key": "pointers.byzagent.featured_round",
+    "raw": 6
+  },
+  {
+    "id": "featDecision",
+    "text": "Downweight",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.decisions[silo=5,round=6].decision",
+    "raw": "downweight"
+  },
+  {
+    "id": "featReason",
+    "text": "high train_loss (0.3766992952671328) and low cosine_to_global (0.3590587707828174) suggest a potentially malicious client.",
+    "file": "byzagent_decisions.json",
+    "key": "by_seed[\"1337\"].f3_sudden.decisions[silo=5,round=6].explanation",
+    "raw": "high train_loss (0.3766992952671328) and low cosine_to_global (0.3590587707828174) suggest a potentially malicious client."
+  },
+  {
+    "id": "nRounds",
+    "text": "20",
+    "file": "byzagent_decisions.json",
+    "key": "n_rounds",
+    "raw": 20
+  },
+  {
+    "id": "trendLo",
+    "text": "35",
+    "file": "byzagent_decisions.json",
+    "key": "trend_claim_error_range_pct.low",
+    "raw": 35
+  },
+  {
+    "id": "trendHi",
+    "text": "45",
+    "file": "byzagent_decisions.json",
+    "key": "trend_claim_error_range_pct.high",
+    "raw": 45
+  },
+  {
+    "id": "mkExcl",
+    "text": "0%",
+    "file": "baselines.json",
+    "key": "strategies[multikrum].conditions.f3.mechanism.malicious_exclusion_rate",
+    "raw": 0
+  },
+  {
+    "id": "mkSeed",
+    "text": "42",
+    "file": "baselines.json",
+    "key": "seed",
+    "raw": 42
+  },
+  {
+    "id": "mkAlpha",
+    "text": "0.5",
+    "file": "baselines.json",
+    "key": "alpha",
+    "raw": 0.5
+  },
+  {
+    "id": "missSeq",
+    "text": "076",
+    "file": "replay_alerts.json",
+    "key": "alerts[first correct == false].seq",
+    "raw": 76
+  },
+  {
+    "id": "missTrue",
+    "text": "WebAttack",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=76].true_family",
+    "raw": "WebAttack"
+  },
+  {
+    "id": "missPred",
+    "text": "Benign",
+    "file": "replay_alerts.json",
+    "key": "alerts[seq=76].predicted_family",
+    "raw": "Benign"
+  },
+  {
+    "id": "nAlerts",
+    "text": "500",
+    "file": "replay_alerts.json",
+    "key": "n_alerts",
+    "raw": 500
+  }
+]

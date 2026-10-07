@@ -1,0 +1,31 @@
+{
+  "_note": "Single timing source for the visuals (src/*.tsx) and the score (scripts/score.mjs). Times are in beats from 0; 1 beat = 18 frames at 30 fps (100 BPM). Fractions allowed for staggers.",
+  "bpm": 100,
+  "fps": 30,
+  "framesPerBeat": 18,
+  "beatsPerBar": 4,
+  "totalBeats": 118,
+  "durationInFrames": 2124,
+  "chapters": [
+    { "id": "S1", "name": "Hook", "start": 0, "end": 8 },
+    { "id": "S2", "name": "Learning without sharing", "start": 8, "end": 24 },
+    { "id": "S3", "name": "Uneven data", "start": 24, "end": 36 },
+    { "id": "S4", "name": "It works", "start": 36, "end": 48 },
+    { "id": "S5", "name": "Do they agree on why?", "start": 48, "end": 68 },
+    { "id": "S6", "name": "Can they be trusted?", "start": 68, "end": 96 },
+    { "id": "S7", "name": "Proof it's real", "start": 96, "end": 108 },
+    { "id": "S8", "name": "Silence and close", "start": 108, "end": 118 }
+  ],
+  "cuts": [8, 24, 36, 40, 48, 58, 68, 72, 96, 98, 102, 105, 108],
+  "ev": {
+    "s1": { "kicker": 0, "words": [0, 1, 2, 2.5, 3, 3.5, 4], "underline": 4.5, "burst": 5, "burstStep": 0.0625, "hub": 6, "edges": 6.5, "edgeStep": 0.125, "tag": 6 },
+    "s2": { "title": 8, "body1": 9, "note1": 12, "note2": 13, "body2": 14, "dotStep": 0.25, "dotTravel": 1.5,
+            "waves": [ { "at": 10, "in": true }, { "at": 14, "in": false }, { "at": 16, "in": true }, { "at": 18, "in": false }, { "at": 20, "in": true }, { "at": 22, "in": false } ] },
+    "s3": { "pies": 24, "question": 26, "org0": 28, "org4": 32, "note": 34 },
+    "s4": { "alert": 36, "number": 40, "countBeats": 3, "label": 41, "seeds": 44, "seedStep": 0.5, "std": 46 },
+    "s5": { "question": 48, "values": 50, "valueStep": 0.5, "def": 51, "drop": 56, "chart": 58, "bar5": 60, "bar05": 61, "bar01": 62, "chance": 63, "ci": 64 },
+    "s6": { "question": 68, "poison": 70, "poisonStep": 0.5, "wipe": 72, "fill": 73, "fillStep": 0.5, "cap1": 74, "summary": 80, "org5": 82, "detail": 84, "type": 85, "typeBeats": 3, "fidelity": 88, "org0": 89, "stamp": 90 },
+    "s7": { "site": 96, "dash": 98, "replay": 102, "ring": 104, "miss": 105 },
+    "s8": { "silence": 108, "hub": 109, "title": 112, "team": 114, "end": 118 }
+  }
+}
