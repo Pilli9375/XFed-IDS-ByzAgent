@@ -542,9 +542,10 @@ em.em { font-style: italic; }
 .fitem .st { font-size: 12px; text-align: right; }
 .fitem .st.ok { color: var(--olive); }
 .fitem .st.miss { color: var(--terracotta-light); }
-/* newest alert drops in on the spring (no fade); two names so the animation restarts every tick */
-@keyframes inA { from { transform: translateY(-22px) scale(.97) } to { transform: none } }
-@keyframes inB { from { transform: translateY(-22px) scale(.97) } to { transform: none } }
+/* newest alert springs in from the side (no fade, and never up into the counts row above it);
+   two names so the animation restarts every tick */
+@keyframes inA { from { transform: translateX(-24px) scale(.97) } to { transform: none } }
+@keyframes inB { from { transform: translateX(-24px) scale(.97) } to { transform: none } }
 .inA { animation: inA .75s var(--spring-t) both; }
 .inB { animation: inB .75s var(--spring-t) both; }
 .rp-why { flex: 1.5 1 520px; min-width: 0; background: var(--cocoa); border-radius: 14px; padding: 30px; }
