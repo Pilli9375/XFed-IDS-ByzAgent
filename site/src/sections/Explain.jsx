@@ -4,6 +4,7 @@ import { d, src } from '../data.js';
 import { f3 } from '../format.js';
 import { useInView } from '../motion.js';
 import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
+import Tick from '../components/Tick.jsx';
 import Src from '../components/Src.jsx';
 
 export default function Explain() {
@@ -38,17 +39,17 @@ export default function Explain() {
           <div className="metric-cards" aria-live="polite">
             <div className="metric lift">
               <div className="k mono">{explain.cards.f1}</div>
-              <div className="v mono">{f3(d.fedF1[pick])}</div>
+              <Tick className="v mono" value={f3(d.fedF1[pick])} />
               <Src href={src('macroF1')} />
             </div>
             <div className="metric lift">
               <div className="k mono">{explain.cards.j}</div>
-              <div className="v mono plum">{f3(ag.j)}</div>
+              <Tick className="v mono plum" value={f3(ag.j)} />
               <Src href={src('agreement')} />
             </div>
             <div className="metric lift">
               <div className="k mono">{explain.cards.t}</div>
-              <div className="v mono">{f3(ag.t)}</div>
+              <Tick className="v mono" value={f3(ag.t)} />
               <Src href={src('agreement')} />
             </div>
           </div>

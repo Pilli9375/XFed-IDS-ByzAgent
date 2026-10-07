@@ -391,6 +391,14 @@ em.em { font-style: italic; }
 .metric .k { font-size: 12px; color: var(--muted); }
 .metric .v { font-size: 46px; margin-top: 10px; }
 .metric .v.plum { color: var(--plum); }
+/* ticking values: a changed character rolls out upward, its replacement springs in from below */
+.tick { display: inline-flex; }
+.tk { display: inline-block; position: relative; }
+.tk-ch { overflow: hidden; vertical-align: top; }
+.tk-in { display: inline-block; animation: tk-in .75s var(--spring-t) var(--d) both; }
+.tk-out { position: absolute; left: 0; top: 0; animation: tk-out .4s cubic-bezier(.55, 0, .8, .2) var(--d) both; }
+@keyframes tk-in { from { transform: translateY(105%) } to { transform: none } }
+@keyframes tk-out { from { transform: none } to { transform: translateY(-105%) } }
 .agree { margin-top: 28px; }
 .agree-track { position: relative; height: 18px; background: var(--line); border-radius: 999px; }
 .agree-floor { position: absolute; top: -6px; bottom: -6px; background: rgba(168, 95, 63, .20); border-left: 1px dashed var(--terracotta); border-right: 1px dashed var(--terracotta); }
@@ -429,6 +437,11 @@ em.em { font-style: italic; }
 .tcard .v.v1 { font-size: 64px; color: var(--terracotta-light); }
 .tcard .v.v2 { font-size: 56px; }
 .tcard .v.v3 { font-size: 40px; margin: 18px 0 10px; }
+/* the two headline numbers slam in on the spring (scale only; the value itself never changes) */
+.tcard .v.slam { transform-origin: 0 100%; opacity: 0; }
+.tcard.in .v.slam { animation: slam-t .9s var(--spring-t) both, slam-o .18s linear both; } /* delay set inline per card */
+@keyframes slam-t { from { transform: scale(1.35) } to { transform: none } }
+@keyframes slam-o { from { opacity: 0 } to { opacity: 1 } }
 .tgrid-sec { margin-top: 96px; border-top: 1px solid var(--dark-line); padding-top: 64px; }
 .tgrid-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 28px; }
 .tgrid-head h3 { margin: 0; font-weight: 400; font-size: clamp(30px, 4vw, 44px); line-height: 1.06; }
@@ -598,5 +611,7 @@ em.em { font-style: italic; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .rv, .fu, .line > span, .underl, .split .wi { opacity: 1 !important; transform: none !important; }
   .wipe-i { clip-path: none !important; }
+  .tk-out { display: none; }
+  .tcard .v.slam { opacity: 1 !important; }
   .dg .dot { display: none; }
 }

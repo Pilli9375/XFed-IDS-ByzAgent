@@ -40,8 +40,8 @@ function Cards() {
   const ref = useRef(null);
   const seen = useInView(ref);
   const cards = [
-    { k: trust.cards.multiKrum, v: pctWhole(d.multiKrumExclusion), cls: 'v1', dot: true, href: src('multiKrum') },
-    { k: trust.cards.krumCost, v: pp(d.krumCleanCost), cls: 'v2', href: src('krumCost') },
+    { k: trust.cards.multiKrum, v: pctWhole(d.multiKrumExclusion), cls: 'v1 slam', dot: true, href: src('multiKrum') },
+    { k: trust.cards.krumCost, v: pp(d.krumCleanCost), cls: 'v2 slam', href: src('krumCost') },
     { k: trust.cards.signal, v: trust.cards.signalValue, cls: 'v3', href: src('attackSignal') },
   ];
   return (
@@ -49,7 +49,7 @@ function Cards() {
       {cards.map((c, i) => (
         <div key={c.k} className={`tcard rv lift${seen ? ' in' : ''}`} style={{ transitionDelay: `${i * 0.1}s` }}>
           <div className="k mono">{c.dot && <span className="pulse" aria-hidden="true" />}{c.k}</div>
-          <div className={`v ${c.cls} disp`}>{c.v}</div>
+          <div className={`v ${c.cls} disp`} style={{ animationDelay: `${0.3 + i * 0.14}s` }}>{c.v}</div>
           <Src href={c.href} />
         </div>
       ))}
