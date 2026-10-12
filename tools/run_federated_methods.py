@@ -81,14 +81,17 @@ def launch(cfg: dict, method: str, alpha: str, seed: int, group: str, rounds: in
         return {"skipped": True}
 
     rc = (f"alpha='{alpha}' seed={seed} method='{method}' run-group='{group}' "
-          f"num-server-rounds={rounds} local-epochs={exp['local_epochs']}")
+          f"num-server-rounds={rounds} "
+          f"local-epochs={cfg['methods'][method].get('local_epochs', exp['local_epochs'])}")
     log_dir = ROOT / exp["results_root"] / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{group}_{method}_a{alpha}_s{seed}.log"
     # flwr spawns flower-superlink by name, so the env's Scripts dir and
     # root must be on PATH even when this script is run by absolute python.
     env_bin = [str(FLWR.parent), str(FLWR.parent.parent), str(FLWR.parent.parent / "Library" / "bin")]
-    env = dict(os.environ, PYTHONIOENCODING="utf-8",
+    # XFED_PROJECT_ROOT: Flower runs the app from a copy, so tell task.py
+    # where the repo is rather than relying on its ancestor search.
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", XFED_PROJECT_ROOT=str(ROOT),
                PATH=os.pathsep.join(env_bin + [os.environ.get("PATH", "")]))
 
     print(f"\n=== {group}: {method} alpha={alpha} seed={seed} rounds={rounds} ===", flush=True)

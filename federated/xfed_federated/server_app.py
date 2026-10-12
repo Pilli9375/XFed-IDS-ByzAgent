@@ -1001,8 +1001,11 @@ def _run_method(grid: Grid, context: Context, method_name: str) -> None:
     # The YAML is the source of truth; pyproject/run-config values must agree
     # with it. The only exception is the "timing" group (a short run used to
     # time a round before committing GPU-hours), which may shorten rounds.
-    if local_epochs != int(exp["local_epochs"]):
-        raise ValueError(f"local-epochs {local_epochs} != YAML {exp['local_epochs']}")
+    # A method may override local_epochs (the epochs-provenance check runs
+    # FedAvg at 1 epoch); otherwise the experiment-wide value applies.
+    expected_epochs = int(method.get("local_epochs", exp["local_epochs"]))
+    if local_epochs != expected_epochs:
+        raise ValueError(f"local-epochs {local_epochs} != YAML {expected_epochs}")
     if run_group != "timing" and num_rounds != int(exp["num_server_rounds"]):
         raise ValueError(f"num-server-rounds {num_rounds} != YAML {exp['num_server_rounds']}")
     if float(context.run_config.get("mu", 0.0)) != 0.0:
@@ -1125,6 +1128,7 @@ def _run_method(grid: Grid, context: Context, method_name: str) -> None:
         "run_group": run_group,
         "num_rounds": num_rounds,
         "local_epochs": local_epochs,
+        "local_epochs_override": "local_epochs" in method,
         "server": method["server"],
         "server_params": server_params,
         "client_mu": mu,

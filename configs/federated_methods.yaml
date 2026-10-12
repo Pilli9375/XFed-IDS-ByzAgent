@@ -89,6 +89,15 @@ methods:
     server: fedyogi
     server_params: {eta: 0.001, beta_1: 0.9, beta_2: 0.99, tau: 0.001}
     client: {mu: 0.0}
+  # Epochs-provenance check (planning chat, 2026-10-13). Not a candidate.
+  # Pre-registered: whatever the result, no locked choice or headline
+  # changes; only whether validation agrees with the 3-epoch lock is
+  # reported. Compared against the published fedavg_a0.5_s{seed} runs.
+  fedavg_epochs1:
+    server: fedavg
+    server_params: {}
+    client: {mu: 0.0}
+    local_epochs: 1
 
 # Candidates that will be run, in order. `fedavg` is not here: the baseline
 # is the existing published runs. If the timed budget exceeds

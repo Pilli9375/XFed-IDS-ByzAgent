@@ -53,6 +53,9 @@ def train(msg: Message, context: Context) -> Message:
             raise ValueError(f"method={method_name!r} takes mu from YAML; got run-config mu={mu}")
         _, method = load_method(method_name)
         mu = float(method["client"]["mu"])
+        if "local_epochs" in method and local_epochs != int(method["local_epochs"]):
+            raise ValueError(f"{method_name}: run-config local-epochs {local_epochs} "
+                             f"!= YAML {method['local_epochs']}")
 
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")
