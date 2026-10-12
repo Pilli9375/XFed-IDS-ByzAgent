@@ -216,3 +216,61 @@ Consolidated from `PROJECT_INSTRUCTIONS.md` ("Findings that limit what can be cl
 ---
 
 *Numbers in this document were current as of the FedProx μ=0.0005 sweep (2026-08-25). If any upstream CSV, manifest, or script referenced above changes, this document is the one to re-derive from and update — the other three locations defer to it.*
+
+---
+---
+
+## Added result: federated optimizer comparison (preregistered)
+
+*Added 2026-10-12. Separate from everything above: no number above this line was changed, and the explanation check (SHAP, agreement, the instability floor) and the trust check stay on the published FedAvg runs. Nothing in this section was recomputed for the new optimizer. Protocol, selection rule and sealed checkpoints: [`docs/preregistration_accuracy.md`](preregistration_accuracy.md).*
+
+**Question.** Does a different federated optimizer raise macro-F1 over FedAvg under non-IID data, mainly at α=0.1?
+
+**Protocol.** Selection used validation data only. Four candidates were compared at α ∈ {0.1, 0.5} × seeds {42, 1337, 2024}: FedAvgM momentum 0.5 and 0.9, FedAdam η=0.01, FedYogi η=0.01. The model, partitions (SHA256-checked), 3 local epochs, 20 rounds and best-by-validation round selection are unchanged. Of the nine requested candidates, fedprox_mu0.1 was cut for budget before the grid. A timing-only budget guard then dropped fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001 and fedyogi_lr0.001 before any of them started. SCAFFOLD was not run: no Flower strategy exists for it, it needs persistent client state, and the locked local optimizer is AdamW. A FedAvg re-run on the new code path reproduced the published α=0.1 seed 42 validation curve exactly (all 21 rounds). The rule picked **FedAvgM, server momentum 0.9, server lr 1.0**. Its 9 best-by-validation checkpoints (α ∈ {0.1, 0.5, 5.0} × 3 seeds) were sealed by SHA256 in commit `1a17277`. They were then scored on the test set once, the single additional test evaluation allowed by the 2026-10-12 rule change.
+
+**Validation (selection).** Source: `results/federated_methods/selection.json`.
+
+| | α=0.1 val mean | α=0.5 val mean |
+|---|---|---|
+| FedAvg (published runs) | 0.5228 | 0.9425 |
+| FedAvgM m=0.5 | 0.5386 | 0.9502 |
+| **FedAvgM m=0.9 (chosen)** | **0.6068** | **0.9861** |
+| FedAdam η=0.01 | 0.4583 | 0.8482 (fails guard) |
+| FedYogi η=0.01 | 0.4627 | 0.9004 (fails guard) |
+
+**Test (single preregistered evaluation).** Source: `results/federated_methods/test_once/result.json` (prereg commit `1a172773523e9ce549952631fe3b89797af83bb7`). Macro-F1 over the 7 headline families, mean ± std over 3 seeds (population std, as in the published table). The FedAvg column is the published result (`results/aggregated/federated_headline.csv`), not re-run.
+
+| α | FedAvg (published) | FedAvgM m=0.9 | Per seed, 42 / 1337 / 2024 (FedAvg → FedAvgM) |
+|---|---|---|---|
+| 0.1 | 0.516 ± 0.048 | **0.593 ± 0.063** | 0.5426→0.6558 / 0.4481→0.5065 / 0.5572→0.6167 |
+| 0.5 | 0.941 ± 0.057 | **0.985 ± 0.001** | 0.9753→0.9846 / 0.9866→0.9856 / 0.8605→0.9856 |
+| 5.0 | 0.990 ± 0.001 | **0.991 ± 0.001** | 0.9900→0.9918 / 0.9905→0.9906 / 0.9889→0.9910 |
+
+Unrounded: 0.5930 ± 0.0632, 0.9852 ± 0.0005, 0.9911 ± 0.0005.
+
+**Per-class test F1, FedAvgM m=0.9** (mean over 3 seeds; Infiltration and Heartbleed per class only, not in the headline):
+
+| Class | α=0.1 | α=0.5 | α=5.0 |
+|---|---|---|---|
+| Benign | 0.9417 | 0.9988 | 0.9993 |
+| Bot | 0.3949 | 0.9646 | 0.9705 |
+| BruteForce | 0.5708 | 0.9947 | 0.9964 |
+| DDoS | 0.9897 | 0.9999 | 0.9999 |
+| DoS | 0.6487 | 0.9946 | 0.9979 |
+| PortScan | 0.2964 | 0.9967 | 0.9977 |
+| WebAttack | 0.3088 | 0.9475 | 0.9762 |
+| Heartbleed (per class only) | 0.0000 | 0.6000 | 0.9333 |
+| Infiltration (per class only) | 0.0000 | 0.4843 | 0.6239 |
+
+**What this supports.**
+- At α=0.1, server momentum 0.9 raised test macro-F1 in each of the 3 seeds (+0.113, +0.058, +0.060). The mean rose from 0.516 to 0.593. α=0.1 remains far below centralized (0.990): whole families still get F1 near 0 in some seeds (per-class std 0.31–0.46 for Bot, BruteForce, DoS, PortScan and WebAttack).
+- At α=0.5 the mean rose from 0.941 to 0.985, and the seed spread shrank from 0.057 to 0.0005. Most of the change is seed 2024 (0.8605 → 0.9856); seed 1337 moved −0.001.
+- At α=5.0 the change is +0.0001 to +0.0021 per seed, within the centralized MLP's own seed spread (0.9900 ± 0.0022).
+
+**Limits.**
+- n=3 seeds per α. No significance test is claimed.
+- Only 4 of the 9 requested candidates were compared (budget), so this is "the best of these four", not a tuned optimum. In particular, server momentum is not swept beyond {0.5, 0.9}, and server lr is fixed at 1.0.
+- The validation gain at α=0.1 (+0.084) was larger than the test gain (+0.077). FedAvgM m=0.9's α=0.1 validation curves oscillate strongly. Its best-by-validation rounds are often spikes, and its final-round α=0.1 val mean (0.5248) is close to FedAvg's (0.5062). This was recorded in the prereg before the test.
+- These are not GPU results. Flower's isolated runtime trains with torch 2.13.0+cpu. The two August runtime envs still on disk (2026-08-10 and 2026-08-26) used the same build, so the published federated runs most likely trained on CPU too. The Flower app's dependencies are now pinned to those versions.
+- Flower 1.33's FedAdam sends float64 global weights from round 2 on (1.5× the per-round payload: 2,381,880 vs 1,587,920 bytes). It was not selected; noted for anyone reusing it. Every other method sends 1,587,920 bytes per round. Per-round wall time and bytes for every run are in `results/federated_methods/runs/*/round_timing_comm.jsonl`.
+- The explanation and trust findings above are FedAvg findings. Whether momentum changes explanation agreement is untested.
