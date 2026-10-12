@@ -40,6 +40,10 @@ with them, they win.
 ## Environment
 
 - Hardware: RTX 4050 6GB VRAM (hard ceiling), 24GB RAM, Windows 11.
+- What ran where: the GPU ran the centralized MLP (baselines, pilots),
+  XGBoost and Ollama (ByzAgent). Federated training ran on CPU: torch
+  2.13.0+cpu in Flower's isolated env, verified for the August envs and all
+  runs from 2026-10-12 on. SHAP, serving and hot-swap also run on CPU.
 - Conda env `xfed`. `conda activate` is a no-op in cmd.exe on this machine;
   use PowerShell.
 - Project root `C:\Pilli\Capstone\xfed-ids\`. Raw dataset stays outside the repo

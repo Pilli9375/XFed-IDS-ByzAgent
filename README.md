@@ -252,6 +252,13 @@ was developed and run on Windows 11 with an RTX 4050 (6 GB VRAM, a hard
 ceiling that shaped several choices) and 24 GB RAM. Full runs are long: the
 SHAP pipeline alone is about 3.7 hours for all 9 configurations.
 
+What ran where: the GPU trained the centralized MLP (baselines and pilots)
+and XGBoost, and ran the Ollama model behind ByzAgent. Federated training ran
+on CPU: Flower installs its own isolated environment with torch 2.13.0+cpu
+(verified in the two August environments and in every run made on
+2026-10-12/13). SHAP, the dashboard backend and hot-swap retraining also run
+on CPU.
+
 ### 1. Environment
 
 The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
@@ -283,7 +290,9 @@ Flower reads its simulation settings from your user-level Flower config
 `[superlink.local-simulation]` block from
 [`federated/flwr_config.example.toml`](federated/flwr_config.example.toml)
 into that file. The example requests one GPU per client, which makes the
-simulation run one client at a time so it fits in 6 GB of VRAM. Also set
+simulation run one client at a time. Training itself runs on CPU (Flower's
+isolated environment installs the CPU build of torch), so in practice this
+setting only serializes the clients. Also set
 `$env:PYTHONIOENCODING = "utf-8"` in the shell; otherwise Flower's summary
 output crashes on the default Windows code page.
 
