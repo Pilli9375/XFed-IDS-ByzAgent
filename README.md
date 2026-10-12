@@ -175,9 +175,10 @@ The ones most likely to matter to a reader:
   not a gate. The instability floor rests on 3 seed pairs. Silos within one
   run share a training trajectory, so the effective sample size is closer to
   the 3 seeds than to the silo count.
-- About 43,890 flows are feature-identical to benign traffic once identifier
-  columns are removed, even in the corrected dataset; they were dropped as
-  label conflicts and cap what any model on these 82 features can separate.
+- Even in the corrected dataset, 43,890 flows labelled Benign or PortScan
+  are feature-identical to a flow of the other family once identifier
+  columns are removed. They were dropped as label conflicts; this is a
+  ceiling set by the 82-feature space, not by any model.
 
 **Trust check**
 
@@ -199,15 +200,46 @@ The ones most likely to matter to a reader:
 - Whether the detectors' failures are general, or entangled with this
   project's worst-case attacker-selection rule (which selects on the same
   compositional axis the detectors react to), is still open.
-- A live run in which ByzAgent's decisions drive aggregation was not run,
+- No live run was done in which ByzAgent's decisions drive aggregation,
   because any number it produced would inherit the compositional confound.
 
 **Engineering**
 
-- The pipeline is Windows-oriented: partition manifests store Windows paths,
-  and `configs/data.yaml` plus several scripts in `scripts/` hard-code the
-  project root `C:\Pilli\Capstone\xfed-ids`.
+- The pipeline is Windows-oriented: checkpoint manifests such as
+  `results/inspection/best_rounds_manifest.json` store Windows backslash
+  paths, and `configs/data.yaml` plus several scripts in `scripts/`
+  hard-code the project root `C:\Pilli\Capstone\xfed-ids`.
 - There is no pinned environment file; the package versions used are listed
   under "Reproduce it" below.
 - A fresh clone has no processed data (`*.parquet` is git-ignored), so the
   backend only starts after the data pipeline has been run locally.
+
+## Repository layout
+
+```
+configs/      every parameter: data, model, attack, defense, agent, backend, hotswap, showcase export
+data/         README.md (data decision record); processed/ is git-ignored
+federated/    xfed_federated/: the Flower app that produced every reported number
+src/          data/, models/, train/ (centralized + XGBoost), attacks/, monitoring/,
+              agents/ (ByzAgent), hotswap/; src/federated/ is an early prototype, unused
+tools/        SHAP pipeline, agreement metrics, parity monitor, plots, showcase export
+scripts/      partition checks, aggregation, trust-check phase gates and analyses
+results/      aggregated/, centralized/, federated/, shap/, inspection/,
+              attacks/, monitoring/, defenses/, agents/, explanations/, figures/
+backend/      FastAPI service for the dashboard (+ simulator.py traffic replay)
+frontend/     React + Recharts dashboard
+site/         static showcase site (Vite + React), deployed to Vercel
+film/         Remotion source for the explainer film
+docs/         contribution_a_results.md, contribution_b_results.md, measurement_protocol.md
+app.py, app_lib/   Streamlit dashboard (Phase 1, superseded by backend/ + frontend/)
+PROJECT_INSTRUCTIONS.md   project rules, locked decisions and headline numbers
+```
+
+The phase-by-phase trust-check write-ups behind
+`docs/contribution_b_results.md` are
+[`PHASE0_SUMMARY.md`](results/attacks/PHASE0_SUMMARY.md),
+[`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md),
+[`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md),
+[`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md),
+[`PHASE4_SUMMARY.md`](results/agents/PHASE4_SUMMARY.md) and
+[`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md).
