@@ -64,6 +64,14 @@ run-group = "runs"
 # subsampling is needed either.
 fraction-train = 1.0
 fraction-evaluate = 1.0
+# Legacy client-side evaluation scores each silo on its OWN TEST ROWS every
+# round (silo_metrics.jsonl "evaluate" rows). Off by default since 2026-10-13:
+# no analysis reads those scores, and they are test-set reads. When false,
+# fraction-evaluate is forced to 0.0 and client_app.evaluate refuses to run.
+# Training is unaffected either way (it never reads these scores). To
+# reproduce a published run's silo_metrics.jsonl (with its evaluate rows), set it on
+# explicitly: --run-config "legacy-client-test-eval=true"
+legacy-client-test-eval = false
 
 
 #######################################################################

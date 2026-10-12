@@ -393,6 +393,13 @@ powershell -ExecutionPolicy Bypass -File tools\run_sweep_fedprox.ps1
 python scripts/aggregate_federated.py
 ```
 
+Legacy client-side evaluation, which scores each silo on its own test rows
+every round, is off by default (`legacy-client-test-eval = false` in
+`federated/pyproject.toml`); training is the same either way. The published
+runs were made with it on. To reproduce their `silo_metrics.jsonl` evaluate
+rows, pass `-LegacyClientTestEval` to either sweep script, or
+`--run-config "legacy-client-test-eval=true"` to `flwr run`.
+
 ### 5. Explanation check (SHAP export and agreement)
 
 ```powershell

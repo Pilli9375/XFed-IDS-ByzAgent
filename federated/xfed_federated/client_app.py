@@ -111,6 +111,12 @@ def evaluate(msg: Message, context: Context) -> Message:
             "client evaluate() called in a method run: it scores silo test rows. "
             "Method runs are validation-only; check fraction_evaluate."
         )
+    if not bool(context.run_config.get("legacy-client-test-eval", False)):
+        raise RuntimeError(
+            "client evaluate() scores silo test rows and is off by default "
+            "(legacy-client-test-eval=false in federated/pyproject.toml). Set it "
+            "true only to reproduce a published run's silo_metrics.jsonl."
+        )
 
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")

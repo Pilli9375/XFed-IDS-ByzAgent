@@ -553,6 +553,12 @@ def main(grid: Grid, context: Context) -> None:
     mu = float(context.run_config.get("mu", 0.0))
     fraction_train = float(context.run_config["fraction-train"])
     fraction_evaluate = float(context.run_config["fraction-evaluate"])
+    # Legacy client-side evaluation scores silo TEST rows every round. Off
+    # unless explicitly switched on (see federated/pyproject.toml); published
+    # runs were made with it on.
+    legacy_client_test_eval = bool(context.run_config.get("legacy-client-test-eval", False))
+    if not legacy_client_test_eval:
+        fraction_evaluate = 0.0
 
     n_silos = int(data_cfg["federation"]["n_silos"])
 
@@ -904,6 +910,7 @@ def main(grid: Grid, context: Context) -> None:
         "alpha": alpha, "seed": seed, "num_rounds": num_rounds,
         "local_epochs": local_epochs, "mu": mu, "fraction_train": fraction_train,
         "fraction_evaluate": fraction_evaluate,
+        "legacy_client_test_eval": legacy_client_test_eval,
         "defense_strategy": strategy_name,
         "num_malicious_nodes_oracle": num_malicious_nodes,
     }, indent=2))

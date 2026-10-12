@@ -7,6 +7,11 @@
 # Run from project root:
 #   powershell -ExecutionPolicy Bypass -File tools\run_sweep.ps1
 
+# -LegacyClientTestEval: switch the legacy client-side per-round TEST scoring
+# back on, only to reproduce a published run's silo_metrics.jsonl exactly.
+# Off by default (2026-10-13); training is identical either way.
+param([switch]$LegacyClientTestEval)
+
 $ErrorActionPreference = "Stop"
 
 # Encoding fix (Flower's box-drawing summary crashes cp1252 otherwise) --
@@ -44,7 +49,7 @@ foreach ($c in $configs) {
 
     $configStart = Get-Date
 
-    $runConfig = "alpha='$($c.alpha)' seed=$($c.seed) num-server-rounds=20"
+    $runConfig = "alpha='$($c.alpha)' seed=$($c.seed) num-server-rounds=20 legacy-client-test-eval=$($LegacyClientTestEval.ToString().ToLower())"
     flwr run federated local-simulation --run-config $runConfig --stream 2>&1 |
         Tee-Object -FilePath $logPath
 
@@ -73,13 +78,14 @@ foreach ($c in $configs) {
 
         if ($roundCkpts -ne 21)  { $ok = $false; $reasons += "round_checkpoints=$roundCkpts (expected 21)" }
         if ($siloCkpts  -ne 200) { $ok = $false; $reasons += "silo_checkpoints=$siloCkpts (expected 200)" }
-        if ($metricsLines -ne 400) { $ok = $false; $reasons += "metrics_lines=$metricsLines (expected 400)" }
+        $expectedLines = if ($LegacyClientTestEval) { 400 } else { 200 }
+        if ($metricsLines -ne $expectedLines) { $ok = $false; $reasons += "metrics_lines=$metricsLines (expected $expectedLines)" }
         if (-not $hasFinal) { $ok = $false; $reasons += "final_metrics.json missing" }
         if (-not $hasBest)  { $ok = $false; $reasons += "model_best.pt missing" }
     }
 
     if ($ok) {
-        $line = "PASS  $tag  ($([math]::Round($elapsed.TotalMinutes,1)) min)  round_ckpts=21 silo_ckpts=200 metrics=400"
+        $line = "PASS  $tag  ($([math]::Round($elapsed.TotalMinutes,1)) min)  round_ckpts=21 silo_ckpts=200 metrics=$metricsLines"
         Write-Host $line -ForegroundColor Green
         $line | Out-File -FilePath $summaryPath -Append
     } else {
