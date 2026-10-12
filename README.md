@@ -210,8 +210,7 @@ The ones most likely to matter to a reader:
 - The pipeline is Windows-oriented: checkpoint manifests such as
   `results/inspection/best_rounds_manifest.json` store Windows backslash
   paths.
-- There is no pinned environment file; the package versions used are listed
-  under "Reproduce it" below.
+- The pinned environment was tested on Windows only.
 - A fresh clone has no processed data (`*.parquet` is git-ignored), so the
   backend only starts after the data pipeline has been run locally.
 
@@ -257,24 +256,25 @@ SHAP pipeline alone is about 3.7 hours for all 9 configurations.
 The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
 on the development machine `conda activate` is a silent no-op in `cmd.exe`.
 
-There is no pinned environment file. These are the versions the project ran
-with; the install commands below have not been tested on a clean machine.
-
-| Package | Version | Package | Version |
-|---|---|---|---|
-| flwr[simulation] | 1.33.0 | xgboost | 3.2.0 |
-| torch (CUDA 12.4 build) | 2.6.0 | optuna | 4.9.0 |
-| shap | 0.51.0 | fastapi | 0.138.2 |
-| scikit-learn | 1.9.0 | uvicorn | 0.49.0 |
-| pandas | 3.0.3 | streamlit | 1.61.1 |
-| pyarrow | 24.0.0 | Node.js (site, frontend, film) | 24.19.0 |
+Create the environment from the repo root:
 
 ```powershell
-conda create -n xfed python=3.11
+conda env create -f environment.yml
 conda activate xfed
-pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
-pip install "flwr[simulation]==1.33.0" shap==0.51.0 scikit-learn==1.9.0 xgboost==3.2.0 optuna==4.9.0 pandas==3.0.3 pyarrow==24.0.0 pyyaml scipy matplotlib plotly requests pydantic fastapi==0.138.2 uvicorn==0.49.0 streamlit==1.61.1
 ```
+
+[`environment.yml`](environment.yml) installs Python 3.11 and the pinned
+packages in [`requirements.txt`](requirements.txt), including the CUDA 12.4
+build of PyTorch 2.6.0. Key versions: flwr 1.33.0, torch 2.6.0, shap 0.51.0,
+scikit-learn 1.9.0, xgboost 3.2.0, optuna 4.9.0, fastapi 0.138.2, uvicorn
+0.49.0, streamlit 1.61.1, pandas 3.0.3, pyarrow 24.0.0. Node.js 24 is needed
+for `site/`, `frontend/` and `film/`.
+
+This install was tested in a fresh conda env on the development machine
+(Windows 11): `pip check` was clean and the Flower app, backend and data
+scripts imported. NumPy and pandas come from pip there rather than conda's
+MKL build, so low-level numerics may differ slightly from the original env.
+It has not been tested on Linux or macOS.
 
 Flower reads its simulation settings from your user-level Flower config
 (`%USERPROFILE%\.flwr\config.toml`), not from this repo. Copy the

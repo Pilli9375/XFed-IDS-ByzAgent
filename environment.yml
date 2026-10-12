@@ -1,0 +1,12 @@
+# Conda environment for XFed-IDS-ByzAgent. Create from the repo root:
+#   conda env create -f environment.yml
+# (run from the repo root: the pip section reads requirements.txt relative to the
+# working directory). Python packages are pinned in requirements.txt.
+name: xfed
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt
