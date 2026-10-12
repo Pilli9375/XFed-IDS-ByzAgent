@@ -88,7 +88,12 @@ features), effective-number class weights β=0.999, MLP [128, 64], dropout 0.1,
 LayerNorm (BatchNorm statistics don't aggregate in FL), 3 local epochs, 9-wide
 frozen label vocabulary, best-by-validation round selection.
 
-**The test set is evaluated exactly once.** Two later read-only extractions of
+**The test set was evaluated once for all results reported up to 2026-10-12.
+It is evaluated one further time, once, for a single federated configuration
+selected beforehand on validation data only. The selection is recorded in
+`docs/preregistration_accuracy.md` and committed before that evaluation. No
+other configuration is ever scored on the test set.** (Team decision, planning
+chat, 2026-10-12.) Two later read-only extractions of
 raw features (514 already-explained rows, for demo display) are documented in
 `docs/contribution_a_results.md`; no metric derives from them.
 
@@ -180,7 +185,8 @@ raw features (514 already-explained rows, for demo display) are documented in
 
 ## Stop and flag immediately
 
-- Anything that would touch the test set again
+- Anything that would touch the test set again, beyond the one preregistered
+  evaluation in `docs/preregistration_accuracy.md`
 - A locked decision under pressure
 - Federated explanation quality beating centralized (possible leakage)
 - A result that looks too good
