@@ -221,10 +221,48 @@ def main() -> None:
             if m not in cfg["methods"]:
                 raise SystemExit(f"unknown method {m}")
         check_manifest(alphas, seeds)
-        for m in methods:
+        for i, m in enumerate(methods):
+            if args.group == "runs" and not budget_allows(cfg, methods[i:], alphas, seeds):
+                print(f"BUDGET GUARD: dropping {methods[i:]} (see budget_guard.jsonl)")
+                break
             for a in alphas:
                 for s in seeds:
                     launch(cfg, m, a, s, args.group, int(exp["num_server_rounds"]))
+
+
+def budget_allows(cfg: dict, remaining_methods: list[str], alphas, seeds) -> bool:
+    """Timing-only budget guard (prereg Part 1, 2026-10-12). Before a
+    candidate starts: elapsed wall time of every logged run + mean candidate
+    run time x (runs still needed for this and all later candidates + the
+    chosen config's extra-alpha runs) must fit experiment.budget_gpu_hours.
+    If not, this candidate and all later ones are dropped, whole, in grid
+    order. Reads run_log.jsonl wall times only, never a validation score.
+    A candidate that has already started is never dropped."""
+    exp = cfg["experiment"]
+    log_path = ROOT / exp["results_root"] / "run_log.jsonl"
+    log = [json.loads(l) for l in log_path.read_text().splitlines()]
+    elapsed = sum(r["process_wall_s"] for r in log)
+    cand = [r["process_wall_s"] for r in log if r["group"] == "runs" and r["ok"]]
+    if not cand:
+        return True
+    mean_run = float(np.mean(cand))
+    started = any(run_dir(cfg, "runs", remaining_methods[0], a, s).exists() for a in alphas for s in seeds)
+    if started:
+        return True
+    todo = sum(1 for m in remaining_methods for a in alphas for s in seeds
+               if not (run_dir(cfg, "runs", m, a, s) / "run_summary.json").exists())
+    extra = len(set(exp["test_alphas"]) - set(exp["alphas"])) * len(exp["seeds"])
+    projected_h = (elapsed + mean_run * (todo + extra)) / 3600
+    ok = projected_h <= exp["budget_gpu_hours"]
+    rec = {"checked_at": dt.datetime.now().isoformat(timespec="seconds"),
+           "next_candidate": remaining_methods[0], "remaining_candidates": remaining_methods,
+           "elapsed_h": elapsed / 3600, "mean_candidate_run_min": mean_run / 60,
+           "runs_todo": todo, "extra_alpha_runs": extra, "projected_total_h": projected_h,
+           "budget_h": exp["budget_gpu_hours"], "allowed": ok}
+    with open(ROOT / exp["results_root"] / "budget_guard.jsonl", "a") as f:
+        f.write(json.dumps(rec) + "\n")
+    print(f"budget guard: next={remaining_methods[0]} projected {projected_h:.2f} h -> {'run' if ok else 'DROP'}")
+    return ok
 
 
 if __name__ == "__main__":

@@ -67,6 +67,19 @@ fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001, fedyogi_lr0.001**
 (48 runs + 3 α=5.0 runs ≈ 11.0 h with the two runs already done). The first
 four run first, the other four after; the order does not depend on any result.
 
+**Budget guard, added 2026-10-12 ~17:00, timing-only.** Candidate runs have
+taken 10.2–18.6 min (mean above the 12.7 min of the regression run), which
+projects past 12 h. Rule, applied mechanically by
+`tools/run_federated_methods.py::budget_allows` before each candidate starts:
+if the elapsed wall time of all logged runs plus the mean candidate-run time ×
+(runs still needed for this and every later candidate + the 3 α=5.0 runs)
+exceeds 12 h, that candidate and every later one in grid order are dropped,
+whole. It reads only wall times from `run_log.jsonl`, never a score; a
+candidate that has started is never dropped. Each check is logged to
+`results/federated_methods/budget_guard.jsonl`. When this was added, five
+runs of fedavgm_m0.5 had finished (one of their scores, α=0.1 seed 42, had
+been seen); none of the four candidates the guard can drop had started.
+
 **Regression check result.** The FedAvg re-run on the new path
 (`results/federated_methods/regression/fedavg_a0.1_s42/round_history.json`) is
 identical to the published curve at all 21 rounds (max absolute difference
