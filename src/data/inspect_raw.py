@@ -22,6 +22,7 @@ Usage:
 from __future__ import annotations
 
 import hashlib
+import os
 import sys
 from pathlib import Path
 
@@ -32,8 +33,10 @@ import pandas as pd
 # Config
 # --------------------------------------------------------------------------
 
-DATASET_DIR = Path(r"C:\Pilli\Capstone\Dataset")
-OUT_DIR = Path(r"C:\Pilli\Capstone\xfed-ids\results\inspection")
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+# Raw dataset lives outside the repo; override with XFED_DATASET_DIR.
+DATASET_DIR = Path(os.environ.get("XFED_DATASET_DIR", _REPO_ROOT.parent / "Dataset"))
+OUT_DIR = _REPO_ROOT / "results" / "inspection"
 
 # Columns flagged as identifiers in the header inspection. Matched
 # case-insensitively after stripping whitespace.

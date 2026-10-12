@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +40,16 @@ from mapping import assign_families
 def load_config(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def resolve_path(value: str, env_var: str | None = None) -> Path:
+    """Resolve a configs/data.yaml path: env override first, then relative to the repo root."""
+    override = os.environ.get(env_var) if env_var else None
+    p = Path(override or value)
+    return p if p.is_absolute() else (_REPO_ROOT / p).resolve()
 
 
 def load_raw(raw_dir: Path) -> pd.DataFrame:
@@ -157,8 +168,8 @@ def main() -> int:
     args = ap.parse_args()
 
     cfg = load_config(Path(args.config))
-    raw_dir = Path(cfg["paths"]["raw_dir"])
-    out_dir = Path(cfg["paths"]["processed_dir"])
+    raw_dir = resolve_path(cfg["paths"]["raw_dir"], "XFED_DATASET_DIR")
+    out_dir = resolve_path(cfg["paths"]["processed_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
 
     label_col = cfg["schema"]["label_col"]

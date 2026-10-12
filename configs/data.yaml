@@ -3,9 +3,12 @@
 # Every value here is a decision made and defended in Chat 02. Change nothing
 # here without updating data/README.md with the reason.
 
+# Relative paths resolve against the repo root. The environment variable
+# XFED_DATASET_DIR, if set, overrides raw_dir (the raw dataset lives outside
+# the repo).
 paths:
-  raw_dir: "C:/Pilli/Capstone/Dataset"
-  processed_dir: "C:/Pilli/Capstone/xfed-ids/data/processed"
+  raw_dir: "../Dataset"
+  processed_dir: "data/processed"
 
 seed: 42
 

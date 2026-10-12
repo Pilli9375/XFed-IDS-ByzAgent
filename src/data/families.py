@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -38,13 +39,23 @@ def load_config(path: Path) -> dict:
         return yaml.safe_load(f)
 
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def resolve_path(value: str, env_var: str | None = None) -> Path:
+    """Resolve a configs/data.yaml path: env override first, then relative to the repo root."""
+    override = os.environ.get(env_var) if env_var else None
+    p = Path(override or value)
+    return p if p.is_absolute() else (_REPO_ROOT / p).resolve()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/data.yaml")
     args = ap.parse_args()
 
     cfg = load_config(Path(args.config))
-    out_dir = Path(cfg["paths"]["processed_dir"])
+    out_dir = resolve_path(cfg["paths"]["processed_dir"])
     floor = cfg["family_floor"]
     seed = cfg["split"]["seed"]
     test_size = cfg["split"]["test_size"]
