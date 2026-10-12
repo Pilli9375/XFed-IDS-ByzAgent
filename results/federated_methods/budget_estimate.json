@@ -1,0 +1,18 @@
+{
+  "timing_runs": [
+    "fedavg_a0.1_s42"
+  ],
+  "sec_per_round_mean": 62.18060889991466,
+  "sec_per_round_values": [
+    62.18060889991466
+  ],
+  "sec_process_overhead_mean": 53.605884900083765,
+  "sec_per_20_round_run": 1297.218062898377,
+  "runs_grid": 54,
+  "runs_chosen_config_extra_alpha": 3,
+  "runs_regression_check": 1,
+  "runs_total": 58,
+  "estimated_gpu_hours": 20.899624346696072,
+  "budget_gpu_hours": 12.0,
+  "over_budget": true
+}

@@ -1,0 +1,1 @@
+{"group": "timing", "method": "fedavg", "alpha": "0.1", "seed": 42, "rounds": 1, "started": "2026-10-12T15:24:09", "process_wall_s": 115.78649379999842, "returncode": 0, "ok": true, "problems": [], "log": "results\\federated_methods\\logs\\timing_fedavg_a0.1_s42.log", "git_head": "b2b9beed0cb12613ae8483625377d6830d224e6e", "harness_dirty": true}

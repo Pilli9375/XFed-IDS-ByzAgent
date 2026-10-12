@@ -1,0 +1,135 @@
+# configs/federated_methods.yaml
+# Preregistered federated optimizer comparison (planning chat, 2026-10-12).
+#
+# Validation-only grid. A run launched with --run-config "method='<name>'"
+# takes EVERY method parameter from this file; nothing method-specific is
+# passed on the command line. Method runs never score anything on the test
+# set: the server skips the test block entirely and client-side evaluation
+# (which in the legacy path scores each silo's own test rows every round) is
+# switched off with fraction_evaluate = 0.0. The single preregistered test
+# evaluation is a separate script, run once, against sealed checkpoints.
+#
+# Everything not listed here (model, class weights beta=0.999, StandardScaler,
+# AdamW lr 1e-3 / wd 1e-4 / batch 1024, label vocabulary) is the locked
+# configs/model.yaml, unchanged.
+
+experiment:
+  alphas: ["0.1", "0.5"]          # validation comparison
+  test_alphas: ["0.1", "0.5", "5.0"]   # the chosen config is also trained
+                                       # (validation-only) at 5.0, then sealed
+  seeds: [42, 1337, 2024]
+  num_server_rounds: 20
+  local_epochs: 3
+  fraction_train: 1.0             # all 10 silos train every round (locked decision 5)
+  fraction_evaluate: 0.0          # no client-side evaluation in method runs (see header)
+  results_root: results/federated_methods
+  baseline:
+    method: fedavg
+    runs_dir: results/federated          # existing published FedAvg runs
+    tag_pattern: "fedavg_a{alpha}_s{seed}"
+  save_round_checkpoints: true    # 21 x ~80 KB per run; needed to seal the chosen round
+  budget_gpu_hours: 12.0          # RTX 4050; runs are strictly sequential (6 GB)
+
+# Selection rule. Written before any candidate run; copied verbatim into
+# docs/preregistration_accuracy.md.
+selection:
+  metric: val_macro_f1_headline   # macro-F1 over the 7 headline families
+                                  # (Infiltration, Heartbleed excluded)
+  round_selection: best_by_validation   # per run: max over rounds 0..20
+  aggregate: mean_over_seeds
+  primary_alpha: "0.1"
+  guard_alpha: "0.5"
+  guard_max_drop: 0.01            # guard-alpha mean >= FedAvg mean - 0.01
+  min_improvement: 0.02           # primary-alpha mean >= FedAvg mean + 0.02
+  centralized_ceiling: 0.990      # stop-and-flag if any alpha=0.1 run exceeds it
+
+# Candidates. `server` names the Flower 1.33 strategy class used for
+# aggregation; `server_params` go to its constructor unchanged; `client.mu`
+# is the FedProx proximal coefficient (0.0 = plain local objective).
+# Flower's FedOpt `eta_l` (client lr) is not used by its server-side update
+# and is not set: client lr is configs/model.yaml training.lr.
+methods:
+  fedavg:
+    server: fedavg
+    server_params: {}
+    client: {mu: 0.0}
+  fedprox_mu0.001:
+    server: fedavg
+    server_params: {}
+    client: {mu: 0.001}
+  fedprox_mu0.01:
+    server: fedavg
+    server_params: {}
+    client: {mu: 0.01}
+  fedprox_mu0.1:
+    server: fedavg
+    server_params: {}
+    client: {mu: 0.1}
+  fedavgm_m0.5:
+    server: fedavgm
+    server_params: {server_learning_rate: 1.0, server_momentum: 0.5}
+    client: {mu: 0.0}
+  fedavgm_m0.9:
+    server: fedavgm
+    server_params: {server_learning_rate: 1.0, server_momentum: 0.9}
+    client: {mu: 0.0}
+  fedadam_lr0.01:
+    server: fedadam
+    server_params: {eta: 0.01, beta_1: 0.9, beta_2: 0.99, tau: 0.001}
+    client: {mu: 0.0}
+  fedadam_lr0.001:
+    server: fedadam
+    server_params: {eta: 0.001, beta_1: 0.9, beta_2: 0.99, tau: 0.001}
+    client: {mu: 0.0}
+  fedyogi_lr0.01:
+    server: fedyogi
+    server_params: {eta: 0.01, beta_1: 0.9, beta_2: 0.99, tau: 0.001}
+    client: {mu: 0.0}
+  fedyogi_lr0.001:
+    server: fedyogi
+    server_params: {eta: 0.001, beta_1: 0.9, beta_2: 0.99, tau: 0.001}
+    client: {mu: 0.0}
+
+# Candidates that will be run, in order. `fedavg` is not here: the baseline
+# is the existing published runs. If the timed budget exceeds
+# experiment.budget_gpu_hours, the cut is recorded in `cut` with a reason.
+#
+# Budget cut, 2026-10-12, decided BEFORE any candidate run. Timing run
+# (results/federated_methods/timing/fedavg_a0.1_s42, budget_estimate.json):
+# 62.2 s/round + 53.6 s startup = 21.6 min per 20-round run. The full plan
+# (54 grid + 3 alpha=5.0 + 1 regression = 58 runs) is 20.9 h, over the 12 h
+# budget; 12 h holds ~33 runs. Kept: 4 candidates x 2 alphas x 3 seeds = 24,
+# + 3 alpha=5.0 runs for the chosen config + 1 FedAvg regression run = 28
+# runs, ~10.1 h, leaving margin for timing error. The cut uses only evidence
+# that predates this grid (validation numbers of existing runs).
+grid: [fedavgm_m0.5, fedavgm_m0.9, fedadam_lr0.01, fedyogi_lr0.01]
+cut:
+  fedprox_mu0.001: >-
+    Existing FedProx mu=0.0005 runs gave alpha=0.1 val mean 0.5235 vs
+    FedAvg 0.5228 (+0.0007), far from the +0.02 threshold; mu=0.001 is a 2x
+    step from a null. Lowest prior chance of clearing the threshold.
+  fedprox_mu0.01: >-
+    Already run once at alpha=0.5 seed 42 (results/federated/
+    fedprox_mu0.01_a0.5_s42): best val 0.7114 vs FedAvg 0.9760, so it would
+    almost certainly fail the alpha=0.5 guard (max drop 0.01).
+  fedprox_mu0.1: >-
+    10x stronger proximal pull than mu=0.01, which already collapsed
+    alpha=0.5 accuracy; expected to fail the guard.
+  fedadam_lr0.001: >-
+    Adam-style server steps move each weight by roughly eta per round, so
+    eta=0.001 bounds total movement to ~0.02 per weight over 20 rounds:
+    expected to underfit in the locked 20-round budget. Kept eta=0.01.
+  fedyogi_lr0.001: >-
+    Same reasoning as fedadam_lr0.001 (Yogi's step is also ~eta per
+    coordinate). Kept eta=0.01.
+
+skipped:
+  scaffold: >-
+    Not run. Flower 1.33 ships no SCAFFOLD strategy, and it does not fit the
+    harness cleanly: (1) it needs a per-client control variate persisted
+    across rounds, while the ClientApp is deliberately stateless; (2) its
+    gradient correction is derived for local SGD, but the locked local
+    optimizer is AdamW, so a correction applied inside AdamW would not be the
+    published algorithm, and switching the local optimizer would change the
+    locked model config; (3) it doubles per-round communication, so it would
+    not be a like-for-like comparison anyway.

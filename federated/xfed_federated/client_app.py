@@ -24,9 +24,11 @@ from xfed_federated.task import (
     PoisonedClient,
     build_model,
     evaluate_arrays,
+    get_method_name,
     get_server_round,
     headline_class_indices,
     load_global_class_weights,
+    load_method,
     load_silo_for_client,
     load_yaml,
     local_train_epochs,
@@ -43,6 +45,14 @@ def train(msg: Message, context: Context) -> Message:
     seed = int(context.run_config["seed"])
     local_epochs = int(context.run_config["local-epochs"])
     mu = float(context.run_config.get("mu", 0.0))
+    method_name = get_method_name(context.run_config)
+    if method_name:
+        # Optimizer-comparison run: mu comes from configs/federated_methods.yaml
+        # only. A run-config mu alongside it would be two sources of truth.
+        if mu != 0.0:
+            raise ValueError(f"method={method_name!r} takes mu from YAML; got run-config mu={mu}")
+        _, method = load_method(method_name)
+        mu = float(method["client"]["mu"])
 
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")
@@ -89,6 +99,15 @@ def evaluate(msg: Message, context: Context) -> Message:
     silo_id = context.node_config["partition-id"]
     alpha = str(context.run_config["alpha"])
     seed = int(context.run_config["seed"])
+
+    # Optimizer-comparison runs set fraction_evaluate = 0.0, so this is never
+    # reached. If it were, it would score the candidate on this silo's TEST
+    # rows -- refuse rather than rely on the server config alone.
+    if get_method_name(context.run_config):
+        raise RuntimeError(
+            "client evaluate() called in a method run: it scores silo test rows. "
+            "Method runs are validation-only; check fraction_evaluate."
+        )
 
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")

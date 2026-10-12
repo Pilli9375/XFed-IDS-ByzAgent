@@ -7,14 +7,20 @@ name = "xfed-federated"
 version = "0.1.0"
 description = "XFed-IDS Chat 03 -- FedAvg over the locked MLP baseline"
 license = "Apache-2.0"
+# Pinned 2026-10-12 to the versions Flower's isolated runtime env resolved
+# for the published runs (read from ~/.flwr/runtime-envs/*/Lib/site-packages,
+# envs dated 2026-08-10 and 2026-08-26; pyarrow 25.0.0 / 25.0.1 respectively).
+# Unpinned, `uv sync` re-resolves to whatever is newest at run time, so a new
+# run would not use the numerics the baseline was trained with. Note torch is
+# the CPU build: these simulations train on CPU, not the RTX 4050.
 dependencies = [
     "flwr[simulation]>=1.32.0",
-    "numpy",
-    "torch",
-    "pandas",
-    "pyarrow",
-    "scikit-learn",
-    "pyyaml",
+    "numpy==2.4.6",
+    "torch==2.13.0",
+    "pandas==3.0.5",
+    "pyarrow==25.0.1",
+    "scikit-learn==1.9.0",
+    "pyyaml==6.0.3",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -45,6 +51,14 @@ local-epochs = 3
 # vanishes and every run so far used this default. Override per run:
 # --run-config "mu=0.01"
 mu = 0.0
+# Preregistered optimizer comparison (2026-10-12). Empty = the legacy path
+# above, unchanged. A name from configs/federated_methods.yaml switches to the
+# validation-only method path, which takes every method parameter from that
+# YAML: --run-config "alpha='0.1' seed=42 method='fedadam_lr0.01'"
+method = ""
+# Output subfolder under results/federated_methods/ ("runs", or "timing" for
+# the short run that times one round before the grid is committed).
+run-group = "runs"
 # All 10 silos train and evaluate every round -- locked decision 5: no
 # size-based exclusion during training, only 10 clients total so no
 # subsampling is needed either.

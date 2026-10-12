@@ -14,13 +14,14 @@ from __future__ import annotations
 from collections.abc import Iterable
 import json
 from pathlib import Path
+import time
 
 import numpy as np
 import torch
 
 from flwr.app import ArrayRecord, ConfigRecord, Context, Message
 from flwr.serverapp import Grid, ServerApp
-from flwr.serverapp.strategy import FedAvg, Krum, MultiKrum, FedTrimmedAvg
+from flwr.serverapp.strategy import FedAvg, FedAvgM, FedAdam, FedYogi, Krum, MultiKrum, FedTrimmedAvg
 from flwr.serverapp.strategy.multikrum import compute_distances
 
 from xfed_federated.task import (
@@ -28,6 +29,7 @@ from xfed_federated.task import (
     _PROJECT_ROOT,
     AgentConfig,
     ClientStatsRecorder,
+    arrayrecord_nbytes,
     build_client_history,
     build_model,
     class_names,
@@ -36,12 +38,16 @@ from xfed_federated.task import (
     decide_round_history,
     decisions_to_weights,
     format_per_class,
+    get_method_name,
     headline_class_indices,
     load_centralized_for_server,
+    load_method,
     load_yaml,
     log_decisions,
     predict,
     resolve_malicious_silos,
+    state_dict_sha256,
+    verify_partition_manifest,
 )
 
 
@@ -532,6 +538,11 @@ app = ServerApp()
 
 @app.main()
 def main(grid: Grid, context: Context) -> None:
+    method_name = get_method_name(context.run_config)
+    if method_name:
+        _run_method(grid, context, method_name)
+        return
+
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")
 
@@ -898,3 +909,234 @@ def main(grid: Grid, context: Context) -> None:
     }, indent=2))
 
     print(f"\n  written: {out_dir}")
+
+
+# ===========================================================================
+# Preregistered federated optimizer comparison (planning chat, 2026-10-12).
+#
+# Entered only when --run-config sets method='<name>'; every parameter comes
+# from configs/federated_methods.yaml. VALIDATION ONLY: this path has no test
+# evaluation at all (the single preregistered test run is a separate script
+# against sealed checkpoints), and client-side evaluation -- which in the
+# legacy path scores each silo's own test rows every round -- is off
+# (fraction_evaluate = 0.0, and client_app.evaluate refuses method runs).
+#
+# Round selection, the validation set, the metric and the per-round
+# validation record are the same as the legacy path's global_evaluate above.
+# The ByzAgent side channel (silo checkpoints, client stats) is not attached:
+# it is read-only with respect to aggregation, the explanation and trust
+# checks stay on the published FedAvg runs, and it would add ~10 extra
+# validation passes per round to the timing.
+# ===========================================================================
+
+_METHOD_SERVER_STRATEGIES = {
+    "fedavg": FedAvg,
+    "fedavgm": FedAvgM,
+    "fedadam": FedAdam,
+    "fedyogi": FedYogi,
+}
+
+
+class _MethodRunLogging:
+    """Per-round wall time and payload bytes for the optimizer comparison.
+
+    Mixed in front of a Flower strategy; every method calls super()
+    unchanged, so aggregation is exactly the library strategy's. Bytes are
+    ArrayRecord tensor payload only (downlink: global model sent to each
+    sampled client; uplink: each client's returned model), not Flower's
+    message framing. Wall time for round r runs from configure_train(r) to
+    the end of the server-side validation pass for r (see _run_method).
+
+    A failed client reply raises instead of being averaged around: a method
+    comparison where one run silently lost a silo would not be like-for-like.
+    """
+
+    def __init__(self, *args, expected_clients: int, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.expected_clients = expected_clients
+        self.round_t0: dict[int, float] = {}
+        self.round_comm: dict[int, dict] = {}
+
+    def configure_train(self, server_round: int, arrays: ArrayRecord, config, grid):
+        self.round_t0[server_round] = time.perf_counter()
+        messages = list(super().configure_train(server_round, arrays, config, grid))
+        if len(messages) != self.expected_clients:
+            raise RuntimeError(
+                f"round {server_round}: {len(messages)} clients sampled, "
+                f"expected {self.expected_clients}"
+            )
+        self.round_comm[server_round] = {
+            "clients_sampled": len(messages),
+            "bytes_down": sum(arrayrecord_nbytes(m.content[self.arrayrecord_key]) for m in messages),
+        }
+        return messages
+
+    def aggregate_train(self, server_round: int, replies):
+        replies = list(replies)
+        errors = [m for m in replies if m.has_error()]
+        if errors or len(replies) != self.expected_clients:
+            raise RuntimeError(
+                f"round {server_round}: {len(replies)} replies, {len(errors)} errors, "
+                f"expected {self.expected_clients} clean replies"
+            )
+        self.round_comm[server_round]["bytes_up"] = sum(
+            arrayrecord_nbytes(m.content[self.arrayrecord_key]) for m in replies
+        )
+        return super().aggregate_train(server_round, replies)
+
+
+def _run_method(grid: Grid, context: Context, method_name: str) -> None:
+    data_cfg = load_yaml("configs/data.yaml")
+    model_cfg = load_yaml("configs/model.yaml")
+    fm_cfg, method = load_method(method_name)
+    exp = fm_cfg["experiment"]
+
+    alpha = str(context.run_config["alpha"])
+    seed = int(context.run_config["seed"])
+    num_rounds = int(context.run_config["num-server-rounds"])
+    local_epochs = int(context.run_config["local-epochs"])
+    run_group = str(context.run_config.get("run-group", "runs"))
+    n_silos = int(data_cfg["federation"]["n_silos"])
+
+    # The YAML is the source of truth; pyproject/run-config values must agree
+    # with it. The only exception is the "timing" group (a short run used to
+    # time a round before committing GPU-hours), which may shorten rounds.
+    if local_epochs != int(exp["local_epochs"]):
+        raise ValueError(f"local-epochs {local_epochs} != YAML {exp['local_epochs']}")
+    if run_group != "timing" and num_rounds != int(exp["num_server_rounds"]):
+        raise ValueError(f"num-server-rounds {num_rounds} != YAML {exp['num_server_rounds']}")
+    if float(context.run_config.get("mu", 0.0)) != 0.0:
+        raise ValueError("method runs take mu from configs/federated_methods.yaml, not run-config")
+
+    # Method runs are clean runs on plain aggregation: no poisoning, no
+    # defense strategy. Refuse rather than silently combine experiments.
+    if bool(load_yaml("configs/attack.yaml")["attack"].get("enabled", False)):
+        raise RuntimeError("configs/attack.yaml attack.enabled is true; method runs must be clean")
+    if str(load_yaml("configs/defense.yaml")["defense"].get("strategy", "fedavg")) != "fedavg":
+        raise RuntimeError("configs/defense.yaml strategy is not fedavg; method runs must not mix in a defense")
+
+    manifest_check = verify_partition_manifest(alpha, seed)
+
+    tag = f"{method_name}_a{alpha}_s{seed}"
+    out_dir = _PROJECT_ROOT / exp["results_root"] / run_group / tag
+    if (out_dir / "run_summary.json").exists():
+        raise RuntimeError(f"{out_dir} already holds a finished run; refusing to overwrite it")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    round_ckpt_dir = out_dir / "round_checkpoints"
+    if exp.get("save_round_checkpoints", True):
+        round_ckpt_dir.mkdir(parents=True, exist_ok=True)
+    timing_path = out_dir / "round_timing_comm.jsonl"
+    timing_path.unlink(missing_ok=True)
+
+    server_cls = _METHOD_SERVER_STRATEGIES[method["server"]]
+    server_params = dict(method.get("server_params") or {})
+    mu = float(method["client"]["mu"])
+
+    print(f"\n[{tag}] METHOD RUN (validation only) server={method['server']} "
+          f"server_params={server_params} client_mu={mu} rounds={num_rounds} "
+          f"local_epochs={local_epochs} manifest=OK")
+
+    # Validation split only is used below. load_centralized also builds the
+    # test arrays (same loader as every other run); they are never referenced
+    # on this path.
+    centralized = load_centralized_for_server(data_cfg, model_cfg)
+    X_val, y_val = centralized.X_val, centralized.y_val
+    cnames = class_names(model_cfg)
+    headline_idx = headline_class_indices(model_cfg)
+    n_classes = int(model_cfg["labels"]["n_classes"])
+    Xv = torch.from_numpy(X_val.copy()).to(DEVICE)
+
+    global_model = build_model(model_cfg, seed=seed, device="cpu")
+    initial_arrays = ArrayRecord(global_model.state_dict())
+
+    round_history: list[dict] = []
+    best = {"round": -1, "val_macro_f1_headline": -1.0, "state": None}
+    strategy_ref: dict = {}
+
+    def global_evaluate(server_round: int, arrays: ArrayRecord, config: dict | None = None):
+        # Same selection logic as the legacy global_evaluate in main().
+        model = build_model(model_cfg, seed=seed, device=DEVICE)
+        model.load_state_dict(arrays.to_torch_state_dict())
+        if exp.get("save_round_checkpoints", True):
+            torch.save(model.state_dict(), round_ckpt_dir / f"round_{server_round:03d}.pt")
+        y_pred = predict(model, Xv).cpu().numpy()
+        m = compute_metrics(y_val, y_pred, n_classes, cnames, headline_idx)
+
+        score = m["macro_f1_headline"]
+        flag = ""
+        if score > best["val_macro_f1_headline"]:
+            best["val_macro_f1_headline"] = score
+            best["round"] = server_round
+            best["state"] = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+            flag = "  *"
+        round_history.append({
+            "round": server_round,
+            "val_macro_f1_headline": score,
+            "val_macro_f1_all": m["macro_f1_all"],
+            "val_false_positive_rate": m["false_positive_rate"],
+            "val_attack_recall": m["attack_recall"],
+            "per_class": m["per_class"],
+        })
+
+        if server_round >= 1:
+            strat = strategy_ref["s"]
+            row = {
+                "round": server_round,
+                "wall_time_s": time.perf_counter() - strat.round_t0[server_round],
+                **strat.round_comm[server_round],
+            }
+            row["bytes_total"] = row["bytes_down"] + row["bytes_up"]
+            with open(timing_path, "a") as f:
+                f.write(json.dumps(row) + "\n")
+
+        print(f"  round {server_round:>3}/{num_rounds}  val macro-F1 {score:.4f}{flag}")
+        return {"val_macro_f1_headline": score}
+
+    strategy_cls = type(f"Method{server_cls.__name__}", (_MethodRunLogging, server_cls), {})
+    strategy = strategy_cls(
+        expected_clients=n_silos,
+        fraction_train=float(exp["fraction_train"]),
+        fraction_evaluate=float(exp["fraction_evaluate"]),
+        min_train_nodes=n_silos,
+        min_available_nodes=n_silos,
+        **server_params,
+    )
+    strategy_ref["s"] = strategy
+
+    t_run = time.perf_counter()
+    result = strategy.start(
+        grid=grid,
+        initial_arrays=initial_arrays,
+        train_config=ConfigRecord({"local-epochs": local_epochs}),
+        num_rounds=num_rounds,
+        evaluate_fn=global_evaluate,
+    )
+    strategy_wall_s = time.perf_counter() - t_run
+
+    print(f"\n  best val macro-F1 {best['val_macro_f1_headline']:.4f} at round {best['round']}")
+
+    torch.save(best["state"], out_dir / "model_best.pt")
+    torch.save(result.arrays.to_torch_state_dict(), out_dir / "model_last.pt")
+    (out_dir / "round_history.json").write_text(json.dumps(round_history, indent=2))
+    (out_dir / "run_summary.json").write_text(json.dumps({
+        "method": method_name,
+        "alpha": alpha,
+        "seed": seed,
+        "run_group": run_group,
+        "num_rounds": num_rounds,
+        "local_epochs": local_epochs,
+        "server": method["server"],
+        "server_params": server_params,
+        "client_mu": mu,
+        "fraction_train": float(exp["fraction_train"]),
+        "fraction_evaluate": float(exp["fraction_evaluate"]),
+        "partition_manifest_check": manifest_check,
+        "best_round": best["round"],
+        "best_val_macro_f1_headline": best["val_macro_f1_headline"],
+        "final_round_val_macro_f1_headline": round_history[-1]["val_macro_f1_headline"],
+        "model_best_state_sha256": state_dict_sha256(best["state"]),
+        "strategy_wall_time_s": strategy_wall_s,
+        "test_evaluated": False,
+        "note": "Validation only. No test-set metric exists for this run.",
+    }, indent=2))
+    print(f"\n  written (validation only): {out_dir}")
