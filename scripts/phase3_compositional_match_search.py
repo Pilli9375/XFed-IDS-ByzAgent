@@ -24,7 +24,7 @@ import csv
 import json
 from pathlib import Path
 
-PROJECT_ROOT = Path(r"C:\Pilli\Capstone\xfed-ids")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 COMPOSITION_PATH = PROJECT_ROOT / "results/inspection/silo_family_composition_a0.5_s42.csv"
 OUT_PATH = PROJECT_ROOT / "results/inspection/phase3_compositional_match_search.json"
 

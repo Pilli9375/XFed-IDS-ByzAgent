@@ -29,9 +29,24 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# Override with:  $env:XFED_PROJECT_ROOT = "D:\some\other\path"
-# before `flwr run`, if the project ever moves.
-_PROJECT_ROOT = Path(os.environ.get("XFED_PROJECT_ROOT", r"C:\Pilli\Capstone\xfed-ids"))
+def _find_project_root() -> Path:
+    """Repo root: $XFED_PROJECT_ROOT if set, else the nearest ancestor of this
+    file or of the working directory that holds configs/data.yaml. Flower may
+    run the app from a copy, so __file__ alone is not trusted."""
+    env = os.environ.get("XFED_PROJECT_ROOT")
+    if env:
+        return Path(env)
+    for start in (Path(__file__).resolve(), Path.cwd().resolve()):
+        for cand in (start, *start.parents):
+            if (cand / "configs" / "data.yaml").is_file() and (cand / "src").is_dir():
+                return cand
+    raise RuntimeError(
+        "Could not locate the xfed-ids repo root (no ancestor holds configs/data.yaml). "
+        "Set the XFED_PROJECT_ROOT environment variable to the repo path."
+    )
+
+
+_PROJECT_ROOT = _find_project_root()
 
 from xfed_federated._vendored.loaders import load_silo, load_centralized, Splits
 from xfed_federated._vendored.schema import (

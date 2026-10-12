@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import spearmanr
 
-PROJECT_ROOT = Path(r"C:\Pilli\Capstone\xfed-ids")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_PATH = PROJECT_ROOT / "results/inspection/phase3_gate_raw_a0.5_s42.json"
 OUT_PATH = PROJECT_ROOT / "results/inspection/phase3_gate_analysis_a0.5_s42.json"
 HAND_CHECK_PATH = PROJECT_ROOT / "results/inspection/phase3_citation_accuracy_sample.json"
