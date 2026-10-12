@@ -1,0 +1,26 @@
+{
+  "method": "fedavg_epochs1",
+  "alpha": "0.5",
+  "seed": 1337,
+  "run_group": "provenance",
+  "num_rounds": 20,
+  "local_epochs": 1,
+  "local_epochs_override": true,
+  "server": "fedavg",
+  "server_params": {},
+  "client_mu": 0.0,
+  "fraction_train": 1.0,
+  "fraction_evaluate": 0.0,
+  "partition_manifest_check": {
+    "tag": "a0.5_s1337",
+    "hash_train": "228e29f12d95d485fc7b7f27515e18be265d676c5407a880989da9a42a8159c5",
+    "hash_test": "ffac93e60e2e94bb68d9616af6eba3cab1b325316f2758281733ebbf9ed440bc"
+  },
+  "best_round": 19,
+  "best_val_macro_f1_headline": 0.8653827767854256,
+  "final_round_val_macro_f1_headline": 0.8651597665778122,
+  "model_best_state_sha256": "f39c04a914b1e40f1eb241d899d124501f6a2a92ffd60efd44611f7791d649c0",
+  "strategy_wall_time_s": 399.1842717998661,
+  "test_evaluated": false,
+  "note": "Validation only. No test-set metric exists for this run."
+}

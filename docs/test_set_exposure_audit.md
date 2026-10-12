@@ -36,6 +36,7 @@ validation only), and `fedavg_a0.1_s999x` folders (checkpoints only).
 | Class-weight β=0.999 | `results/pilots/weights_comparison.csv`; `configs/model.yaml` comment | Both: val 0.9941 and test 0.9924 | eff_999 (val 0.9941) | Mixed (both cited; validation agrees) |
 | Architecture [128, 64] | `results/pilots/architecture_comparison.csv`; `configs/model.yaml` comment | Validation (top 4 arms within 0.0008 val) plus parameter count | h128_64_d01 (val 0.9939) | No |
 | Dropout 0.1 | same pilot | "inside noise"; chosen arm is the validation-best arm | h128_64_d01 | No |
+| 3 local epochs, re-checked on validation (2026-10-13) | `results/federated/epochs_provenance_val.json` | FedAvg α=0.5, best-by-validation val macro-F1, 1 vs 3 local epochs: seed 42 0.8644 vs 0.9760, seed 1337 0.8654 vs 0.9871, seed 2024 0.8508 vs 0.8644; mean 0.8602 vs 0.9425 | 3 epochs (all 3 seeds) | No (validation only, pre-registered as report-only) |
 | Centralized pilot runs | `scripts/run_pilots.py` | Ranks on validation and prints "Select on the validation column"; also prints test "to confirm the ranking" | — | All 14 arms test-scored (row 2) |
 | Stopping epoch (centralized, XGBoost) / best round (federated) | `src/train/centralized.py`, `scripts/tune_xgboost.py`, harness `global_evaluate` | Validation | — | No |
 
