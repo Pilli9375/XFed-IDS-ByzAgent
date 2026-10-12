@@ -390,7 +390,9 @@ their committed state all three leave plain FedAvg untouched.
    (locked primary: `f: 3`, `malicious_silos: [0, 3, 5]`, `mode: sudden`,
    `flip_fraction: 0.40`), then run the same `flwr run federated
    local-simulation` command at α=0.5, seed 42. Poisoned runs get their own
-   result directory and are hard-blocked from evaluating on the test set.
+   result directory. The server-side test pass is blocked for poisoned
+   runs; legacy client-side per-round test scores were still logged and are
+   unused.
 2. **Behaviour statistics.** Runs that predate the statistics logger are
    replayed, then checked with the Phase 1 gate:
    ```powershell
