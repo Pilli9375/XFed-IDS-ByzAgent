@@ -113,3 +113,101 @@ project's locked wording:
 
 ByzAgent produces decisions plus a rationale of measured fidelity. Giving it
 a rolling history of past rounds failed its pre-registered test.
+
+## How this differs from prior work
+
+- Oki et al. (IEEE Networking Letters, 2024) showed that federated training
+  reduces explanation distance in a distributed IDS. This project does not
+  dispute that; it characterises where the reduction breaks down as client
+  data becomes more heterogeneous.
+- It adds a null control that, as far as we found, prior work in this space
+  does not report: how much explanation rankings differ between centralized
+  models that differ only by random seed. Without it, a reported difference
+  cannot be told apart from seed noise. The protocol is written up so it can
+  be applied to other federated systems
+  ([`measurement_protocol.md`](docs/measurement_protocol.md)).
+- Gholizade et al. (arXiv 2607.13045, June 2026 federated-XAI survey) name
+  explanation consistency under non-IID data as an open challenge and note
+  that there are no standard metrics for it.
+- The trust check tests Krum and its variants with 10 clients and an oracle
+  attacker count, and audits how often the agent's own explanations are
+  accurate.
+- The LLM explanation sentences in the dashboard are a usability feature, not
+  a research claim.
+
+We do not claim to be the first to measure explanation agreement in
+federated IDS, and we do not claim the broad "federated learning + IDS +
+explainability" combination as new; several 2025–2026 papers cover it.
+
+## What we did not claim, and other limitations
+
+The full lists are in
+[results A, Limitations](docs/contribution_a_results.md#limitations) and
+[results B §10](docs/contribution_b_results.md#10-limitations-stated-plainly).
+The ones most likely to matter to a reader:
+
+**Explanation check**
+
+- The α=0.1 below-floor result is directional, not significant (intervals
+  overlap, see above).
+- The round lottery is real: macro-F1 can differ by up to 0.118 between the
+  best-by-validation round and the final round, so every number uses
+  validation-based round selection.
+- Silo size is not independent of label skew under Dirichlet partitioning;
+  it is largely determined by it, and size-controlled partitions were proven
+  impossible with this partitioner. After conditioning on log(size), KL
+  divergence from the global label distribution still predicts agreement
+  (partial r = −0.57 at α=0.1, n=29; −0.82 / −0.87 for Jaccard@10 / τ at
+  α=0.5, n=30). This is observational, reported as r and n only with no
+  p-values. Label entropy was the pre-specified covariate, failed this
+  conditioning, and KL was substituted afterwards.
+- Round-wise agreement declines from round 5 to round 20 at α=0.1 and α=0.5
+  while validation macro-F1 rises, and is flat at α=5.0. This is directional
+  and was computed at reduced SHAP fidelity (`nsamples=1000`).
+- The FedProx result holds at μ=0.0005 only, which was not swept: agreement
+  improves with flat accuracy at α=0.5 across all 3 seeds, is inconclusive at
+  α=0.1 (n=3), and shows no effect at α=5.0.
+- Parity-monitor flags rely on averaging at least 3 explainer draws;
+  single-draw flags were shown to be artifacts.
+- SHAP's Monte Carlo sampling is unseeded, so each headline agreement number
+  reflects one draw per (config, silo).
+- The faithfulness check is a single-config spot-check (α=0.5, seed 42),
+  not a gate. The instability floor rests on 3 seed pairs. Silos within one
+  run share a training trajectory, so the effective sample size is closer to
+  the 3 seeds than to the silo count.
+- About 43,890 flows are feature-identical to benign traffic once identifier
+  columns are removed, even in the corrected dataset; they were dropped as
+  label conflicts and cap what any model on these 82 features can separate.
+
+**Trust check**
+
+- All attacks are worst-case, full-knowledge adversaries, and the classical
+  baselines were given the true attacker count as an oracle. No result here
+  describes a naturalistic attack.
+- ByzAgent does not "explain its reasoning". It produces decisions plus a
+  rationale of measured fidelity: ≈35–45% of its trend claims under rolling
+  history contradicted the data it was given, and its citation error rate
+  rose from 11.7% at seed 42 to 22.5% at seeds 1337/2024.
+- LLM decisions are nondeterministic; decision stability is reported
+  alongside them.
+- `train_loss` is the only strong attack signal (33.8×–154.3×), and for a
+  label-flipping attack an elevated loss is close to definitional. The
+  geometry statistics are weak to null, and validation accuracy inverts
+  (malicious clients score higher on the Benign-heavy validation set).
+- The Krum/Multi-Krum/trimmed-mean baselines, the Phase 4 rolling-history
+  matrix and gradual-mode attacks are n=1 (seed 42) by design.
+- Whether the detectors' failures are general, or entangled with this
+  project's worst-case attacker-selection rule (which selects on the same
+  compositional axis the detectors react to), is still open.
+- A live run in which ByzAgent's decisions drive aggregation was not run,
+  because any number it produced would inherit the compositional confound.
+
+**Engineering**
+
+- The pipeline is Windows-oriented: partition manifests store Windows paths,
+  and `configs/data.yaml` plus several scripts in `scripts/` hard-code the
+  project root `C:\Pilli\Capstone\xfed-ids`.
+- There is no pinned environment file; the package versions used are listed
+  under "Reproduce it" below.
+- A fresh clone has no processed data (`*.parquet` is git-ignored), so the
+  backend only starts after the data pipeline has been run locally.
