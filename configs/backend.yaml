@@ -107,9 +107,22 @@ simulator:
   # or not this is running.
   backend_url: http://127.0.0.1:8000
   rate_per_second: 1.0
+  # Which split the replayed rows come from:
+  #   val  -- train_pool.parquet rows where val_mask.is_val is true (default).
+  #   test -- test_global.parquet. Refused unless the served model's
+  #           checkpoint state-dict sha256 (the hash the hot-swap audit log
+  #           records) is listed in test_split_checkpoint_allowlist below, and
+  #           no hot-swap is active. Reason: a candidate model that has not
+  #           been sealed (e.g. a hot-swapped one) must never show per-alert
+  #           correctness on test rows.
+  # Validation rows carry no precomputed SHAP, so alerts from the val split
+  # never have shap_available.
+  source_split: val
+  # State-dict sha256 values of checkpoints that may be replayed on the test
+  # split. Empty on purpose: add an entry only for a sealed checkpoint.
+  test_split_checkpoint_allowlist: []
   # true = restart from row 0 (of the SHUFFLED order below) after the last
-  # row of test_global.parquet (478,376 rows) so the demo feed never just
-  # stops.
+  # row of the chosen split so the demo feed never just stops.
   loop: true
   # Row order is shuffled ONCE at simulator startup with this seed (see
   # _load_demo_rows in backend/simulator.py), then replayed sequentially and
