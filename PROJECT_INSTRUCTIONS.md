@@ -92,14 +92,25 @@ features), effective-number class weights β=0.999, MLP [128, 64], dropout 0.1,
 LayerNorm (BatchNorm statistics don't aggregate in FL), 3 local epochs, 9-wide
 frozen label vocabulary, best-by-validation round selection.
 
-**The test set was evaluated once for all results reported up to 2026-10-12.
-It is evaluated one further time, once, for a single federated configuration
-selected beforehand on validation data only. The selection is recorded in
-`docs/preregistration_accuracy.md` and committed before that evaluation. No
-other configuration is ever scored on the test set.** (Team decision, planning
-chat, 2026-10-12.) Two later read-only extractions of
-raw features (514 already-explained rows, for demo display) are documented in
-`docs/contribution_a_results.md`; no metric derives from them.
+**Test-set use.** All model and round selection used validation data. Three early design choices
+were recorded with test-set numbers as their justification: 3 local epochs,
+FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
+scaler are selected; for local epochs, validation also selects 3 epochs over 1
+at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
+0.8602). Headline test metrics come from one evaluation of each run's
+validation-selected checkpoint. The test set was also read, without informing
+any later choice, in these ways: (a) legacy client-side per-round scoring in
+35 runs, unread by any analysis; (b) round-20 scoring for an earlier
+round-lottery comparison, since replaced by a validation-based one; (c) 14 fixed
+rows as SHAP explanation inputs; (d) display-only use: 514 extracted rows, and
+the dashboard simulator before 2026-10-13 (not logged, no aggregate); (e)
+centralized pilot and baseline runs (18) and XGBoost seeds (3) scored on test
+during development; (f) one preregistered re-evaluation of a single
+validation-selected configuration (`docs/preregistration_accuracy.md`). Full
+table: `docs/test_set_exposure_audit.md`.
+
+**Rule going forward** (team decision, planning chat, 2026-10-12): no
+configuration other than the preregistered one is ever scored on the test set.
 
 The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
 

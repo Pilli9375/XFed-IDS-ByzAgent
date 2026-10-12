@@ -116,6 +116,26 @@ project's locked wording:
 ByzAgent produces decisions plus a rationale of measured fidelity. Giving it
 a rolling history of past rounds failed its pre-registered test.
 
+### Test-set use
+
+All model and round selection used validation data. Three early design choices
+were recorded with test-set numbers as their justification: 3 local epochs,
+FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
+scaler are selected; for local epochs, validation also selects 3 epochs over 1
+at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
+0.8602). Headline test metrics come from one evaluation of each run's
+validation-selected checkpoint. The test set was also read, without informing
+any later choice, in these ways: (a) legacy client-side per-round scoring in
+35 runs, unread by any analysis; (b) round-20 scoring for an earlier
+round-lottery comparison, since replaced by a validation-based one; (c) 14
+fixed rows as SHAP explanation inputs; (d) display-only use: 514 extracted
+rows, and the dashboard simulator before 2026-10-13 (not logged, no
+aggregate); (e) centralized pilot and baseline runs (18) and XGBoost seeds (3)
+scored on test during development; (f) one preregistered re-evaluation of a
+single validation-selected configuration
+([`docs/preregistration_accuracy.md`](docs/preregistration_accuracy.md)). Full
+table: [`docs/test_set_exposure_audit.md`](docs/test_set_exposure_audit.md).
+
 ## How this differs from prior work
 
 - Oki et al. (IEEE Networking Letters, 2024) showed that federated training

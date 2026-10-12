@@ -41,9 +41,12 @@ validation only), and `fedavg_a0.1_s999x` folders (checkpoints only).
 | Stopping epoch (centralized, XGBoost) / best round (federated) | `src/train/centralized.py`, `scripts/tune_xgboost.py`, harness `global_evaluate` | Validation | — | No |
 
 **Outcome:** two locked choices (3 local epochs; FedProx μ=0.0005) and the
-scaler's written rationale rest on test scores, as recorded. For μ and the
-scaler, the validation column would have made the same choice; for local
-epochs this cannot be checked from disk. The sentence "No model selection,
-stopping round, hyperparameter or method choice used any test score" is
-therefore **not supported** as written. Per the planning brief, the wording
-changes are stopped here pending a decision.
+scaler's written rationale rest on test scores, as recorded. Re-checked on
+validation, all three are the validation-preferred values: μ and the scaler
+from the existing pilot and exploratory runs, local epochs from the 2026-10-13
+check above (3 epochs beat 1 at α=0.5 in every seed, mean 0.9425 vs 0.8602;
+pre-registered as report-only, nothing locked changed). The sentence "No
+model selection, stopping round, hyperparameter or method choice used any
+test score" was therefore not used; the planning chat replaced it with the
+disclosure now in `README.md`, `PROJECT_INSTRUCTIONS.md` and
+`docs/contribution_a_results.md`, which names these three choices.
