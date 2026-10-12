@@ -209,8 +209,7 @@ The ones most likely to matter to a reader:
 
 - The pipeline is Windows-oriented: checkpoint manifests such as
   `results/inspection/best_rounds_manifest.json` store Windows backslash
-  paths, and `configs/data.yaml` plus several scripts in `scripts/`
-  hard-code the project root `C:\Pilli\Capstone\xfed-ids`.
+  paths.
 - There is no pinned environment file; the package versions used are listed
   under "Reproduce it" below.
 - A fresh clone has no processed data (`*.parquet` is git-ignored), so the
@@ -278,27 +277,19 @@ pip install "flwr[simulation]==1.33.0" shap==0.51.0 scikit-learn==1.9.0 xgboost=
 ```
 
 Flower reads its simulation settings from your user-level Flower config
-(`%USERPROFILE%\.flwr\config.toml`), not from this repo. Add:
-
-```toml
-[superlink.local-simulation]
-address = ":local:"
-options.num-supernodes = 10
-options.backend.name = "ray"
-options.backend.client-resources.num-cpus = 2
-options.backend.client-resources.num-gpus = 1.0
-```
-
-`num-gpus = 1.0` per client makes the simulation run one client at a time,
-which is what fits in 6 GB of VRAM. Also set
+(`%USERPROFILE%\.flwr\config.toml`), not from this repo. Copy the
+`[superlink.local-simulation]` block from
+[`federated/flwr_config.example.toml`](federated/flwr_config.example.toml)
+into that file. The example requests one GPU per client, which makes the
+simulation run one client at a time so it fits in 6 GB of VRAM. Also set
 `$env:PYTHONIOENCODING = "utf-8"` in the shell; otherwise Flower's summary
 output crashes on the default Windows code page.
 
-Paths are Windows-specific. `configs/data.yaml` (`paths.raw_dir`,
-`paths.processed_dir`) and several trust-check scripts in `scripts/`
-hard-code `C:\Pilli\Capstone\...`; edit them if your checkout lives
-elsewhere. `federated/xfed_federated/task.py` reads an `XFED_PROJECT_ROOT`
-environment variable.
+Paths are relative to the repo root. The raw dataset is expected in a
+`Dataset` folder next to the repo (`../Dataset`, set by `paths.raw_dir` in
+`configs/data.yaml`); set the `XFED_DATASET_DIR` environment variable to
+put it anywhere else. The Flower app finds the repo root on its own;
+`XFED_PROJECT_ROOT` overrides that if it ever guesses wrong.
 
 ### 2. Dataset
 
@@ -316,8 +307,8 @@ redistributed by this project; get it from its authors and cite both papers:
   Workshops (SPW), Workshop on Traffic Measurements for Cybersecurity
   (WTMC), 2021.
 
-Put the CSVs outside the repo (the project used `C:\Pilli\Capstone\Dataset\`)
-and point `paths.raw_dir` in `configs/data.yaml` at that folder. Derived data
+Put the CSVs outside the repo, in a `Dataset` folder next to it (the project
+used `C:\Pilli\Capstone\Dataset\`), or point `XFED_DATASET_DIR` at the folder. Derived data
 (`*.parquet`, the demo `.npz` files) is git-ignored and not committed.
 
 ### 3. Cleaning, split and partitioning
