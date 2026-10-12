@@ -789,31 +789,12 @@ def load_raw_inspection_csv(name: str) -> pd.DataFrame | None:
 
 @st.cache_resource
 def get_round_lottery_table() -> pd.DataFrame | None:
-    """Best-by-validation test score vs. final-round (unselected) test
-    score, per federated config -- computed live from each config's
-    final_metrics.json rather than restating one historical example.
-    Path and the two keys used (test.macro_f1_headline,
-    test_final_round_unselected.macro_f1_headline) are confirmed directly
-    from federated/xfed_federated/server_app.py."""
-    rows = []
-    for m in load_manifest():
-        path = RESULTS_ROOT / "federated" / m["tag"] / "final_metrics.json"
-        if not path.exists():
-            continue
-        data = json.loads(path.read_text())
-        best_f1 = data["test"]["macro_f1_headline"]
-        final_f1 = data["test_final_round_unselected"]["macro_f1_headline"]
-        rows.append(
-            {
-                "alpha": m["alpha"],
-                "seed": m["seed"],
-                "tag": m["tag"],
-                "best_round": m["best_round"],
-                "best_round_test_f1": best_f1,
-                "final_round_test_f1": final_f1,
-                "gap": final_f1 - best_f1,
-            }
-        )
-    if not rows:
+    """Round lottery from validation only: best-by-validation round vs round
+    20, both scored by validation macro-F1, per FedAvg config. Read from
+    results/federated/round_lottery_val.csv (scripts/aggregate_federated.py
+    --only-val-lottery). Replaced 2026-10-13 the earlier test-based version,
+    which used a round-20 test score of the unselected checkpoint."""
+    path = RESULTS_ROOT / "federated" / "round_lottery_val.csv"
+    if not path.exists():
         return None
-    return pd.DataFrame(rows).sort_values(["alpha", "seed"]).reset_index(drop=True)
+    return pd.read_csv(path).sort_values(["alpha", "seed"]).reset_index(drop=True)

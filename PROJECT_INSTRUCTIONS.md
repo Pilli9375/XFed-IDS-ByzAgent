@@ -122,8 +122,10 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 ## Findings that limit what can be claimed
 
 **Explanation check**
-- Round lottery is real: up to 0.118 between best-by-validation and final-round
-  numbers. Validation-based selection is required.
+- Round lottery is real: up to 0.118 (α=5.0, seed 42, validation macro-F1)
+  between the best-by-validation round and round 20
+  (`results/federated/round_lottery_val.csv`). Validation-based selection is
+  required.
 - The below-floor result at α=0.1 is directional, not significant
   (cluster-bootstrap CIs overlap: [0.250, 0.429] vs floor [0.429, 0.484]).
 - Silo size is not independent of label skew under Dirichlet partitioning; it

@@ -152,9 +152,10 @@ The ones most likely to matter to a reader:
 
 - The α=0.1 below-floor result is directional, not significant (intervals
   overlap, see above).
-- The round lottery is real: macro-F1 can differ by up to 0.118 between the
-  best-by-validation round and the final round, so every number uses
-  validation-based round selection.
+- The round lottery is real: validation macro-F1 can differ by up to 0.118
+  (α=5.0, seed 42) between the best-by-validation round and the final round
+  ([`round_lottery_val.csv`](results/federated/round_lottery_val.csv)), so
+  every number uses validation-based round selection.
 - Silo size is not independent of label skew under Dirichlet partitioning;
   it is largely determined by it, and size-controlled partitions were proven
   impossible with this partitioner. After conditioning on log(size), KL

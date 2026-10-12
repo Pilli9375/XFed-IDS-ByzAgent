@@ -55,5 +55,6 @@ verify:
   # candidate round only replaces the served model if its val metric is >=
   # the incumbent's. This is a live-served model, not an experimental
   # comparison -- see PROJECT_INSTRUCTIONS.md's own "round lottery" finding
-  # (up to 0.118 gap between best-by-validation and final-round numbers) for
+  # (up to 0.118 validation macro-F1, alpha=5.0 seed 42, between the
+  # best-by-validation round and round 20) for
   # why leniency here is the wrong default.

@@ -31,8 +31,9 @@ export default function MethodsLimits({ eyebrow, title, lede }) {
 
       <ul className="xf-limitations-list">
         <li>
-          <b>Round lottery is real</b> — gap up to 0.118 between best-by-validation and
-          final-round test numbers. Validation selection is not optional.
+          <b>Round lottery is real</b> — gap up to 0.118 (α=5.0, seed 42, validation
+          macro-F1) between the best-by-validation round and the final round.
+          Validation selection is not optional.
         </li>
         <li>
           <b>Bot/WebAttack near-duplication</b> (test-NN ≈ 0.0): the pre-registered
