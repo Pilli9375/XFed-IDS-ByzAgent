@@ -10,12 +10,22 @@ combination and produces:
                               below --collapse-threshold -- the evidence for
                               the "which family gets erased is arbitrary"
                               finding, not an average that would hide it
-  round_lottery.csv          best-by-val vs final-round test macro-F1 per run,
-                              quantifying how much the validation-selection
-                              fix actually mattered
+  round_lottery.csv          EARLIER ANALYSIS, superseded 2026-10-13: best-by-val
+                              vs final-round TEST macro-F1 per run. It uses a
+                              round-20 test score (an unselected checkpoint);
+                              kept only for the labelled historical note in
+                              docs/contribution_a_results.md.
+
+and, from configs/round_lottery.yaml (validation only, no test score read):
+
+  results/federated/round_lottery_val.csv
+                             best-by-val round vs final round, both scored by
+                             validation macro-F1 from round_history.json --
+                             the primary round-lottery claim.
 
 Usage:
     python scripts/aggregate_federated.py
+    python scripts/aggregate_federated.py --only-val-lottery   # reads no test score
 """
 
 from __future__ import annotations
@@ -26,9 +36,45 @@ import json
 from pathlib import Path
 
 import numpy as np
+import yaml
 
 ALPHAS = ["0.1", "0.5", "5.0"]
 SEEDS = [42, 1337, 2024]
+
+
+def val_lottery(config_path: Path) -> list[dict]:
+    """Round lottery from validation curves only: per run, the best-by-
+    validation round (first maximum, the harness's strict-> rule) vs the
+    final round, both scored by validation macro-F1. Reads round_history.json
+    only -- never final_metrics.json, so no test score enters."""
+    cfg = yaml.safe_load(config_path.read_text())["round_lottery_val"]
+    metric, final_round = cfg["metric"], int(cfg["final_round"])
+    rows = []
+    print(f"\n  ROUND LOTTERY, VALIDATION ONLY (best-by-val round vs round {final_round}):")
+    print(f"  {'alpha':<8}{'seed':<8}{'best_rd':>8}{'best':>10}{'final':>10}{'gap':>10}")
+    for alpha in cfg["alphas"]:
+        for seed in cfg["seeds"]:
+            tag = cfg["tag_pattern"].format(alpha=alpha, seed=seed)
+            hist = json.loads((Path(cfg["runs_dir"]) / tag / "round_history.json").read_text())
+            best = hist[0]
+            for r in hist:
+                if r[metric] > best[metric]:
+                    best = r
+            final = next(r for r in hist if r["round"] == final_round)
+            gap = best[metric] - final[metric]
+            rows.append({"alpha": alpha, "seed": seed, "best_round": best["round"],
+                         "best_val": best[metric], "final_round": final_round,
+                         "final_val": final[metric], "gap": gap})
+            print(f"  {alpha:<8}{seed:<8}{best['round']:>8}{best[metric]:>10.4f}"
+                  f"{final[metric]:>10.4f}{gap:>10.4f}")
+    out = Path(cfg["out_csv"])
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    print(f"\n  written: {out}")
+    return rows
 
 
 def main() -> int:
@@ -37,7 +83,14 @@ def main() -> int:
     p.add_argument("--out-dir", type=Path, default=Path("results/aggregated"))
     p.add_argument("--collapse-threshold", type=float, default=0.05,
                    help="Headline-family recall below this counts as collapsed.")
+    p.add_argument("--lottery-config", type=Path, default=Path("configs/round_lottery.yaml"))
+    p.add_argument("--only-val-lottery", action="store_true",
+                   help="Write only round_lottery_val.csv; read no final_metrics.json.")
     args = p.parse_args()
+
+    val_lottery(args.lottery_config)
+    if args.only_val_lottery:
+        return 0
 
     runs: dict[str, dict] = {}
     missing = []
@@ -118,7 +171,8 @@ def main() -> int:
     if not collapse_rows:
         print("    none")
 
-    # ---- round lottery: best-by-val vs final-round, per run ---------------
+    # ---- round lottery, EARLIER TEST-BASED ANALYSIS (superseded by
+    # val_lottery above; uses a round-20 test score) ---------------------------
     lottery_rows = []
     print(f"\n  ROUND LOTTERY (best-by-val vs final-round test macro-F1):")
     print(f"  {'alpha':<8}{'seed':<8}{'best':>10}{'final':>10}{'gap':>10}")

@@ -48,6 +48,7 @@ results/**/*.log
 !results/inspection/best_rounds_manifest.json
 # Headline macro-F1 tables: the showcase site links its macro-F1 numbers here.
 !results/aggregated/*_headline.csv
+!results/federated/round_lottery_val.csv
 # ...and these two: served live by GET /faithfulness/*.png and rendered
 # by the Faithfulness page -- not illustrative like the other figures.
 !results/figures/deletion_curve.png
