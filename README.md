@@ -243,3 +243,260 @@ The phase-by-phase trust-check write-ups behind
 [`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md),
 [`PHASE4_SUMMARY.md`](results/agents/PHASE4_SUMMARY.md) and
 [`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md).
+
+## Reproduce it
+
+All commands run from the repo root in PowerShell unless noted. Everything
+was developed and run on Windows 11 with an RTX 4050 (6 GB VRAM, a hard
+ceiling that shaped several choices) and 24 GB RAM. Full runs are long: the
+SHAP pipeline alone is about 3.7 hours for all 9 configurations.
+
+### 1. Environment
+
+The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
+on the development machine `conda activate` is a silent no-op in `cmd.exe`.
+
+There is no pinned environment file. These are the versions the project ran
+with; the install commands below have not been tested on a clean machine.
+
+| Package | Version | Package | Version |
+|---|---|---|---|
+| flwr[simulation] | 1.33.0 | xgboost | 3.2.0 |
+| torch (CUDA 12.4 build) | 2.6.0 | optuna | 4.9.0 |
+| shap | 0.51.0 | fastapi | 0.138.2 |
+| scikit-learn | 1.9.0 | uvicorn | 0.49.0 |
+| pandas | 3.0.3 | streamlit | 1.61.1 |
+| pyarrow | 24.0.0 | Node.js (site, frontend, film) | 24.19.0 |
+
+```powershell
+conda create -n xfed python=3.11
+conda activate xfed
+pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+pip install "flwr[simulation]==1.33.0" shap==0.51.0 scikit-learn==1.9.0 xgboost==3.2.0 optuna==4.9.0 pandas==3.0.3 pyarrow==24.0.0 pyyaml scipy matplotlib plotly requests pydantic fastapi==0.138.2 uvicorn==0.49.0 streamlit==1.61.1
+```
+
+Flower reads its simulation settings from your user-level Flower config
+(`%USERPROFILE%\.flwr\config.toml`), not from this repo. Add:
+
+```toml
+[superlink.local-simulation]
+address = ":local:"
+options.num-supernodes = 10
+options.backend.name = "ray"
+options.backend.client-resources.num-cpus = 2
+options.backend.client-resources.num-gpus = 1.0
+```
+
+`num-gpus = 1.0` per client makes the simulation run one client at a time,
+which is what fits in 6 GB of VRAM. Also set
+`$env:PYTHONIOENCODING = "utf-8"` in the shell; otherwise Flower's summary
+output crashes on the default Windows code page.
+
+Paths are Windows-specific. `configs/data.yaml` (`paths.raw_dir`,
+`paths.processed_dir`) and several trust-check scripts in `scripts/`
+hard-code `C:\Pilli\Capstone\...`; edit them if your checkout lives
+elsewhere. `federated/xfed_federated/task.py` reads an `XFED_PROJECT_ROOT`
+environment variable.
+
+### 2. Dataset
+
+This project uses **Distrinet CICIDS2017 V4**, the IEEE CNS 2022 update of
+CICIDS2017, published on Kaggle as
+[`dhoogla/distrinetcicids2017`](https://www.kaggle.com/datasets/dhoogla/distrinetcicids2017),
+version 4 (five per-day CSVs, about 1.15 GB). The dataset is not owned or
+redistributed by this project; get it from its authors and cite both papers:
+
+- L. Liu, G. Engelen, T. Lynar, D. Essam and W. Joosen, "Error Prevalence in
+  NIDS datasets: A Case Study on CIC-IDS-2017 and CSE-CIC-IDS-2018," IEEE
+  Conference on Communications and Network Security (CNS), 2022, pp. 254–262.
+- G. Engelen, V. Rimmer and W. Joosen, "Troubleshooting an Intrusion
+  Detection Dataset: the CICIDS2017 Case Study," IEEE Security and Privacy
+  Workshops (SPW), Workshop on Traffic Measurements for Cybersecurity
+  (WTMC), 2021.
+
+Put the CSVs outside the repo (the project used `C:\Pilli\Capstone\Dataset\`)
+and point `paths.raw_dir` in `configs/data.yaml` at that folder. Derived data
+(`*.parquet`, the demo `.npz` files) is git-ignored and not committed.
+
+### 3. Cleaning, split and partitioning
+
+```powershell
+python src/data/clean.py           # raw CSVs -> clean.parquet
+python src/data/families.py        # -> train_pool.parquet, test_global.parquet
+python src/data/partition.py       # -> data/processed/partitions/ + manifest.json
+python scripts/check_partitions.py --partition-dir data/processed/partitions
+python scripts/make_val_split.py   # group-aware validation mask inside train_pool
+python scripts/export_class_weights.py   # run once, before any Flower run
+```
+
+`partition.py` writes row-to-silo assignments for all 9 (α, seed)
+configurations and a manifest holding the SHA256 of each assignment array.
+`load_silo()` in `src/data/partition.py` recomputes that hash every time a
+silo is loaded and raises on a mismatch, so a silently regenerated partition
+cannot be trained on. `check_partitions.py` is a pre-flight check for silos
+that would crash a federated round (empty train or test shards, missing
+classes).
+
+### 4. Training
+
+Centralized and XGBoost baselines, one run per seed, then aggregated:
+
+```powershell
+python -m src.train.centralized --tag baseline_s42 --seed 42
+python -m src.train.xgboost_baseline --tag xgb_s42 --seed 42
+python scripts/aggregate_seeds.py --pattern "baseline_s*" --label centralized
+python scripts/aggregate_seeds.py --results-dir results/xgboost --pattern "xgb_s*" --label xgboost
+```
+
+Repeat the first two lines for seeds 1337 and 2024 before aggregating.
+
+Federated training uses the Flower app in `federated/`. Use exactly this
+invocation. A bare `flwr run` from the repo root fails on purpose: the root
+`pyproject.toml` has no Flower app section, so nothing can train against the
+unused prototype in `src/federated/` by accident.
+
+```powershell
+flwr run federated local-simulation --run-config "alpha='0.5' seed=42" --stream
+```
+
+Each run trains for 20 rounds with 3 local epochs, writes to
+`results/federated/<tag>/`, and keeps the best-by-validation round. The full
+9-configuration sweep and the FedProx (μ=0.0005) sweep are scripted:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\run_sweep.ps1
+powershell -ExecutionPolicy Bypass -File tools\run_sweep_fedprox.ps1
+python scripts/aggregate_federated.py
+```
+
+### 5. Explanation check (SHAP export and agreement)
+
+```powershell
+python tools/extract_best_rounds.py         # -> results/inspection/best_rounds_manifest.json
+python tools/local_shap_pipeline.py --all   # per-silo + global SHAP, all 9 configs
+python tools/agreement_metrics.py           # Jaccard@10 and weighted tau
+python tools/centralized_shap_floor.py      # seed-noise instability floor
+python tools/round_wise_shap.py             # rounds 5/10/15/20, nsamples=1000
+python tools/round_wise_agreement.py
+python tools/parity_monitor.py --all        # multi-draw drift flags (long)
+```
+
+SHAP runs on CPU, which was measured to be faster than the GPU for this
+small model. The FedProx variants take `--tag-prefix fedprox_mu0.0005` plus
+a matching manifest path; see each script's docstring.
+
+### 6. Trust check (ByzAgent)
+
+Attacks, defenses and the agent are switched on through
+`configs/attack.yaml`, `configs/defense.yaml` and `configs/agent.yaml`. In
+their committed state all three leave plain FedAvg untouched.
+
+1. **Poisoned run.** Set `attack.enabled: true` in `configs/attack.yaml`
+   (locked primary: `f: 3`, `malicious_silos: [0, 3, 5]`, `mode: sudden`,
+   `flip_fraction: 0.40`), then run the same `flwr run federated
+   local-simulation` command at α=0.5, seed 42. Poisoned runs get their own
+   result directory and are hard-blocked from evaluating on the test set.
+2. **Behaviour statistics.** Runs that predate the statistics logger are
+   replayed, then checked with the Phase 1 gate:
+   ```powershell
+   python scripts/replay_client_stats.py --run-dir results/federated/fedavg_a0.5_s42
+   python scripts/phase1_verification_gate.py
+   ```
+3. **Classical baselines.** Set `defense.strategy` to `multikrum`, `krum` or
+   `trimmed_mean` in `configs/defense.yaml`, with `num_malicious_nodes` set
+   to the true `f` (the oracle), and re-run training. Analyse with
+   `scripts/phase2_analysis.py` (its arguments are listed in the script).
+4. **ByzAgent.** Install [Ollama](https://ollama.com), pull the model, and
+   keep Ollama serving on `http://localhost:11434` (the host set in
+   `configs/agent.yaml`):
+   ```powershell
+   ollama pull llama3.1:8b-instruct-q4_K_M
+   python scripts/phase3_verification_gate.py   # replays client_stats.jsonl through the agent
+   python scripts/phase3_analysis.py
+   python scripts/phase4_verification_gate.py   # current-round vs rolling-history matrix
+   python scripts/phase4_analysis.py
+   python scripts/phase_multiseed_agent_replay.py
+   python scripts/phase_multiseed_fidelity_audit.py
+   ```
+   The reported agent numbers come from these retrospective replays over
+   logged statistics, not from retraining. The agent samples at temperature
+   0.2, so a fresh replay is a new sample and will not match the published
+   decisions exactly. `phase3_verification_gate.py` overwrites
+   `results/federated/<tag>/agent_decisions.jsonl`, the files the published
+   Phase 3 numbers were computed from; back them up first.
+   `defense.strategy: byzagent` wires the agent into live aggregation, but
+   no reported number comes from a live ByzAgent run.
+
+### 7. Dashboard (FastAPI + React)
+
+The backend needs the processed data from step 3, the trained
+`fedavg_a0.5_s42` checkpoint and `best_rounds_manifest.json`. At startup it
+re-checks the served model's validation macro-F1 against the logged value;
+it never reads the test set.
+
+The two demo SHAP files are not redistributed. Rebuild them once. Each
+script is a one-time, logged read of already-explained rows of
+`test_global.parquet` (14 and 500 rows) for display only; see the test-set
+access note in
+[`docs/contribution_a_results.md`](docs/contribution_a_results.md#test-set-access-note).
+
+```powershell
+python -m tools.build_shap_eval_sidecar --tag fedavg_a0.5_s42
+python -m tools.build_shap_streamed_pool --tag fedavg_a0.5_s42
+```
+
+Both files were committed at one point and later removed from tracking; they
+remain in git history (`eval_rows_sidecar.npz` since `0d9a8aa`,
+`streamed_pool.npz` since `2823faf`), so a full clone still fetches those old
+copies. History was not rewritten.
+
+The one-sentence alert explanations are committed in
+`results/explanations/fedavg_a0.5_s42/sentences.json`;
+`python -m tools.build_explanations --tag fedavg_a0.5_s42` regenerates them
+with Ollama.
+
+Then, in three terminals:
+
+```powershell
+uvicorn backend.main:app --reload
+```
+
+```powershell
+python -m backend.simulator
+```
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
+`/api` to it. The simulator is optional: it replays rows of
+`test_global.parquet` as example live traffic so the alert stream moves, and
+it never computes or reports a metric.
+
+The older Streamlit dashboard still runs with `streamlit run app.py`.
+
+### 8. Showcase site and film
+
+The site reads small JSON files in `site/public/data/`. Regenerate them from
+`results/` and `docs/` (read-only; the output path is set in
+`configs/showcase_export.yaml`):
+
+```powershell
+python tools/export_showcase_data.py
+python tools/export_showcase_data.py --only headline story   # only some files
+```
+
+Build the site with the same `npm run build` that Vercel runs:
+
+```powershell
+cd site
+npm ci
+npm run check:sources   # every source link on the site must point at a git-tracked file
+npm run build           # -> site/dist
+```
+
+The film's source and render steps are in [`film/README.md`](film/README.md);
+the rendered film is in `site/public/film/`.
