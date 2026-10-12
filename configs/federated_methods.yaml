@@ -94,34 +94,27 @@ methods:
 # is the existing published runs. If the timed budget exceeds
 # experiment.budget_gpu_hours, the cut is recorded in `cut` with a reason.
 #
-# Budget cut, 2026-10-12, decided BEFORE any candidate run. Timing run
-# (results/federated_methods/timing/fedavg_a0.1_s42, budget_estimate.json):
-# 62.2 s/round + 53.6 s startup = 21.6 min per 20-round run. The full plan
-# (54 grid + 3 alpha=5.0 + 1 regression = 58 runs) is 20.9 h, over the 12 h
-# budget; 12 h holds ~33 runs. Kept: 4 candidates x 2 alphas x 3 seeds = 24,
-# + 3 alpha=5.0 runs for the chosen config + 1 FedAvg regression run = 28
-# runs, ~10.1 h, leaving margin for timing error. The cut uses only evidence
-# that predates this grid (validation numbers of existing runs).
-grid: [fedavgm_m0.5, fedavgm_m0.9, fedadam_lr0.01, fedyogi_lr0.01]
+# Budget cut, 2026-10-12, decided BEFORE any candidate result.
+# First estimate (timing run, results/federated_methods/timing/, one round):
+# 62.2 s/round + 53.6 s startup = 21.6 min/run -> 58 runs = 20.9 h. That
+# round was inflated (first-round warm-up, and an unrelated `conda env
+# create` running at the same time), and the grid was first cut to 4
+# candidates (commit ad249bd). The full 20-round FedAvg regression run then
+# measured 34.7 s/round, 12.7 min/run end to end
+# (results/federated_methods/run_log.jsonl). Revised estimate, still made
+# before any candidate run had finished: 58 runs x 12.7 min = 12.3 h, over
+# the 12 h budget by about one candidate. Revised cut: drop fedprox_mu0.1
+# only. 8 candidates x 6 = 48 runs + 3 alpha=5.0 + the 2 runs already done
+# (timing, regression) = ~11.0 h. The 4 originally kept candidates run
+# first; the other 4 are appended, so run order is not result-dependent.
+grid: [fedavgm_m0.5, fedavgm_m0.9, fedadam_lr0.01, fedyogi_lr0.01,
+       fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001, fedyogi_lr0.001]
 cut:
-  fedprox_mu0.001: >-
-    Existing FedProx mu=0.0005 runs gave alpha=0.1 val mean 0.5235 vs
-    FedAvg 0.5228 (+0.0007), far from the +0.02 threshold; mu=0.001 is a 2x
-    step from a null. Lowest prior chance of clearing the threshold.
-  fedprox_mu0.01: >-
-    Already run once at alpha=0.5 seed 42 (results/federated/
-    fedprox_mu0.01_a0.5_s42): best val 0.7114 vs FedAvg 0.9760, so it would
-    almost certainly fail the alpha=0.5 guard (max drop 0.01).
   fedprox_mu0.1: >-
-    10x stronger proximal pull than mu=0.01, which already collapsed
-    alpha=0.5 accuracy; expected to fail the guard.
-  fedadam_lr0.001: >-
-    Adam-style server steps move each weight by roughly eta per round, so
-    eta=0.001 bounds total movement to ~0.02 per weight over 20 rounds:
-    expected to underfit in the locked 20-round budget. Kept eta=0.01.
-  fedyogi_lr0.001: >-
-    Same reasoning as fedadam_lr0.001 (Yogi's step is also ~eta per
-    coordinate). Kept eta=0.01.
+    Budget. Of the nine, the weakest prior: 10x the proximal pull of
+    mu=0.01, which already collapsed alpha=0.5 accuracy once
+    (results/federated/fedprox_mu0.01_a0.5_s42: best val 0.7114 vs FedAvg
+    0.9760), so it is the most likely to fail the alpha=0.5 guard.
 
 skipped:
   scaffold: >-

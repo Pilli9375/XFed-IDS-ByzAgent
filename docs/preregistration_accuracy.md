@@ -54,6 +54,24 @@ fedyogi_lr0.001 (a step of ~η per weight per round cannot move far in 20
 rounds). The cut candidates are not part of the selection; nothing is claimed
 about them.
 
+**Revision of the cut, 2026-10-12, committed before any candidate run had
+finished.** The one timed round above was inflated (first-round warm-up, plus
+an unrelated `conda env create` running at the same time). The full 20-round
+FedAvg regression run then measured 34.7 s/round, 12.7 min per run end to end
+(`results/federated_methods/run_log.jsonl`). Revised estimate: 58 runs × 12.7
+min = 12.3 h, still over 12 h, by about one candidate. Revised cut: only
+**fedprox_mu0.1** is dropped (strongest proximal pull; μ=0.01 already
+collapsed α=0.5 once). The candidate set for selection is therefore
+**fedavgm_m0.5, fedavgm_m0.9, fedadam_lr0.01, fedyogi_lr0.01,
+fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001, fedyogi_lr0.001**
+(48 runs + 3 α=5.0 runs ≈ 11.0 h with the two runs already done). The first
+four run first, the other four after; the order does not depend on any result.
+
+**Regression check result.** The FedAvg re-run on the new path
+(`results/federated_methods/regression/fedavg_a0.1_s42/round_history.json`) is
+identical to the published curve at all 21 rounds (max absolute difference
+0.0). The published FedAvg runs are therefore a like-for-like baseline.
+
 β1, β2 and τ are Flower 1.33's defaults for FedAdam/FedYogi, written out
 explicitly. SCAFFOLD is not run; the reason is recorded under `skipped:` in
 the YAML (no Flower strategy, needs persistent client state, and its
