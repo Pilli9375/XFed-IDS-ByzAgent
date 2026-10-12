@@ -180,6 +180,8 @@ This is stated as an **open pattern, with no mechanism proposed**. Three analyse
 
 **Test-set access note.** The test set was evaluated exactly once, for model evaluation. Separately, raw feature values for 514 rows (a 14-row eval sidecar and a 500-row streamed SHAP pool) were read from `test_global.parquet` for display in the demo dashboard only, because SHAP values for those rows had already been computed. No metric was recomputed, no model was selected, and no reported number derives from these reads. Both reads were one-time and logged.
 
+The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
+
 ---
 
 ## Limitations

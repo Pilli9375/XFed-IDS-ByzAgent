@@ -274,7 +274,8 @@ This install was tested in a fresh conda env on the development machine
 (Windows 11): `pip check` was clean and the Flower app, backend and data
 scripts imported. NumPy and pandas come from pip there rather than conda's
 MKL build, so low-level numerics may differ slightly from the original env.
-It has not been tested on Linux or macOS.
+
+Environment tested on Windows + NVIDIA (cu124 wheels); Linux/macOS need the matching torch index.
 
 Flower reads its simulation settings from your user-level Flower config
 (`%USERPROFILE%\.flwr\config.toml`), not from this repo. Copy the
@@ -465,11 +466,13 @@ npm run dev
 ```
 
 The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
-`/api` to it. The simulator is optional: it replays rows of
-`test_global.parquet` as example live traffic so the alert stream moves. It
-computes no metric, but the dashboard marks each replayed alert ✓ or ✗
-against that row's true label; no accuracy or count is aggregated from
-those marks.
+`/api` to it. The simulator is optional: it replays rows so the alert
+stream moves. The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
+To replay test rows instead, set `simulator.source_split: test` in
+`configs/backend.yaml`; the simulator refuses unless the served checkpoint's
+hash is listed in `simulator.test_split_checkpoint_allowlist` (empty by
+default). Validation rows have no precomputed SHAP, so replayed alerts show
+no SHAP panel.
 
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 

@@ -92,6 +92,8 @@ frozen label vocabulary, best-by-validation round selection.
 raw features (514 already-explained rows, for demo display) are documented in
 `docs/contribution_a_results.md`; no metric derives from them.
 
+The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
+
 ---
 
 ## How to work
