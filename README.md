@@ -500,3 +500,47 @@ npm run build           # -> site/dist
 
 The film's source and render steps are in [`film/README.md`](film/README.md);
 the rendered film is in `site/public/film/`.
+
+## Team
+
+VIT-AP University capstone project, 2026.
+
+| Name | Register number |
+|---|---|
+| V Naga Adithya | 23BCE9062 |
+| T Shaun | 23BCE9916 |
+| P Sampath | 23BCE8614 |
+| D Tharun | 23BCE8818 |
+
+## Citation
+
+If you use this code or the measurement protocol, please cite the
+repository:
+
+```bibtex
+@misc{xfedidsbyzagent2026,
+  title        = {{XFed-IDS-ByzAgent}: A federated intrusion detection system that checks whether its own explanations and its own participants can be trusted},
+  author       = {V Naga Adithya and T Shaun and P Sampath and D Tharun},
+  year         = {2026},
+  howpublished = {VIT-AP University capstone project},
+  url          = {https://github.com/Pilli9375/XFed-IDS-ByzAgent}
+}
+```
+
+Please also cite the dataset papers (Liu et al., IEEE CNS 2022; Engelen et
+al., WTMC 2021) listed under [Dataset](#2-dataset).
+
+## Acknowledgements
+
+- The authors of the corrected CICIDS2017 dataset this project is built on
+  (Engelen, Rimmer and Joosen; Liu, Engelen, Lynar, Essam and Joosen).
+- The Canadian Institute for Cybersecurity, for the original CICIDS2017
+  capture.
+- The open-source tools the system runs on: Flower, PyTorch, SHAP,
+  scikit-learn, XGBoost, FastAPI, React, Recharts, Vite and Remotion.
+- Meta's Llama 3.1 8B Instruct, served locally through Ollama, which is
+  covered by its own license.
+
+## License
+
+License: to be decided. This repository does not have a license file yet.
