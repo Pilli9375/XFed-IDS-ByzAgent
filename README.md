@@ -66,9 +66,11 @@ results to a general audience.
 
 ## Key results
 
-Every value below is copied from the linked file; nothing is recomputed or
-rounded here. Macro-F1 is over the 7 headline classes (6 attack families +
-Benign) and is reported as mean ± std over 3 seeds. The explanation check and
+Values are taken as stated in
+[`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) and the two results
+documents, each traced to the linked file. Some are rounded there from the
+raw CSVs; nothing is recomputed here. Macro-F1 is over the 7 headline
+classes (6 attack families + Benign), as mean ± std over 3 seeds. The explanation check and
 the trust check are different experiments; read each block on its own.
 
 | Result | Value | Source |
@@ -93,7 +95,7 @@ the trust check are different experiments; read each block on its own.
 **Reading the explanation check.** Explanation agreement rises with α, and
 at α=5.0 it sits well above both chance and the seed-noise floor. At α=0.1
 the median Jaccard@10 (0.333) falls below the floor's lower bound, even
-though accuracy at that α is 0.516 ± 0.048. That below-floor result is
+though FedAvg macro-F1 at that α is 0.516 ± 0.048. That below-floor result is
 directional, not significant: the cluster-bootstrap interval at α=0.1
 ([0.250, 0.429]) overlaps the floor ([0.429, 0.484]).
 
