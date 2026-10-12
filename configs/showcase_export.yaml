@@ -10,6 +10,10 @@ n_features: 82            # for the chance-level Jaccard formula (tools/agreemen
 eligible_column: family_eligible
 rounds_wise: [5, 10, 15, 20]
 final_window: 5           # "final-5-round mean"
+# Off since 2026-10-13 (planning chat): final_metrics.json's round-20
+# (unselected) test score is not exported to the site. It stays on disk in
+# results/federated/<run>/final_metrics.json, disclosed in contribution B.
+export_final_round_test_score: false
 
 paths:
   agreement_metrics: results/inspection/agreement_metrics.csv

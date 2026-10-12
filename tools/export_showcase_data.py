@@ -405,7 +405,11 @@ def export_baselines(cfg, out_dir):
                 t, tf = fm["test"]["macro_f1_headline"], fm["test_final_round_unselected"]["macro_f1_headline"]
                 e["best_round"], e["best_val_macro_f1_headline"] = fm["best_round"], fm["best_val_macro_f1_headline"]
                 e["test_macro_f1_headline_best_by_val"] = t
-                e["test_macro_f1_headline_final_round"] = tf
+                # Round-20 (unselected) test score: off by default since
+                # 2026-10-13 -- it is a test score of a non-selected round and
+                # no site claim uses it. Still on disk in final_metrics.json.
+                if cfg.get("export_final_round_test_score", False):
+                    e["test_macro_f1_headline_final_round"] = tf
                 e["fedavg_clean_test_macro_f1_headline"] = clean_test
                 e["clean_control_cost_pp"] = (t - clean_test) * 100
             # mechanism-level
