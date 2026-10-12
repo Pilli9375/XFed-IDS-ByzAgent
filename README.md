@@ -1,43 +1,65 @@
-# xfed-ids
+# XFed-IDS-ByzAgent
 
-Explanation parity under non-IID federation for network intrusion detection
-(explanation check), plus a demo dashboard (FastAPI backend + React frontend).
-Canonical write-up: [`docs/contribution_a_results.md`](docs/contribution_a_results.md).
+A federated intrusion detection system that checks whether its own explanations and its own participants can be trusted.
 
-## Reproducing the demo data
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
 
-`results/shap/<tag>/streamed_pool.npz` (500-row streamed SHAP pool) and
-`results/shap/<tag>/eval_rows_sidecar.npz` (14-row eval sidecar) are **not
-redistributed**. They are regenerated locally from the Distrinet CICIDS2017 V4
-dataset, via `data/processed/test_global.parquet`. Each script is a one-time,
-logged read of that file (see the "Test-set access note" in
-`docs/contribution_a_results.md`); run from the repo root:
+- Live site: https://xfed-ids-byzagent.vercel.app
+- Explainer film: [`site/public/film/xfed_film_16x9.mp4`](site/public/film/xfed_film_16x9.mp4)
+- Explanation check write-up: [`docs/contribution_a_results.md`](docs/contribution_a_results.md)
+- Trust check write-up: [`docs/contribution_b_results.md`](docs/contribution_b_results.md)
+- Measurement protocol: [`docs/measurement_protocol.md`](docs/measurement_protocol.md)
+- Data pipeline decision record: [`data/README.md`](data/README.md)
 
-```bash
-python -m tools.build_shap_eval_sidecar --tag fedavg_a0.5_s42
-python -m tools.build_shap_streamed_pool --tag fedavg_a0.5_s42
-```
+The two `contribution_*_results.md` files are the canonical results. Where
+anything else in this repo (including this README) disagrees with them, they
+win.
 
-`fedavg_a0.5_s42` is the served model tag (`configs/backend.yaml`, `model.tag`).
-Both scripts need the trained federated checkpoint for that tag.
+## The system in five stages
 
-### Known limitations
+The project is one system, built as a VIT-AP capstone. It has five stages.
+Stages 3 and 4 are separate experiments with separate evidence, and their
+findings are reported separately below.
 
-- Manifest paths use Windows backslashes, so the backend as shipped is
-  Windows-oriented.
-- A fresh clone lacks `train_pool.parquet` and `val_mask.parquet` (`*.parquet`
-  is git-ignored), which the backend needs at startup to refit the scaler. The
-  backend only starts on a machine where the full data pipeline has been run.
-- Both `.npz` files are git-ignored and were removed from tracking (`git rm
-  --cached`) after being committed earlier. They remain in earlier history:
-  `eval_rows_sidecar.npz` since commit `0d9a8aa`, `streamed_pool.npz` since
-  commit `2823faf`. History was not rewritten, so cloning the repo still
-  fetches those historical copies; the current tree does not contain them. The
-  two commands above regenerate them locally.
+**1. Data.** The Distrinet CICIDS2017 V4 dataset (a corrected release of
+CICIDS2017), cleaned from 2,099,976 raw flows to 1,913,502 and mapped into
+8 attack families plus Benign. Families under a 1,000-flow floor
+(Infiltration, Heartbleed) are kept in the data and reported per class, but
+left out of the headline macro-F1. The split is one global, group-aware
+75/25 train/test split made before any federated partitioning, so no feature
+vector appears on both sides. Every cleaning decision and its row count is in
+[`data/README.md`](data/README.md).
 
-## Dataset attribution
+**2. Federated training.** Ten organizations (silos) train a shared MLP
+detector with Flower, without sharing traffic. Data is split across silos by
+a Dirichlet draw over labels at α ∈ {0.1, 0.5, 5.0} (severe, realistic and
+near-IID heterogeneity) with seeds 42, 1337 and 2024, giving 9
+configurations. Partitions are stored on disk as row-to-silo assignments
+with a SHA256 manifest that is checked every time a silo is loaded. The
+round used for every reported number is chosen on validation macro-F1, never
+on the final round.
 
-This project uses the Distrinet CICIDS2017 V4 dataset: Liu et al., IEEE CNS
-2022, and Engelen et al., WTMC 2021. The dataset is not owned or redistributed
-by this project; obtain it from its original authors. Derived data
-(`*.parquet`, the demo `.npz` files) is likewise not committed.
+**3. Explanation check.** Do the silos' models flag attacks for the same
+reasons? Each silo computes SHAP attributions locally against a fixed,
+seeded background drawn from its own training rows; only top-k feature
+rankings cross to the server. Agreement between each silo and the global
+model is measured with Jaccard@10 and weighted Kendall's τ, compared across
+α, against a chance level, and against a null control: how much rankings
+differ between centralized models that differ only by random seed.
+
+**4. Trust check (ByzAgent).** Is any organization poisoning the model? A
+label-flipping attack is injected into chosen silos. Each round, five
+per-silo behaviour statistics (update norm, two cosine similarities, local
+training loss, validation accuracy) are given to a local LLM agent
+(`llama3.1:8b-instruct-q4_K_M` through Ollama), which decides trust,
+downweight or quarantine for each silo and writes a short rationale. The
+agent is compared against Krum, Multi-Krum and coordinate-wise trimmed mean,
+and its rationales are audited against the numbers it was given.
+
+**5. Dashboard.** A FastAPI backend and a React + Recharts frontend show
+live detection on streamed flows, per-alert SHAP explanations, and the
+trust decisions together. The served model is `fedavg_a0.5_s42` at round 18.
+One-sentence alert explanations in the dashboard are generated by the same
+local LLM; they are a usability feature, not a research claim. A static
+showcase site (`site/`) and an explainer film (`film/`) present the same
+results to a general audience.
