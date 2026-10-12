@@ -466,8 +466,10 @@ npm run dev
 
 The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
 `/api` to it. The simulator is optional: it replays rows of
-`test_global.parquet` as example live traffic so the alert stream moves, and
-it never computes or reports a metric.
+`test_global.parquet` as example live traffic so the alert stream moves. It
+computes no metric, but the dashboard marks each replayed alert ✓ or ✗
+against that row's true label; no accuracy or count is aggregated from
+those marks.
 
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 
