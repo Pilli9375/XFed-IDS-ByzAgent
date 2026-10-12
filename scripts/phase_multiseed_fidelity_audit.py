@@ -16,7 +16,7 @@ from pathlib import Path
 
 from scipy.stats import spearmanr
 
-PROJECT_ROOT = Path(r"C:\Pilli\Capstone\xfed-ids")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_PATH = PROJECT_ROOT / "results/inspection/multiseed_agent_gate_raw.json"
 OUT_PATH = PROJECT_ROOT / "results/inspection/multiseed_fidelity_audit.json"
 HAND_CHECK_PATH = PROJECT_ROOT / "results/inspection/multiseed_citation_accuracy_sample.json"

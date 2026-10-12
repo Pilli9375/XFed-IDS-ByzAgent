@@ -70,3 +70,6 @@ results/shap/**/eval_rows_sidecar.npz
 XFED_PLAYBOOK.md
 PHASE2_OPENING_PROMPT.md
 CLAUDE.md
+
+# Veo clips, not committed until the cut is approved
+film/veo/

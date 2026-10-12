@@ -209,10 +209,8 @@ The ones most likely to matter to a reader:
 
 - The pipeline is Windows-oriented: checkpoint manifests such as
   `results/inspection/best_rounds_manifest.json` store Windows backslash
-  paths, and `configs/data.yaml` plus several scripts in `scripts/`
-  hard-code the project root `C:\Pilli\Capstone\xfed-ids`.
-- There is no pinned environment file; the package versions used are listed
-  under "Reproduce it" below.
+  paths.
+- The pinned environment was tested on Windows only.
 - A fresh clone has no processed data (`*.parquet` is git-ignored), so the
   backend only starts after the data pipeline has been run locally.
 
@@ -258,47 +256,41 @@ SHAP pipeline alone is about 3.7 hours for all 9 configurations.
 The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
 on the development machine `conda activate` is a silent no-op in `cmd.exe`.
 
-There is no pinned environment file. These are the versions the project ran
-with; the install commands below have not been tested on a clean machine.
-
-| Package | Version | Package | Version |
-|---|---|---|---|
-| flwr[simulation] | 1.33.0 | xgboost | 3.2.0 |
-| torch (CUDA 12.4 build) | 2.6.0 | optuna | 4.9.0 |
-| shap | 0.51.0 | fastapi | 0.138.2 |
-| scikit-learn | 1.9.0 | uvicorn | 0.49.0 |
-| pandas | 3.0.3 | streamlit | 1.61.1 |
-| pyarrow | 24.0.0 | Node.js (site, frontend, film) | 24.19.0 |
+Create the environment from the repo root:
 
 ```powershell
-conda create -n xfed python=3.11
+conda env create -f environment.yml
 conda activate xfed
-pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
-pip install "flwr[simulation]==1.33.0" shap==0.51.0 scikit-learn==1.9.0 xgboost==3.2.0 optuna==4.9.0 pandas==3.0.3 pyarrow==24.0.0 pyyaml scipy matplotlib plotly requests pydantic fastapi==0.138.2 uvicorn==0.49.0 streamlit==1.61.1
 ```
+
+[`environment.yml`](environment.yml) installs Python 3.11 and the pinned
+packages in [`requirements.txt`](requirements.txt), including the CUDA 12.4
+build of PyTorch 2.6.0. Key versions: flwr 1.33.0, torch 2.6.0, shap 0.51.0,
+scikit-learn 1.9.0, xgboost 3.2.0, optuna 4.9.0, fastapi 0.138.2, uvicorn
+0.49.0, streamlit 1.61.1, pandas 3.0.3, pyarrow 24.0.0. Node.js 24 is needed
+for `site/`, `frontend/` and `film/`.
+
+This install was tested in a fresh conda env on the development machine
+(Windows 11): `pip check` was clean and the Flower app, backend and data
+scripts imported. NumPy and pandas come from pip there rather than conda's
+MKL build, so low-level numerics may differ slightly from the original env.
+
+Environment tested on Windows + NVIDIA (cu124 wheels); Linux/macOS need the matching torch index.
 
 Flower reads its simulation settings from your user-level Flower config
-(`%USERPROFILE%\.flwr\config.toml`), not from this repo. Add:
-
-```toml
-[superlink.local-simulation]
-address = ":local:"
-options.num-supernodes = 10
-options.backend.name = "ray"
-options.backend.client-resources.num-cpus = 2
-options.backend.client-resources.num-gpus = 1.0
-```
-
-`num-gpus = 1.0` per client makes the simulation run one client at a time,
-which is what fits in 6 GB of VRAM. Also set
+(`%USERPROFILE%\.flwr\config.toml`), not from this repo. Copy the
+`[superlink.local-simulation]` block from
+[`federated/flwr_config.example.toml`](federated/flwr_config.example.toml)
+into that file. The example requests one GPU per client, which makes the
+simulation run one client at a time so it fits in 6 GB of VRAM. Also set
 `$env:PYTHONIOENCODING = "utf-8"` in the shell; otherwise Flower's summary
 output crashes on the default Windows code page.
 
-Paths are Windows-specific. `configs/data.yaml` (`paths.raw_dir`,
-`paths.processed_dir`) and several trust-check scripts in `scripts/`
-hard-code `C:\Pilli\Capstone\...`; edit them if your checkout lives
-elsewhere. `federated/xfed_federated/task.py` reads an `XFED_PROJECT_ROOT`
-environment variable.
+Paths are relative to the repo root. The raw dataset is expected in a
+`Dataset` folder next to the repo (`../Dataset`, set by `paths.raw_dir` in
+`configs/data.yaml`); set the `XFED_DATASET_DIR` environment variable to
+put it anywhere else. The Flower app finds the repo root on its own;
+`XFED_PROJECT_ROOT` overrides that if it ever guesses wrong.
 
 ### 2. Dataset
 
@@ -316,8 +308,8 @@ redistributed by this project; get it from its authors and cite both papers:
   Workshops (SPW), Workshop on Traffic Measurements for Cybersecurity
   (WTMC), 2021.
 
-Put the CSVs outside the repo (the project used `C:\Pilli\Capstone\Dataset\`)
-and point `paths.raw_dir` in `configs/data.yaml` at that folder. Derived data
+Put the CSVs outside the repo, in a `Dataset` folder next to it (the project
+used `C:\Pilli\Capstone\Dataset\`), or point `XFED_DATASET_DIR` at the folder. Derived data
 (`*.parquet`, the demo `.npz` files) is git-ignored and not committed.
 
 ### 3. Cleaning, split and partitioning
@@ -474,9 +466,13 @@ npm run dev
 ```
 
 The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
-`/api` to it. The simulator is optional: it replays rows of
-`test_global.parquet` as example live traffic so the alert stream moves, and
-it never computes or reports a metric.
+`/api` to it. The simulator is optional: it replays rows so the alert
+stream moves. The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
+To replay test rows instead, set `simulator.source_split: test` in
+`configs/backend.yaml`; the simulator refuses unless the served checkpoint's
+hash is listed in `simulator.test_split_checkpoint_allowlist` (empty by
+default). Validation rows have no precomputed SHAP, so replayed alerts show
+no SHAP panel.
 
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 

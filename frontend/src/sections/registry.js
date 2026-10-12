@@ -114,7 +114,7 @@ export const SECTIONS = [
     eyebrow: 'Analyst tools',
     title: 'Alert Stream',
     lede:
-      'Alerts recorded by the traffic simulator, which replays held-out test flows through the ' +
+      'Alerts recorded by the traffic simulator, which replays validation flows through the ' +
       'live model. Open an alert to see its precomputed SHAP explanation, when one exists — ' +
       'a small fixed subset of streamed rows has one, the rest do not, and nothing is computed ' +
       'on demand. An operational view: <b>not</b> a result of either research contribution.',

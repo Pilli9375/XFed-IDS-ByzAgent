@@ -1,0 +1,22 @@
+# Example user-level Flower configuration for the XFed-IDS simulation.
+#
+# `flwr run federated local-simulation` looks up the SuperLink connection named
+# "local-simulation" in your own Flower config file, not in this repo:
+#
+#   Windows:      %USERPROFILE%\.flwr\config.toml
+#   Linux/macOS:  ~/.flwr/config.toml
+#
+# Copy the [superlink.local-simulation] block below into that file (create the
+# file if it does not exist). Values match the machine this project was built
+# on (RTX 4050, 6 GB VRAM).
+
+[superlink.local-simulation]
+address = ":local:"
+# 10 silos, matching the locked federation shape.
+options.num-supernodes = 10
+options.backend.name = "ray"
+options.backend.client-resources.num-cpus = 2
+# 1.0 GPU per client means the whole GPU is requested per client, so the
+# simulation runs one client at a time. That is deliberate: it fits 6 GB VRAM.
+# On a CPU-only machine set this to 0.0.
+options.backend.client-resources.num-gpus = 1.0
