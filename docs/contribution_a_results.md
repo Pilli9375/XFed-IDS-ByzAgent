@@ -228,7 +228,7 @@ Consolidated from `PROJECT_INSTRUCTIONS.md` ("Findings that limit what can be cl
 
 **Question.** Does a different federated optimizer raise macro-F1 over FedAvg under non-IID data, mainly at α=0.1?
 
-**Protocol.** Selection used validation data only. Four candidates were compared at α ∈ {0.1, 0.5} × seeds {42, 1337, 2024}: FedAvgM momentum 0.5 and 0.9, FedAdam η=0.01, FedYogi η=0.01. The model, partitions (SHA256-checked), 3 local epochs, 20 rounds and best-by-validation round selection are unchanged. Of the nine requested candidates, fedprox_mu0.1 was cut for budget before the grid. A timing-only budget guard then dropped fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001 and fedyogi_lr0.001 before any of them started. SCAFFOLD was not run: no Flower strategy exists for it, it needs persistent client state, and the locked local optimizer is AdamW. A FedAvg re-run on the new code path reproduced the published α=0.1 seed 42 validation curve exactly (all 21 rounds). The rule picked **FedAvgM, server momentum 0.9, server lr 1.0**. Its 9 best-by-validation checkpoints (α ∈ {0.1, 0.5, 5.0} × 3 seeds) were sealed by SHA256 in commit `1a17277`. They were then scored on the test set once, the single additional test evaluation allowed by the 2026-10-12 rule change.
+**Protocol.** Selection used validation data only. Four candidates were compared at α ∈ {0.1, 0.5} × seeds {42, 1337, 2024}: FedAvgM momentum 0.5 and 0.9, FedAdam η=0.01, FedYogi η=0.01. The model, partitions (SHA256-checked), 3 local epochs, 20 rounds and best-by-validation round selection are unchanged. 4 of the 9 requested candidates were run. The other 5 were cut on wall-time grounds only, each recorded in the preregistration before that candidate started: fedprox_mu0.1 by the budget estimate before any candidate ran, and fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001 and fedyogi_lr0.001 by a timing-only budget guard (added after one fedavgm_m0.5 validation score had been seen; disclosed in the preregistration). SCAFFOLD was not run: no Flower strategy exists for it, it needs persistent client state, and the locked local optimizer is AdamW. A FedAvg re-run on the new code path reproduced the published α=0.1 seed 42 validation curve exactly (all 21 rounds). The rule picked **FedAvgM, server momentum 0.9, server lr 1.0**. Its 9 best-by-validation checkpoints (α ∈ {0.1, 0.5, 5.0} × 3 seeds) were sealed by SHA256 in commit `1a17277`. They were then scored on the test set once, the single additional test evaluation allowed by the 2026-10-12 rule change.
 
 **Validation (selection).** Source: `results/federated_methods/selection.json`.
 
@@ -265,9 +265,9 @@ Unrounded: 0.5930 ± 0.0632, 0.9852 ± 0.0005, 0.9911 ± 0.0005.
 | Infiltration (per class only) | 0.0000 | 0.4843 | 0.6239 |
 
 **What this supports.**
-- At α=0.1, server momentum 0.9 raised test macro-F1 in each of the 3 seeds (+0.113, +0.058, +0.060). The mean rose from 0.516 to 0.593. α=0.1 remains far below centralized (0.990): whole families still get F1 near 0 in some seeds (per-class std 0.31–0.46 for Bot, BruteForce, DoS, PortScan and WebAttack).
-- At α=0.5 the mean rose from 0.941 to 0.985, and the seed spread shrank from 0.057 to 0.0005. Most of the change is seed 2024 (0.8605 → 0.9856); seed 1337 moved −0.001.
-- At α=5.0 the change is +0.0001 to +0.0021 per seed, within the centralized MLP's own seed spread (0.9900 ± 0.0022).
+- **α=0.5: stability.** The mean rose from 0.941 to 0.985, and the seed spread shrank from 0.057 to 0.0005. Most of the change is one seed that FedAvg handled badly (seed 2024: 0.8605 → 0.9856); seed 1337 moved −0.001. The main effect is removing a bad seed, not raising good ones.
+- **α=0.1: consistent but modest.** Server momentum 0.9 raised test macro-F1 in each of the 3 seeds (+0.113, +0.058, +0.060), mean 0.516 → 0.593. That is n=3, and the validation curves oscillate strongly at this α, so the best-by-validation rounds are often spikes. α=0.1 remains far below centralized (0.990): whole families still get F1 near 0 in some seeds (per-class std 0.31–0.46 for Bot, BruteForce, DoS, PortScan and WebAttack).
+- **α=5.0: parity.** The change is +0.0001 to +0.0021 per seed, within the centralized MLP's own seed spread (0.9900 ± 0.0022).
 
 **Limits.**
 - n=3 seeds per α. No significance test is claimed.
