@@ -48,9 +48,24 @@ def comm_summary(run_dir: Path) -> dict:
             "bytes_per_round": sorted({r["bytes_total"] for r in rows})}
 
 
+def candidates() -> tuple[list[str], list[str]]:
+    """The YAML grid minus whatever the timing-only budget guard dropped
+    (results/federated_methods/budget_guard.jsonl, rule in the prereg)."""
+    dropped: list[str] = []
+    guard = RES / "budget_guard.jsonl"
+    if guard.exists():
+        for line in guard.read_text().splitlines():
+            rec = json.loads(line)
+            if not rec["allowed"]:
+                dropped = rec["remaining_candidates"]
+    return [m for m in CFG["grid"] if m not in dropped], dropped
+
+
 def main() -> None:
     alphas, seeds = EXP["alphas"], EXP["seeds"]
-    summary: dict = {"metric": METRIC, "std": "population (ddof=0)", "methods": {}}
+    grid, dropped = candidates()
+    summary: dict = {"metric": METRIC, "std": "population (ddof=0)", "candidates": grid,
+                     "dropped_by_budget_guard": dropped, "methods": {}}
 
     # Baseline: published FedAvg runs.
     entry = {"source": "published runs, " + EXP["baseline"]["runs_dir"], "alphas": {}}
@@ -61,7 +76,7 @@ def main() -> None:
     summary["methods"]["fedavg"] = entry
 
     missing = []
-    for m in CFG["grid"]:
+    for m in grid:
         entry = {"source": str((RES / "runs").relative_to(ROOT)), "alphas": {}}
         for a in alphas:
             runs = {}
@@ -102,13 +117,13 @@ def main() -> None:
     base_p = summary["methods"]["fedavg"]["alphas"][p]["mean"]
     base_g = summary["methods"]["fedavg"]["alphas"][g]["mean"]
     flags = []
-    for m in CFG["grid"]:
+    for m in grid:
         for s, r in summary["methods"][m]["alphas"][p]["per_seed"].items():
             if r["best_val"] > SEL["centralized_ceiling"]:
                 flags.append(f"STOP AND FLAG: {m} alpha={p} seed={s} val {r['best_val']:.4f} > {SEL['centralized_ceiling']}")
 
     table = []
-    for order, m in enumerate(CFG["grid"]):
+    for order, m in enumerate(grid):
         mp = summary["methods"][m]["alphas"][p]["mean"]
         mg = summary["methods"][m]["alphas"][g]["mean"]
         table.append({"method": m, "order": order, f"mean_a{p}": mp, f"mean_a{g}": mg,
@@ -133,7 +148,7 @@ def main() -> None:
         "rule": SEL, "fedavg_baseline": {f"mean_a{p}": base_p, f"mean_a{g}": base_g},
         "threshold_primary": base_p + SEL["min_improvement"],
         "threshold_guard": base_g - SEL["guard_max_drop"],
-        "candidates": table, "outcome": outcome,
+        "dropped_by_budget_guard": dropped, "candidates": table, "outcome": outcome,
         "chosen": chosen["method"] if outcome == "selected" else None,
         "best_eligible": chosen["method"] if chosen else None,
         "reason": reason, "flags": flags,

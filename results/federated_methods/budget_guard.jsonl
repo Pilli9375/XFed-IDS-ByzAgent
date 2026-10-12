@@ -1,0 +1,1 @@
+{"checked_at": "2026-10-12T22:59:14", "next_candidate": "fedprox_mu0.001", "remaining_candidates": ["fedprox_mu0.001", "fedprox_mu0.01", "fedadam_lr0.001", "fedyogi_lr0.001"], "elapsed_h": 7.403300384500116, "mean_candidate_run_min": 17.827858682847484, "runs_todo": 24, "extra_alpha_runs": 3, "projected_total_h": 15.425836791781483, "budget_h": 12.0, "allowed": false}

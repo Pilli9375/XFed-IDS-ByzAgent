@@ -1,0 +1,471 @@
+{
+  "metric": "val_macro_f1_headline",
+  "std": "population (ddof=0)",
+  "candidates": [
+    "fedavgm_m0.5",
+    "fedavgm_m0.9",
+    "fedadam_lr0.01",
+    "fedyogi_lr0.01"
+  ],
+  "dropped_by_budget_guard": [
+    "fedprox_mu0.001",
+    "fedprox_mu0.01",
+    "fedadam_lr0.001",
+    "fedyogi_lr0.001"
+  ],
+  "methods": {
+    "fedavg": {
+      "source": "published runs, results/federated",
+      "alphas": {
+        "0.1": {
+          "per_seed": {
+            "42": {
+              "best_round": 20,
+              "best_val": 0.5440290883625463,
+              "final_round_val": 0.5440290883625463,
+              "n_rounds_logged": 21
+            },
+            "1337": {
+              "best_round": 16,
+              "best_val": 0.45508550109799273,
+              "final_round_val": 0.41809781128484025,
+              "n_rounds_logged": 21
+            },
+            "2024": {
+              "best_round": 16,
+              "best_val": 0.5693557565455213,
+              "final_round_val": 0.5564556389332246,
+              "n_rounds_logged": 21
+            }
+          },
+          "mean": 0.5228234486686868,
+          "std": 0.04900123934575669
+        },
+        "0.5": {
+          "per_seed": {
+            "42": {
+              "best_round": 18,
+              "best_val": 0.9759668074383557,
+              "final_round_val": 0.9745243217941979,
+              "n_rounds_logged": 21
+            },
+            "1337": {
+              "best_round": 11,
+              "best_val": 0.9871291446306404,
+              "final_round_val": 0.8698961617071168,
+              "n_rounds_logged": 21
+            },
+            "2024": {
+              "best_round": 17,
+              "best_val": 0.864383114463526,
+              "final_round_val": 0.8492075691139905,
+              "n_rounds_logged": 21
+            }
+          },
+          "mean": 0.9424930221775073,
+          "std": 0.05541971794234479
+        }
+      }
+    },
+    "fedavgm_m0.5": {
+      "source": "results\\federated_methods\\runs",
+      "alphas": {
+        "0.1": {
+          "per_seed": {
+            "42": {
+              "best_round": 20,
+              "best_val": 0.5439610933862382,
+              "final_round_val": 0.5439610933862382,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 38.238279579998924,
+              "wall_time_s_total_rounds": 764.7655915999785,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 18,
+              "best_val": 0.5064495833828754,
+              "final_round_val": 0.41678053061519094,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 28.480989704991224,
+              "wall_time_s_total_rounds": 569.6197940998245,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 15,
+              "best_val": 0.5652536411329798,
+              "final_round_val": 0.5570492259266615,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 41.22421157500357,
+              "wall_time_s_total_rounds": 824.4842315000715,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.5385547726340311,
+          "std": 0.02430912764136431
+        },
+        "0.5": {
+          "per_seed": {
+            "42": {
+              "best_round": 16,
+              "best_val": 0.9892058178219726,
+              "final_round_val": 0.8541596648154698,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.235317215009125,
+              "wall_time_s_total_rounds": 1064.7063443001825,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 17,
+              "best_val": 0.9897874742832656,
+              "final_round_val": 0.9867330944678695,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.594944724999365,
+              "wall_time_s_total_rounds": 1051.8988944999874,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 18,
+              "best_val": 0.8715930853945011,
+              "final_round_val": 0.861438107139134,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.19244836999569,
+              "wall_time_s_total_rounds": 1043.8489673999138,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.9501954591665798,
+          "std": 0.055580778769966345
+        }
+      }
+    },
+    "fedavgm_m0.9": {
+      "source": "results\\federated_methods\\runs",
+      "alphas": {
+        "0.1": {
+          "per_seed": {
+            "42": {
+              "best_round": 16,
+              "best_val": 0.6567503134978313,
+              "final_round_val": 0.5339969642420935,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 51.46789561998448,
+              "wall_time_s_total_rounds": 1029.3579123996897,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 15,
+              "best_val": 0.5263028813097518,
+              "final_round_val": 0.4561899867355118,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.305521594994936,
+              "wall_time_s_total_rounds": 1066.1104318998987,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 13,
+              "best_val": 0.6372493088064698,
+              "final_round_val": 0.5842612253041314,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.23740448501776,
+              "wall_time_s_total_rounds": 1064.7480897003552,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.6067675012046844,
+          "std": 0.057451362543285846
+        },
+        "0.5": {
+          "per_seed": {
+            "42": {
+              "best_round": 17,
+              "best_val": 0.9869777875691746,
+              "final_round_val": 0.9625538585005813,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.852559365000346,
+              "wall_time_s_total_rounds": 1077.0511873000069,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 17,
+              "best_val": 0.9896486812195251,
+              "final_round_val": 0.9894564264237115,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.261631199985274,
+              "wall_time_s_total_rounds": 1045.2326239997055,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 11,
+              "best_val": 0.981606476863608,
+              "final_round_val": 0.8680213761410691,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.223819364991506,
+              "wall_time_s_total_rounds": 1044.47638729983,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.9860776485507693,
+          "std": 0.00334434352451267
+        }
+      }
+    },
+    "fedadam_lr0.01": {
+      "source": "results\\federated_methods\\runs",
+      "alphas": {
+        "0.1": {
+          "per_seed": {
+            "42": {
+              "best_round": 19,
+              "best_val": 0.4140132904905603,
+              "final_round_val": 0.4140129438916248,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 54.11690132999793,
+              "wall_time_s_total_rounds": 1082.3380265999585,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            },
+            "1337": {
+              "best_round": 18,
+              "best_val": 0.4082944056280264,
+              "final_round_val": 0.40798198428644206,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.322771925001874,
+              "wall_time_s_total_rounds": 1066.4554385000374,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            },
+            "2024": {
+              "best_round": 15,
+              "best_val": 0.5525024437714795,
+              "final_round_val": 0.5511012140793895,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.18392615005141,
+              "wall_time_s_total_rounds": 1063.6785230010282,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            }
+          },
+          "mean": 0.4582700466300221,
+          "std": 0.06667325757896614
+        },
+        "0.5": {
+          "per_seed": {
+            "42": {
+              "best_round": 20,
+              "best_val": 0.8471055513020848,
+              "final_round_val": 0.8471055513020848,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.338309030025265,
+              "wall_time_s_total_rounds": 1066.7661806005053,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            },
+            "1337": {
+              "best_round": 12,
+              "best_val": 0.8476139400504427,
+              "final_round_val": 0.8403101043495546,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.31459529501153,
+              "wall_time_s_total_rounds": 1066.2919059002306,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            },
+            "2024": {
+              "best_round": 20,
+              "best_val": 0.8498482348768206,
+              "final_round_val": 0.8498482348768206,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.21390129500069,
+              "wall_time_s_total_rounds": 1064.2780259000137,
+              "bytes_per_round": [
+                1587920,
+                2381880
+              ]
+            }
+          },
+          "mean": 0.8481892420764493,
+          "std": 0.001191303939283053
+        }
+      }
+    },
+    "fedyogi_lr0.01": {
+      "source": "results\\federated_methods\\runs",
+      "alphas": {
+        "0.1": {
+          "per_seed": {
+            "42": {
+              "best_round": 18,
+              "best_val": 0.41880115379592103,
+              "final_round_val": 0.4159927415581322,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.892194574978205,
+              "wall_time_s_total_rounds": 1057.843891499564,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 19,
+              "best_val": 0.41399331820557184,
+              "final_round_val": 0.4136738963228068,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 52.59749009498628,
+              "wall_time_s_total_rounds": 1051.9498018997256,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 20,
+              "best_val": 0.5553303857782067,
+              "final_round_val": 0.5553303857782067,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.92207126501016,
+              "wall_time_s_total_rounds": 1078.4414253002033,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.46270828592656654,
+          "std": 0.06552311987108754
+        },
+        "0.5": {
+          "per_seed": {
+            "42": {
+              "best_round": 20,
+              "best_val": 0.8642341175257189,
+              "final_round_val": 0.8642341175257189,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 54.30554437000537,
+              "wall_time_s_total_rounds": 1086.1108874001075,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "1337": {
+              "best_round": 18,
+              "best_val": 0.987100068296803,
+              "final_round_val": 0.9811307990910629,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.14487768501276,
+              "wall_time_s_total_rounds": 1062.8975537002552,
+              "bytes_per_round": [
+                1587920
+              ]
+            },
+            "2024": {
+              "best_round": 20,
+              "best_val": 0.8497337001730008,
+              "final_round_val": 0.8497337001730008,
+              "n_rounds_logged": 21,
+              "wall_time_s_per_round_mean": 53.6464022549917,
+              "wall_time_s_total_rounds": 1072.928045099834,
+              "bytes_per_round": [
+                1587920
+              ]
+            }
+          },
+          "mean": 0.9003559619985074,
+          "std": 0.061622347185460974
+        }
+      }
+    }
+  },
+  "regression_fedavg_a0.1_s42": {
+    "rounds_compared": 21,
+    "max_abs_diff": 0.0,
+    "per_round_new": [
+      0.13026924370163342,
+      0.2452001097373207,
+      0.4186883491787509,
+      0.41400360156016563,
+      0.41599044833703813,
+      0.41394894632173906,
+      0.4160737403229513,
+      0.4160454239024167,
+      0.4160434547505032,
+      0.41400542984562516,
+      0.4161008405926097,
+      0.4160887655680442,
+      0.5185940639776477,
+      0.5206324419182745,
+      0.5206217742783441,
+      0.42617153612677905,
+      0.5278928918242641,
+      0.5278816854517525,
+      0.5380337099642057,
+      0.5396525919988174,
+      0.5440290883625463
+    ],
+    "per_round_published": [
+      0.13026924370163342,
+      0.2452001097373207,
+      0.4186883491787509,
+      0.41400360156016563,
+      0.41599044833703813,
+      0.41394894632173906,
+      0.4160737403229513,
+      0.4160454239024167,
+      0.4160434547505032,
+      0.41400542984562516,
+      0.4161008405926097,
+      0.4160887655680442,
+      0.5185940639776477,
+      0.5206324419182745,
+      0.5206217742783441,
+      0.42617153612677905,
+      0.5278928918242641,
+      0.5278816854517525,
+      0.5380337099642057,
+      0.5396525919988174,
+      0.5440290883625463
+    ],
+    "best_new": {
+      "best_round": 20,
+      "best_val": 0.5440290883625463,
+      "final_round_val": 0.5440290883625463,
+      "n_rounds_logged": 21
+    },
+    "best_published": {
+      "best_round": 20,
+      "best_val": 0.5440290883625463,
+      "final_round_val": 0.5440290883625463,
+      "n_rounds_logged": 21
+    }
+  }
+}
