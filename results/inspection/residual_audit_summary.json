@@ -1,0 +1,534 @@
+{
+  "val_pool_max_reference": 3.3358242511749268,
+  "per_silo_check_max_abs_diff": 5.551115123125783e-17,
+  "n_files": 594,
+  "n_files_by_pass": {
+    "final": 198,
+    "round_wise": 396
+  },
+  "exceed_val_pool_max": {
+    "fedavg/final": {
+      "n_exceed": 4,
+      "n_files": 99,
+      "by_alpha": {
+        "0.1": "3/33",
+        "0.5": "0/33",
+        "5.0": "1/33"
+      },
+      "by_model": {
+        "global": "1/9",
+        "silo": "3/90"
+      },
+      "by_silo_index": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1,
+        "9": 1
+      },
+      "max": 11.955,
+      "median": 0.895
+    },
+    "fedavg/round_wise": {
+      "n_exceed": 31,
+      "n_files": 396,
+      "by_alpha": {
+        "0.1": "26/132",
+        "0.5": "0/132",
+        "5.0": "5/132"
+      },
+      "by_model": {
+        "global": "2/36",
+        "silo": "29/360"
+      },
+      "by_silo_index": {
+        "0": 0,
+        "1": 2,
+        "2": 3,
+        "3": 6,
+        "4": 0,
+        "5": 1,
+        "6": 6,
+        "7": 2,
+        "8": 4,
+        "9": 5
+      },
+      "max": 15.874,
+      "median": 1.454
+    },
+    "fedprox_mu0.0005/final": {
+      "n_exceed": 1,
+      "n_files": 99,
+      "by_alpha": {
+        "0.1": "1/33",
+        "0.5": "0/33",
+        "5.0": "0/33"
+      },
+      "by_model": {
+        "global": "0/9",
+        "silo": "1/90"
+      },
+      "by_silo_index": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 1
+      },
+      "max": 4.258,
+      "median": 0.562
+    }
+  },
+  "spearman_silo_residual_vs_jaccard10": {
+    "fedavg/final": {
+      "0.1": {
+        "r": -0.237,
+        "n": 29
+      },
+      "0.5": {
+        "r": 0.202,
+        "n": 30
+      },
+      "5.0": {
+        "r": 0.11,
+        "n": 30
+      }
+    },
+    "fedprox_mu0.0005/final": {
+      "0.1": {
+        "r": -0.207,
+        "n": 29
+      },
+      "0.5": {
+        "r": 0.431,
+        "n": 30
+      },
+      "5.0": {
+        "r": -0.078,
+        "n": 30
+      }
+    },
+    "fedavg/round_wise": {
+      "alpha=0.1 round=5": {
+        "r": -0.441,
+        "n": 29
+      },
+      "alpha=0.1 round=10": {
+        "r": -0.428,
+        "n": 29
+      },
+      "alpha=0.1 round=15": {
+        "r": -0.222,
+        "n": 29
+      },
+      "alpha=0.1 round=20": {
+        "r": -0.2,
+        "n": 29
+      },
+      "alpha=0.5 round=5": {
+        "r": 0.135,
+        "n": 30
+      },
+      "alpha=0.5 round=10": {
+        "r": 0.285,
+        "n": 30
+      },
+      "alpha=0.5 round=15": {
+        "r": 0.025,
+        "n": 30
+      },
+      "alpha=0.5 round=20": {
+        "r": 0.334,
+        "n": 30
+      },
+      "alpha=5.0 round=5": {
+        "r": 0.167,
+        "n": 30
+      },
+      "alpha=5.0 round=10": {
+        "r": -0.425,
+        "n": 30
+      },
+      "alpha=5.0 round=15": {
+        "r": 0.036,
+        "n": 30
+      },
+      "alpha=5.0 round=20": {
+        "r": -0.1,
+        "n": 30
+      }
+    }
+  },
+  "files_exceeding": [
+    {
+      "algo": "fedavg",
+      "pass": "final",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": null,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 4.193
+    },
+    {
+      "algo": "fedavg",
+      "pass": "final",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": null,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 11.955
+    },
+    {
+      "algo": "fedavg",
+      "pass": "final",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": null,
+      "model": "silo",
+      "silo": 8.0,
+      "additivity_max_diff": 6.576
+    },
+    {
+      "algo": "fedavg",
+      "pass": "final",
+      "alpha": 5.0,
+      "seed": 1337,
+      "round": null,
+      "model": "global",
+      "silo": null,
+      "additivity_max_diff": 3.5
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 5.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 14.935
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 5.0,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 5.269
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 3.895
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 13.145
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 7.006
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 7.054
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 4.455
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 15.874
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 7.859
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 7.667
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 10.708
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 5.0,
+      "model": "silo",
+      "silo": 8.0,
+      "additivity_max_diff": 4.639
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 2.0,
+      "additivity_max_diff": 4.265
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 5.0,
+      "additivity_max_diff": 3.67
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 8.0,
+      "additivity_max_diff": 9.977
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 15.0,
+      "model": "global",
+      "silo": null,
+      "additivity_max_diff": 6.468
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 1.0,
+      "additivity_max_diff": 5.582
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 2.0,
+      "additivity_max_diff": 8.525
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 8.0,
+      "additivity_max_diff": 9.668
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 20.0,
+      "model": "global",
+      "silo": null,
+      "additivity_max_diff": 4.104
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 1.0,
+      "additivity_max_diff": 4.248
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 2.0,
+      "additivity_max_diff": 7.878
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 1337,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 8.0,
+      "additivity_max_diff": 8.701
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 2024,
+      "round": 15.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 3.747
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 2024,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 3.844
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 0.1,
+      "seed": 2024,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 7.0,
+      "additivity_max_diff": 4.132
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 5.0,
+      "seed": 42,
+      "round": 10.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 3.474
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 5.0,
+      "seed": 42,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 6.98
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 5.0,
+      "seed": 1337,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 3.0,
+      "additivity_max_diff": 3.991
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 5.0,
+      "seed": 2024,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 6.0,
+      "additivity_max_diff": 4.611
+    },
+    {
+      "algo": "fedavg",
+      "pass": "round_wise",
+      "alpha": 5.0,
+      "seed": 2024,
+      "round": 20.0,
+      "model": "silo",
+      "silo": 7.0,
+      "additivity_max_diff": 3.923
+    },
+    {
+      "algo": "fedprox_mu0.0005",
+      "pass": "final",
+      "alpha": 0.1,
+      "seed": 42,
+      "round": null,
+      "model": "silo",
+      "silo": 9.0,
+      "additivity_max_diff": 4.258
+    }
+  ]
+}
