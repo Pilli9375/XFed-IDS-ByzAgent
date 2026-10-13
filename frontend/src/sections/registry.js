@@ -29,7 +29,8 @@ export const SECTIONS = [
     eyebrow: 'Inference',
     title: 'Detect',
     lede:
-      'Every prediction here — centralized or federated — is scaled with the same ' +
+      'Predictions come from the one model the backend serves: the federated global model ' +
+      'shown in the sidebar. No centralized model is served. Inputs are scaled with the same ' +
       'centralized scaler <code>server_app.py</code> uses to score the global model each ' +
       'round. Confirmed against that file, not assumed.',
     group: 'sections',
@@ -42,9 +43,9 @@ export const SECTIONS = [
     eyebrow: 'Attribution',
     title: 'Explain',
     lede:
-      'SHAP contributions for a row from the fixed 14, read from the precomputed ' +
-      '<code>.npz</code> artifacts. Only the base value is computed live — the background’s ' +
-      'mean logit, used by both pipelines for their additivity checks but never persisted. ' +
+      'SHAP contributions for a row from the fixed 14, explaining the federated model the ' +
+      'backend serves. Everything is read from precomputed <code>.npz</code> artifacts, ' +
+      'including the base value (the background’s mean logit) — nothing is computed live. ' +
       'Values are in <b>logit space</b>, the space SHAP explains for this model — not probabilities.',
     group: 'sections',
   },
