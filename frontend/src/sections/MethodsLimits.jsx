@@ -54,13 +54,16 @@ export default function MethodsLimits({ eyebrow, title, lede }) {
           <b>Silo size is a deterministic output of the label draw, not a separate
           cause</b> — under <code>dirichlet_assign()</code>, per-family proportions sum to
           1 over silos by construction, so size and heterogeneity can't be varied
-          independently. Conditioning on log(size), KL-from-global still predicts
-          agreement (r=−0.57 at α=0.1, −0.82/−0.87 at α=0.5) — heterogeneity's effect
-          holds up, size alone doesn't explain it away.
+          independently. Label entropy was the covariate tried first; it failed the
+          log(size) conditioning (its partial correlation weakened and flipped sign, to
+          +0.23/+0.13, n=30 at α=0.5), so KL divergence from the global family
+          distribution was substituted after. Conditioning on log(size), KL-from-global
+          still predicts agreement (partial r=−0.57, n=29 at α=0.1; −0.82/−0.87, n=30 at
+          α=0.5) — heterogeneity's effect holds up, size alone doesn't explain it away.
           <div className="xf-source-note" style={{ margin: '0.4rem 0 0 0' }}>
             Addendum, docs/contribution_a_results.md §5 (the canonical write-up this
             bullet compresses): zero-order, silo size correlates with Jaccard@10 at
-            α=0.1 (r=+0.46, p=0.011) but not at α=5.0 (r=+0.07) — consistent with size
+            α=0.1 (r=+0.46, n=29) but not at α=5.0 (r=+0.07, n=30) — consistent with size
             carrying signal that is really the label-skew effect. Heterogeneity is{' '}
             <b>not</b> the sole cause of that correlation: the KL-from-global partial
             correlation above is what isolates heterogeneity's own contribution once
