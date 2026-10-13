@@ -64,6 +64,8 @@ class LoadedModel:
     seed: int
     best_round: int
     device: str
+    # Rows in the validation split the startup check recomputed the metric on.
+    n_val_rows: int = 0
 
 
 @torch.no_grad()
@@ -319,6 +321,7 @@ def load_and_verify(backend_config_path: str | Path = "configs/backend.yaml") ->
         seed=int(entry["seed"]),
         best_round=best_round,
         device=device,
+        n_val_rows=int(len(y_val)),
     )
 
 

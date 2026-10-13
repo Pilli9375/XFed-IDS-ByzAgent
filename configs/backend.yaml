@@ -80,6 +80,60 @@ paths:
   # 500 rows of shap_val_pool_filename; served under /explain/{id}?source=val.
   explanations_val_filename: val_sentences.json
 
+  # Dashboard v2 (GET /figures, /accuracy, /agreement/summary, and the
+  # baselines/fidelity blocks added to GET /trust). Every file is read once
+  # at startup by backend/figures.py; nothing is recomputed per request.
+  prereg_test_result: results/federated_methods/test_once/result.json
+  prereg_selection: results/federated_methods/selection.json
+  inference_speed_summary: results/efficiency/inference_speed_summary.json
+  communication: results/efficiency/communication.json
+  update_compression: results/efficiency/update_compression.json
+  agent_prescreen_replay: results/efficiency/agent_prescreen_replay.json
+  federated_headline: results/aggregated/federated_headline.csv
+  federated_per_family: results/aggregated/federated_per_family.csv
+  centralized_headline: results/aggregated/centralized_headline.csv
+  centralized_per_family: results/aggregated/centralized_per_family.csv
+  xgboost_headline: results/aggregated/xgboost_headline.csv
+  xgboost_per_family: results/aggregated/xgboost_per_family.csv
+  phase4_reasoning_audit: results/inspection/phase4_diagnostic_reasoning_audit.json
+  trend_claim_handcheck: results/inspection/multiseed_trend_claim_handcheck_verdicts.json
+
+dashboard:
+  # GET /figures. Keys name entries inside the files above, never values.
+  figures:
+    headline_alpha: "0.5"
+    serving_variant: ort_fp32
+    reference_variant: torch_eager
+    dropped_inference_variant: ort_int8_dynamic
+    upload_scheme: fp16
+    upload_scheme_alt: int8
+    # Delta statistic reported for compressed uploads (update_compression.json).
+    upload_delta_stat: best_by_val
+  # GET /agreement/summary: the alpha=0.1 vs floor comparison. Same method,
+  # seed and resample count as tools/chat04_closeout.py, which first printed
+  # these intervals; the backend imports that script's function, it does
+  # not reimplement it.
+  agreement_summary:
+    ci_alpha: "0.1"
+    ci_metric: jaccard_at_10
+    cluster_cols: [seed, silo]
+    n_boot: 10000
+    rng_seed: 0
+    chance_k: 10
+  # Phase 2 classical defences (GET /trust -> baselines). seed 42, the
+  # defence is told the true f (oracle). Malicious silos come from each
+  # attack's attack_config.json, never from this file.
+  trust_baselines:
+    seed: 42
+    clean_reference_run: fedavg_a0.5_s42
+    clean_control_runs:
+      - {label: Krum, run: krumclassical_f3_a0.5_s42}
+      - {label: Multi-Krum, run: multikrum_f3_a0.5_s42}
+      - {label: Trimmed mean, run: trimmedmean_f3_a0.5_s42}
+    multikrum_attack_runs:
+      - {run: multikrum_f3_a0.5_s42_poisoned_f3_sudden_silos0-3-5, attack: a0.5_s42_f3_sudden_silos0-3-5}
+      - {run: multikrum_f2_a0.5_s42_poisoned_f2_sudden_silos0-3, attack: a0.5_s42_f2_sudden_silos0-3}
+
 model:
   # Which (algo, alpha, seed) run this backend serves. Must match a "tag"
   # entry in best_rounds_manifest.json.

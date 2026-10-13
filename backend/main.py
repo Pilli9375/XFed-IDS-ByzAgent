@@ -20,6 +20,7 @@ import logging
 import threading
 import time
 from collections import deque
+from pathlib import Path
 from typing import Literal
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -28,6 +29,7 @@ import numpy as np
 import pandas as pd
 import torch
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from backend.model_loader import LoadedModel, load_and_verify, load_backend_config, resolve_path
@@ -36,6 +38,14 @@ from backend.federation import build_federation_snapshot
 from backend.faithfulness import build_faithfulness_snapshot, load_faithfulness_figures
 from backend.hotswap_service import HotSwapState, new_state, poll, revert, trigger
 from backend.onnx_engine import build_onnx_session, load_serving_config
+from backend.figures import (
+    ROOT,
+    build_accuracy_snapshot,
+    build_agreement_summary,
+    build_figures_snapshot,
+    build_trust_baselines,
+    build_trust_fidelity,
+)
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +59,9 @@ class HealthResponse(BaseModel):
     model_loaded: bool
     scaler_sha256: str
     uptime_seconds: float
+    # Rows of the validation split the startup check scored the served
+    # model on (backend/model_loader.py::load_and_verify()).
+    verified_val_rows: int
 
 
 class HotSwapInfo(BaseModel):
@@ -81,6 +94,12 @@ class ConfigResponse(BaseModel):
     best_round: int
     n_features: int
     n_classes: int
+    # Engine answering /predict right now: onnx_fp32 for the base model when
+    # configs/efficiency.yaml says so, torch otherwise and whenever a
+    # hot-swapped model is active (that model only has the torch path).
+    engine: Literal["onnx_fp32", "torch"]
+    # Frozen 9-wide label vocabulary, class-index order (src.data.schema).
+    class_names: list[str]
     hotswap: HotSwapInfo
 
 
@@ -350,6 +369,57 @@ def _load_explanations(
     return rows
 
 
+def _source_whitelist(cfg_paths: dict, snapshots: list, loaded: LoadedModel) -> set[str]:
+    """Every repo-relative file a dashboard number is read from: the
+    `source`/`sources`/`attack_config`/`prereg_file` fields of the cached
+    snapshots, the trust runs' logs, and the inspection files the older
+    endpoints read. GET /source serves exactly this set; snapshots[-1] is
+    the /trust payload."""
+    found: set[str] = set()
+
+    def walk(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in ("source", "attack_config", "prereg_file") and isinstance(v, str):
+                    found.add(v)
+                elif k in ("sources", "per_class_sources") and isinstance(v, list):
+                    found.update(x for x in v if isinstance(x, str))
+                else:
+                    walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+
+    def rel(p) -> str:
+        p = Path(p)
+        return (p if p.is_absolute() else ROOT / p).resolve().relative_to(ROOT).as_posix()
+
+    trust = snapshots[-1]
+    for snap in snapshots[:-1]:
+        walk(snap)
+    walk({k: v for k, v in trust.items() if k in ("baselines", "fidelity")})
+
+    fed_dir = resolve_path(cfg_paths, "federated_results_dir")
+    attacks_dir = resolve_path(cfg_paths, "attacks_dir")
+    for cond in trust.get("conditions", []):
+        found.add(rel(attacks_dir / cond["attack_tag"] / "attack_config.json"))
+        for side in ("clean", "attack"):
+            run = cond[side]
+            found.add(rel(fed_dir / run["run_tag"] / run["decision_log"]))
+            found.add(rel(fed_dir / run["run_tag"] / "client_stats.jsonl"))
+    for cell in trust.get("decision_variance", []):
+        found.add(rel(cell["source"]))
+    for key in ("agreement_metrics", "per_silo_agreement", "round_wise_agreement",
+                "centralized_instability_floor", "deletion_auc", "insertion_auc", "silo_sizes",
+                "best_rounds_manifest"):
+        found.add(rel(resolve_path(cfg_paths, key)))
+    found.add(rel(fed_dir / loaded.tag / "round_history.json"))
+    found.add(rel(resolve_path(cfg_paths, "explanations_dir") / loaded.tag / cfg_paths["explanations_val_filename"]))
+    found.add(rel(resolve_path(cfg_paths, "shap_dir") / loaded.tag / cfg_paths["shap_val_pool_filename"]))
+    found.update(["configs/backend.yaml", "configs/efficiency.yaml"])
+    return {f for f in found if (ROOT / f).is_file()}
+
+
 def _csv_records_json(path) -> list:
     """Read once, normalize to JSON-native types via pandas' own encoder
     (handles numpy dtypes and NaN->null), return already-parsed records."""
@@ -425,6 +495,20 @@ async def lifespan(app: FastAPI):
     app.state.faithfulness_json = json.dumps(build_faithfulness_snapshot())
     app.state.faithfulness_figures = load_faithfulness_figures()
 
+    # Dashboard v2 snapshots (backend/figures.py), cached like the above.
+    dash_cfg = cfg["dashboard"]
+    figures = build_figures_snapshot(cfg_paths, dash_cfg, resolve_path)
+    accuracy = build_accuracy_snapshot(cfg_paths, resolve_path)
+    agreement_summary = build_agreement_summary(cfg_paths, dash_cfg, resolve_path, len(loaded.feature_cols))
+    trust = json.loads(app.state.trust_json)
+    trust["baselines"] = build_trust_baselines(cfg_paths, dash_cfg, resolve_path)
+    trust["fidelity"] = build_trust_fidelity(cfg_paths, resolve_path)
+    app.state.trust_json = json.dumps(trust)
+    app.state.figures_json = json.dumps(figures)
+    app.state.accuracy_json = json.dumps(accuracy)
+    app.state.agreement_summary_json = json.dumps(agreement_summary)
+    app.state.source_files = _source_whitelist(cfg_paths, [figures, accuracy, agreement_summary, trust], loaded)
+
     app.state.start_time = time.time()
 
     # In-memory only -- lost on restart, never written to results/. A
@@ -463,6 +547,7 @@ def health() -> HealthResponse:
         model_loaded=loaded.model is not None,
         scaler_sha256=loaded.scaler_sha256,
         uptime_seconds=time.time() - app.state.start_time,
+        verified_val_rows=loaded.n_val_rows,
     )
 
 
@@ -493,8 +578,17 @@ def config() -> ConfigResponse:
         best_round=loaded.best_round,
         n_features=len(loaded.feature_cols),
         n_classes=int(loaded.model_cfg["labels"]["n_classes"]),
+        engine=_active_engine(),
+        class_names=loaded.class_names,
         hotswap=_hotswap_info(),
     )
+
+
+def _active_engine() -> str:
+    state: HotSwapState = app.state.hotswap
+    if state.active and state.active_model is not None:
+        return "torch"
+    return "onnx_fp32" if app.state.onnx_session is not None else "torch"
 
 
 @app.post("/predict", response_model=PredictResponse)
@@ -754,6 +848,48 @@ def faithfulness() -> Response:
     """AUC table only (config_label + auc). The curve images themselves are
     GET /faithfulness/deletion_curve.png and /insertion_curve.png below."""
     return Response(content=app.state.faithfulness_json, media_type="application/json")
+
+
+@app.get("/figures")
+def figures() -> Response:
+    """Key figures for the dashboard (backend/figures.py): FedAvgM test
+    macro-F1 from the one preregistered evaluation, serving latency, upload
+    compression, bytes and time per round, and the dropped options. Each
+    entry carries the repo-relative `source` file it was read from."""
+    return Response(content=app.state.figures_json, media_type="application/json")
+
+
+@app.get("/accuracy")
+def accuracy() -> Response:
+    """FedAvg (aggregated CSVs) vs FedAvgM (preregistered result) per alpha,
+    centralized and XGBoost references, per-class F1."""
+    return Response(content=app.state.accuracy_json, media_type="application/json")
+
+
+@app.get("/agreement/summary")
+def agreement_summary() -> Response:
+    """alpha=0.1 cluster-bootstrap CI vs the seed-noise floor, and the
+    chance level, each computed once at startup by the project's own
+    functions (tools/chat04_closeout.py, tools/agreement_metrics.py)."""
+    return Response(content=app.state.agreement_summary_json, media_type="application/json")
+
+
+_SOURCE_MEDIA = {".json": "application/json", ".csv": "text/plain", ".jsonl": "text/plain",
+                 ".md": "text/plain", ".py": "text/plain", ".yaml": "text/plain"}
+
+
+@app.get("/source/{path:path}")
+def source(path: str) -> FileResponse:
+    """Serves one results/docs file a dashboard number was read from, so the
+    number can link to it. Only paths in the startup whitelist are served
+    (see _source_whitelist); anything else is 404, never a directory listing
+    or an arbitrary file read."""
+    if path not in app.state.source_files:
+        raise HTTPException(status_code=404, detail=f"{path} is not a dashboard source file.")
+    full = ROOT / path
+    media = _SOURCE_MEDIA.get(full.suffix, "text/plain")
+    return FileResponse(full, media_type=f"{media}; charset=utf-8", content_disposition_type="inline",
+                        filename=full.name)
 
 
 @app.get("/faithfulness/deletion_curve.png")
