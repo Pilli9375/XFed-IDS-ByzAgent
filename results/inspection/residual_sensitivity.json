@@ -1,0 +1,143 @@
+{
+  "rule": "exclude (alpha, seed, silo) whose final FedAvg SHAP additivity_max_diff > 3.3358242511749268 (val-pool per-row max); pre-specified before computing",
+  "threshold": 3.3358242511749268,
+  "threshold_source": "results/shap/fedavg_a0.5_s42/val_pool_summary.json",
+  "flagged_silos": [
+    {
+      "alpha": 0.1,
+      "seed": 42,
+      "silo": 3.0,
+      "additivity_max_diff": 4.193
+    },
+    {
+      "alpha": 0.1,
+      "seed": 42,
+      "silo": 9.0,
+      "additivity_max_diff": 11.955
+    },
+    {
+      "alpha": 0.1,
+      "seed": 1337,
+      "silo": 8.0,
+      "additivity_max_diff": 6.576
+    }
+  ],
+  "flagged_global_models_not_excluded_by_rule": [
+    {
+      "alpha": 5.0,
+      "seed": 1337,
+      "additivity_max_diff": 3.5
+    }
+  ],
+  "by_alpha": {
+    "0.1": {
+      "baseline": {
+        "jaccard_at_10_median": 0.333333,
+        "kendall_weighted_tau_median": 0.591584,
+        "n_rows": 220,
+        "n_silos": 29
+      },
+      "rule_applied": {
+        "jaccard_at_10_median": 0.333333,
+        "kendall_weighted_tau_median": 0.596706,
+        "n_rows": 212,
+        "n_silos": 27
+      },
+      "flagged_silos_in_alpha": [
+        [
+          0.1,
+          42,
+          3
+        ],
+        [
+          0.1,
+          42,
+          9
+        ],
+        [
+          0.1,
+          1337,
+          8
+        ]
+      ],
+      "flagged_silos_with_eligible_rows": [
+        [
+          0.1,
+          42,
+          3
+        ],
+        [
+          0.1,
+          1337,
+          8
+        ]
+      ],
+      "rows_dropped": 8,
+      "silos_dropped": 2,
+      "secondary_median_of_per_silo_medians": {
+        "baseline": 0.333333,
+        "rule_applied": 0.333333,
+        "n_silos_baseline": 29,
+        "n_silos_rule_applied": 27
+      }
+    },
+    "0.5": {
+      "baseline": {
+        "jaccard_at_10_median": 0.538462,
+        "kendall_weighted_tau_median": 0.787193,
+        "n_rows": 388,
+        "n_silos": 30
+      },
+      "rule_applied": {
+        "jaccard_at_10_median": 0.538462,
+        "kendall_weighted_tau_median": 0.787193,
+        "n_rows": 388,
+        "n_silos": 30
+      },
+      "flagged_silos_in_alpha": [],
+      "flagged_silos_with_eligible_rows": [],
+      "rows_dropped": 0,
+      "silos_dropped": 0,
+      "secondary_median_of_per_silo_medians": {
+        "baseline": 0.538462,
+        "rule_applied": 0.538462,
+        "n_silos_baseline": 30,
+        "n_silos_rule_applied": 30
+      }
+    },
+    "5.0": {
+      "baseline": {
+        "jaccard_at_10_median": 0.666667,
+        "kendall_weighted_tau_median": 0.844261,
+        "n_rows": 420,
+        "n_silos": 30
+      },
+      "rule_applied": {
+        "jaccard_at_10_median": 0.666667,
+        "kendall_weighted_tau_median": 0.844261,
+        "n_rows": 420,
+        "n_silos": 30
+      },
+      "flagged_silos_in_alpha": [],
+      "flagged_silos_with_eligible_rows": [],
+      "rows_dropped": 0,
+      "silos_dropped": 0,
+      "secondary_median_of_per_silo_medians": {
+        "baseline": 0.666667,
+        "rule_applied": 0.666667,
+        "n_silos_baseline": 30,
+        "n_silos_rule_applied": 30
+      },
+      "variant_also_drop_configs_with_flagged_global": {
+        "dropped_seeds": [
+          1337
+        ],
+        "jaccard_at_10_median": 0.666667,
+        "kendall_weighted_tau_median": 0.843983,
+        "n_rows": 280,
+        "n_silos": 20,
+        "rows_dropped_vs_baseline": 140
+      }
+    }
+  }
+}
