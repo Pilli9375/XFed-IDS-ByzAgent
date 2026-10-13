@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Investigate</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz@1,6..72&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes xfShimmer{from{background-position:150% 0}to{background-position:-50% 0}}
+@keyframes xfBloom{0%,100%{box-shadow:0 0 0 1px var(--b1),0 24px 70px -26px var(--g1)}50%{box-shadow:0 0 0 1px var(--b2),0 24px 96px -18px var(--g2)}}
+@keyframes xfPulse{0%,100%{opacity:var(--o1);transform:scale(1)}50%{opacity:var(--o2);transform:scale(1.08)}}
+@keyframes xfFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+</helmet>
+<div style="{{st.page}}">
+<div aria-hidden="true" style="{{st.ambientA}}"></div>
+<div aria-hidden="true" style="{{st.ambientB}}"></div>
+
+<div style="position: relative; z-index: 1;">
+<header style="{{st.header}}">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" rx="5" fill="none" stroke="{{t.ok}}" stroke-width="1.5"></rect><path d="M6 6l10 10M16 6L6 16" stroke="{{t.ink}}" stroke-width="1.5" stroke-linecap="round"></path></svg>
+    <span style="font-weight: 600; font-size: 15px;">XFed-IDS</span>
+  </div>
+  <nav aria-label="Views" style="{{st.seg}}">
+    <a href="Main.dc.html" style="{{st.segOff}}">Live</a>
+    <a href="#" style="{{st.segOn}}">Investigate</a>
+    <a href="#" style="{{st.segOff}}">Limits</a>
+  </nav>
+  <div style="flex: 1 1 60px;"></div>
+  <div role="group" aria-label="Theme" style="{{st.seg}}">
+    <sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+      <button type="button" aria-pressed="{{th.on}}" onClick="{{th.pick}}" style="{{th.style}}"><span style="{{th.sw}}"></span>{{th.label}}</button>
+    </sc-for>
+  </div>
+  <span style="{{st.monoMute}}">α=0.5 · seed 1337</span>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; max-width: 1560px; margin: 0 auto;">
+  <aside style="flex: 1 1 220px; max-width: 260px; padding: 28px 20px 28px 28px; box-sizing: border-box;">
+    <nav aria-label="Questions" style="display: flex; flex-direction: column; gap: 2px;">
+      <sc-for list="{{toc}}" as="q" hint-placeholder-count="4">
+        <a href="{{q.href}}" style="{{q.style}}"><span style="{{st.tocNum}}">{{q.n}}</span>{{q.label}}</a>
+      </sc-for>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 640px; min-width: 0; padding: 28px 28px 48px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+
+  <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+    <div aria-busy="true" aria-label="Loading results" style="display: flex; flex-direction: column; gap: 20px;">
+      <sc-for list="{{skelSections}}" as="s" hint-placeholder-count="4">
+        <div style="{{s.box}}">
+          <div style="{{sk.title}}"></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px;">
+            <div style="{{sk.block}}"></div><div style="{{sk.block}}"></div><div style="{{sk.block}}"></div>
+          </div>
+          <div style="{{sk.line}}"></div>
+        </div>
+      </sc-for>
+      <p style="{{st.foot}}">Reading results files…</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+  <div style="display: flex; flex-direction: column; gap: 20px; animation: xfFadeIn .6s ease-out;">
+
+    <section id="q3" aria-labelledby="q3h" style="{{st.panelHot}}">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center;">
+        <div>
+          <span style="{{st.eyebrow}}">03 · TRUST CHECK</span>
+          <h2 id="q3h" style="{{st.h2}}">Is anyone poisoning it?</h2>
+        </div>
+        <div role="group" aria-label="Organization" style="display: flex; flex-wrap: wrap; gap: 4px;">
+          <sc-for list="{{orgBtns}}" as="b" hint-placeholder-count="10">
+            <button type="button" aria-pressed="{{b.on}}" onClick="{{b.pick}}" style="{{b.style}}">{{b.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+        <div style="{{st.orgCard}}">
+          <span style="{{st.orgTag}}">{{org.tag}}</span>
+          <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+            <div><p style="{{st.small0}}">flagged, clean run</p><p style="{{st.bigNum}}">{{org.c}}</p></div>
+            <div><p style="{{st.small0}}">flagged, attack run</p><p style="{{st.bigNumHot}}">{{org.a}}</p></div>
+            <div><p style="{{st.small0}}">lift</p><p style="{{st.bigNumHot}}">{{org.lift}}</p></div>
+          </div>
+          <p style="{{st.small0}}">{{org.note}}</p>
+        </div>
+        <div style="flex: 1 1 300px; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+          <div style="{{st.tile}}"><p style="{{st.small0}}">Multi-Krum caught a poisoned org</p><p style="{{st.tileNumHot}}">0%</p><p style="{{st.tiny}}">seed 42, told f exactly</p></div>
+          <div style="{{st.tile}}"><p style="{{st.small0}}">Cost with no attack</p><p style="{{st.tileNumSm}}">−22.7 / −4.9 / −1.6 pp</p><p style="{{st.tiny}}">Krum / Multi-Krum / trimmed</p></div>
+          <div style="{{st.tile}}"><p style="{{st.small0}}">Decision stability</p><p style="{{st.tileNum}}">27/30</p><p style="{{st.tiny}}">LLM is nondeterministic</p></div>
+        </div>
+      </div>
+      <blockquote style="{{st.quote}}">“Both effects are present. A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated. Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition.”</blockquote>
+      <p style="{{st.small0}}">The agent produces decisions plus a rationale of measured fidelity; ~35–45% of its trend claims contradicted the data it was given.</p>
+    </section>
+
+    <section id="q1" aria-labelledby="q1h" style="{{st.panel}}">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline;">
+        <div><span style="{{st.eyebrow}}">01 · DETECTION</span><h2 id="q1h" style="{{st.h2}}">Is it accurate?</h2></div>
+        <span style="{{st.monoMute}}">test macro-F1 · mean ± sd · 3 seeds</span>
+      </div>
+      <div style="{{st.gridLine}}">
+        <sc-for list="{{acc}}" as="c" hint-placeholder-count="3">
+          <div style="{{st.cell}}">
+            <span style="{{st.eyebrow}}">{{c.a}}</span>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: {{t.body}};"><span>FedAvg</span><span style="font-family: 'Geist Mono', monospace;">{{c.base}}</span></div>
+            <div style="{{st.barTrack}}"><div style="{{c.baseBar}}"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px;"><span>FedAvgM β=0.9</span><span style="font-family: 'Geist Mono', monospace; font-weight: 600;">{{c.mom}}</span></div>
+            <div style="{{st.barTrack}}"><div style="{{c.momBar}}"></div></div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="{{st.small0}}">Without federation: centralized MLP 0.9900 ± 0.0022 · XGBoost 0.9946 ± 0.0001. FedAvgM: one preregistered test run, 4 of 9 planned candidates compared.</p>
+    </section>
+
+    <section id="q2" aria-labelledby="q2h" style="{{st.panel}}">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline;">
+        <div><span style="{{st.eyebrow}}">02 · EXPLANATION CHECK</span><h2 id="q2h" style="{{st.h2}}">Do the orgs agree on why?</h2></div>
+        <span style="{{st.monoMute}}">Jaccard@10 vs global model · median</span>
+      </div>
+      <div role="img" aria-label="Jaccard at 10: 0.333 at alpha 0.1, 0.538 at 0.5, 0.667 at 5.0; seed-noise floor 0.429 to 0.484; chance 0.065" style="position: relative; height: 120px; margin: 8px 6px 0;">
+        <div style="{{st.axis}}"></div>
+        <div style="{{st.band}}"></div>
+        <span style="{{st.bandLabel}}">seed-noise floor 0.429–0.484</span>
+        <div style="{{st.chance}}"></div>
+        <span style="{{st.chanceLabel}}">chance 0.065</span>
+        <sc-for list="{{pts}}" as="p" hint-placeholder-count="3">
+          <div style="{{p.pos}}">
+            <span style="font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600;">{{p.v}}</span>
+            <span style="{{p.dot}}"></span>
+            <span style="{{st.monoMute}}">α={{p.a}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <div style="{{st.tile}}"><p style="{{st.eyebrow0}}">WEIGHTED τ</p><p style="{{st.tileNumSm}}">0.592 → 0.787 → 0.844</p></div>
+        <div style="{{st.tile}}"><p style="{{st.eyebrow0}}">α=0.1 CI VS FLOOR</p><p style="{{st.tileNumSm}}">[0.250, 0.429] · [0.429, 0.484]</p><p style="{{st.agentNote}}">Overlapping — directional, not significant</p></div>
+        <div style="{{st.tile}}"><p style="{{st.eyebrow0}}">FAITHFULNESS · GLOBAL</p><p style="{{st.tileNumSm}}">deletion 0.167 · insertion 0.696</p><p style="{{st.tiny}}">α=0.5, seed 42 spot check</p></div>
+      </div>
+    </section>
+
+    <section id="q4" aria-labelledby="q4h" style="{{st.panel}}">
+      <div><span style="{{st.eyebrow}}">04 · EFFICIENCY</span><h2 id="q4h" style="{{st.h2}}">What does it cost to run?</h2></div>
+      <div style="{{st.gridLine}}">
+        <sc-for list="{{eff}}" as="e" hint-placeholder-count="4">
+          <div style="{{st.cell}}">
+            <span style="{{st.eyebrow}}">{{e.label}}</span>
+            <span style="font-family: 'Geist Mono', monospace; font-size: 24px; letter-spacing: -0.03em;">{{e.value}}</span>
+            <span style="{{st.small}}">{{e.sub}}</span>
+            <span style="{{st.tinyMono}}">{{e.kind}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="{{st.small0}}">Tested and dropped: int8 inference (−0.1428 macro-F1) and a train_loss pre-screen for the agent (did not transfer across seeds).</p>
+    </section>
+
+    <p style="{{st.foot}}">Design mock · every figure copied from the canonical docs and results files; in the build each links to its source. <button type="button" onClick="{{reload}}" style="{{st.linkBtn}}">Replay loading</button></p>
+  </div>
+  </sc-if>
+  </main>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { theme: 'deep', org: 5, loading: true }; }
+  componentDidMount() {
+    try { this.reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { this.reduce = false; }
+    this.load();
+  }
+  componentWillUnmount() { clearTimeout(this.loadT); }
+  load() {
+    clearTimeout(this.loadT);
+    this.setState({ loading: true });
+    this.loadT = setTimeout(() => this.setState({ loading: false }), this.reduce ? 300 : 2400);
+  }
+  renderVals() {
+    const T = {
+      deep: { name: 'Deep Sea', bg: '#061316', s1: '#0A1B1F', s2: '#0F2328', line: '#12292E', line2: '#1C383D', ink: '#E7F2F0', body: '#9DB8B5', mute: '#7C9A97', attack: '#FF6A4D', attackText: '#FF8E75', ok: '#5FD4B4', agent: '#F6B54A', away: '#3E6A70', inv: '#E7F2F0', invInk: '#061316', glow: 0.5 },
+      aub:  { name: 'Aubergine', bg: '#120B17', s1: '#1C1322', s2: '#241929', line: '#2A1E32', line2: '#3A2B44', ink: '#F3ECF5', body: '#C2B2C8', mute: '#9A879F', attack: '#FF5E3A', attackText: '#FF8466', ok: '#B8E986', agent: '#C9A7FF', away: '#5A4763', inv: '#F3ECF5', invInk: '#120B17', glow: 0.5 },
+      porc: { name: 'Porcelain', bg: '#EEF1F5', s1: '#FFFFFF', s2: '#F5F7FA', line: '#E1E6ED', line2: '#D3DAE3', ink: '#0B1221', body: '#3F4A5C', mute: '#5E6A7D', attack: '#E2441F', attackText: '#C23710', ok: '#2448E8', agent: '#B7791F', away: '#9AA7BA', inv: '#0B1221', invInk: '#FFFFFF', glow: 0.26 }
+    };
+    const t = T[this.state.theme];
+    const hex = (h, a) => h + Math.round(Math.min(1, a) * 255).toString(16).padStart(2, '0');
+    const mono = "font-family: 'Geist Mono', monospace;";
+    const L = this.state.loading;
+
+    const tr = [[0,0.05,0.10,1],[1,1.00,1.00],[2,1.00,0.90],[3,0.00,0.40,1],[4,1.00,1.00],[5,0.00,0.95,1],[6,0.00,0.00],[7,1.00,1.00],[8,0.00,0.05],[9,0.10,0.15]];
+    const sel = tr[this.state.org];
+    const poisoned = !!sel[3], confound = !poisoned && sel[1] >= 0.9;
+    const amb = poisoned ? t.attack : confound ? t.agent : t.ok;
+    const liftV = sel[2] - sel[1];
+    const org = {
+      c: sel[1].toFixed(2), a: sel[2].toFixed(2),
+      lift: (liftV >= 0 ? '+' : '−') + Math.abs(liftV).toFixed(2),
+      tag: 'ORG ' + sel[0] + ' · ' + (poisoned ? 'POISONED · GROUND TRUTH, NEVER SHOWN TO THE AGENT' : confound ? 'CLEAN · FLAGGED EVEN WITHOUT AN ATTACK' : 'CLEAN'),
+      note: poisoned ? 'The agent saw only five per-round statistics. Lift is the share of rounds flagged under attack minus the share flagged in the clean run.'
+        : confound ? 'High flag rate in both runs: the compositional confound. A raw flag rate alone cannot tell this org apart from a poisoned one.'
+        : 'Rarely flagged in either run.'
+    };
+    const orgBtns = tr.map(([id,,,m]) => ({
+      label: (m ? '● ' : '') + id, on: this.state.org === id ? 'true' : 'false',
+      pick: () => this.setState({ org: id }),
+      style: 'min-width: 44px; height: 36px; padding: 0 10px; border-radius: 7px; ' + mono + ' font-size: 12px; cursor: pointer; ' +
+        (this.state.org === id ? 'background: ' + t.inv + '; color: ' + t.invInk + '; border: 0; font-weight: 600;' : 'background: transparent; border: 1px solid ' + t.line2 + '; color: ' + (m ? t.attackText : t.body) + ';')
+    }));
+
+    const panelBase = 'background: ' + t.s1 + '; border: 1px solid ' + t.line + '; border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px;';
+    const st = {
+      page: 'position: relative; overflow: hidden; min-height: 100vh; background: ' + t.bg + '; color: ' + t.ink + "; font-family: 'Instrument Sans', sans-serif; font-size: 14px; line-height: 1.5; letter-spacing: -0.005em;",
+      ambientA: L
+        ? 'position: absolute; z-index: 0; left: 12%; top: 120px; width: 50%; height: 40%; border-radius: 50%; filter: blur(120px); background: radial-gradient(closest-side, ' + t.ok + ', transparent); --o1: ' + (t.glow * 0.5) + '; --o2: ' + t.glow + '; animation: xfPulse 2.4s ease-in-out infinite; pointer-events: none;'
+        : 'position: absolute; z-index: 0; left: 20%; top: 80px; width: 70%; height: 46%; border-radius: 50%; filter: blur(130px); opacity: ' + t.glow + '; background: radial-gradient(closest-side, ' + amb + ', transparent); transition: background 1.2s ease; pointer-events: none;',
+      ambientB: L
+        ? 'position: absolute; z-index: 0; left: 50%; top: 600px; width: 46%; height: 40%; border-radius: 50%; filter: blur(130px); background: radial-gradient(closest-side, ' + t.agent + ', transparent); --o1: ' + t.glow + '; --o2: ' + (t.glow * 0.45) + '; animation: xfPulse 2.4s ease-in-out infinite; pointer-events: none;'
+        : 'position: absolute; z-index: 0; left: -10%; top: -10%; width: 40%; height: 30%; border-radius: 50%; filter: blur(140px); opacity: ' + (t.glow * 0.4) + '; background: radial-gradient(closest-side, ' + amb + ', transparent); transition: background 1.6s ease; pointer-events: none;',
+      header: 'display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 28px; border-bottom: 1px solid ' + t.line + '; background: ' + hex(t.bg, 0.6) + '; backdrop-filter: blur(8px);',
+      seg: 'display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: ' + t.s1 + '; border: 1px solid ' + t.line + ';',
+      segOn: 'padding: 7px 14px; border-radius: 6px; background: ' + t.s2 + '; box-shadow: inset 0 0 0 1px ' + t.line2 + '; color: ' + t.ink + '; text-decoration: none; font-weight: 500; font-size: 13px;',
+      segOff: 'padding: 7px 14px; border-radius: 6px; color: ' + t.body + '; text-decoration: none; font-size: 13px;',
+      tocNum: mono + ' font-size: 11px; width: 22px; color: ' + t.mute + ';',
+      panel: panelBase,
+      panelHot: panelBase + ' transition: box-shadow 1.2s ease; box-shadow: 0 0 0 1px ' + hex(amb, 0.35) + ', 0 24px 80px -28px ' + hex(amb, t.glow) + ';',
+      h2: 'margin: 4px 0 0; font-size: 22px; font-weight: 600; letter-spacing: -0.015em;',
+      eyebrow: mono + ' font-size: 11px; letter-spacing: 0.06em; color: ' + t.mute + ';',
+      eyebrow0: 'margin: 0; ' + mono + ' font-size: 11px; letter-spacing: 0.06em; color: ' + t.mute + ';',
+      monoMute: mono + ' font-size: 11px; color: ' + t.mute + ';',
+      small: 'font-size: 12px; color: ' + t.body + ';',
+      small0: 'margin: 0; font-size: 12px; color: ' + t.body + ';',
+      tiny: 'margin: 2px 0 0; font-size: 11px; color: ' + t.mute + ';',
+      tinyMono: mono + ' font-size: 10px; margin-top: 4px; color: ' + t.mute + ';',
+      orgCard: 'flex: 1 1 300px; min-width: 0; padding: 18px; border-radius: 10px; background: ' + t.s2 + '; display: flex; flex-direction: column; gap: 14px; transition: box-shadow 1s; box-shadow: inset 0 0 0 1px ' + hex(amb, 0.3) + ';',
+      orgTag: mono + ' font-size: 11px; letter-spacing: 0.06em; color: ' + (poisoned ? t.attackText : confound ? t.agent : t.ok) + '; transition: color .6s;',
+      bigNum: 'margin: 2px 0 0; ' + mono + ' font-size: 30px; letter-spacing: -0.03em;',
+      bigNumHot: 'margin: 2px 0 0; ' + mono + ' font-size: 30px; letter-spacing: -0.03em; color: ' + (liftV >= 0.3 ? t.agent : t.ink) + ';',
+      tile: 'padding: 14px 16px; border-radius: 10px; background: ' + t.s2 + ';',
+      tileNum: 'margin: 6px 0 0; ' + mono + ' font-size: 26px;',
+      tileNumHot: 'margin: 6px 0 0; ' + mono + ' font-size: 26px; color: ' + t.attackText + ';',
+      tileNumSm: 'margin: 6px 0 0; ' + mono + ' font-size: 15px;',
+      agentNote: 'margin: 4px 0 0; font-size: 12px; color: ' + t.agent + ';',
+      quote: 'margin: 0; padding: 18px 20px; border-radius: 10px; background: ' + t.s2 + "; font-family: 'Newsreader', serif; font-style: italic; font-size: 17px; line-height: 1.5;",
+      gridLine: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: ' + t.line + '; border-radius: 10px; overflow: hidden;',
+      cell: 'background: ' + t.s2 + '; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;',
+      barTrack: 'height: 6px; border-radius: 3px; background: ' + t.line + ';',
+      axis: 'position: absolute; left: 0; right: 0; bottom: 30px; height: 1px; background: ' + t.line2 + ';',
+      band: 'position: absolute; left: 42.9%; width: 5.5%; top: 0; bottom: 30px; background: ' + hex(t.agent, 0.14) + '; border-left: 1px solid ' + hex(t.agent, 0.5) + '; border-right: 1px solid ' + hex(t.agent, 0.5) + ';',
+      bandLabel: 'position: absolute; left: 48.4%; top: 0; padding-left: 8px; ' + mono + ' font-size: 11px; white-space: nowrap; color: ' + t.agent + ';',
+      chance: 'position: absolute; left: 6.5%; top: 26px; bottom: 30px; border-left: 1px dashed ' + t.away + ';',
+      chanceLabel: 'position: absolute; left: 6.5%; top: 8px; padding-left: 6px; ' + mono + ' font-size: 11px; color: ' + t.mute + ';',
+      foot: 'margin: 0; font-size: 11px; color: ' + t.mute + ';',
+      linkBtn: 'border: 0; background: none; padding: 0 0 0 8px; font: inherit; font-size: 11px; color: ' + t.ok + '; text-decoration: underline; cursor: pointer;'
+    };
+
+    const shim = 'border-radius: 6px; background: linear-gradient(100deg, ' + t.s2 + ' 30%, ' + hex(t.ok, 0.28) + ' 42%, ' + hex(t.agent, 0.32) + ' 50%, ' + hex(t.attack, 0.26) + ' 58%, ' + t.s2 + ' 70%); background-size: 300% 100%; animation: xfShimmer 1.8s linear infinite;';
+    const sk = { title: 'height: 22px; width: 32%; ' + shim, block: 'height: 84px; ' + shim, line: 'height: 12px; width: 70%; ' + shim };
+    const glows = [t.attack, t.ok, t.agent, t.ok];
+    const skelSections = glows.map((g, k) => ({
+      box: 'padding: 22px 24px; border-radius: 14px; background: ' + t.s1 + '; display: flex; flex-direction: column; gap: 16px; --b1: ' + t.line + '; --b2: ' + hex(g, 0.45) + '; --g1: ' + hex(g, 0.08) + '; --g2: ' + hex(g, t.glow * 0.8) + '; animation: xfBloom 2.4s ease-in-out ' + (k * 0.25) + 's infinite;'
+    }));
+
+    const toc = [['03','Is anyone poisoning it?','#q3',1],['01','Is it accurate?','#q1'],['02','Do the orgs agree on why?','#q2'],['04','What does it cost?','#q4']].map(([n,label,href,on]) => ({
+      n, label, href,
+      style: 'display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 7px; text-decoration: none; font-size: 13px; ' + (on ? 'background: ' + t.s1 + '; color: ' + t.ink + '; box-shadow: inset 0 0 0 1px ' + t.line + ';' : 'color: ' + t.body + ';')
+    }));
+    const acc = [['α = 0.1','0.516 ± 0.048',0.516,'0.5930 ± 0.0632',0.5930],['α = 0.5','0.941 ± 0.057',0.941,'0.9852 ± 0.0005',0.9852],['α = 5.0','0.990 ± 0.001',0.990,'0.9911 ± 0.0005',0.9911]].map(([a,base,b,mom,m]) => ({
+      a, base, mom,
+      baseBar: 'height: 6px; border-radius: 3px; background: ' + t.away + '; width: ' + (b*100) + '%;',
+      momBar: 'height: 6px; border-radius: 3px; background: ' + t.ok + '; width: ' + (m*100) + '%;'
+    }));
+    const pts = [['0.1',0.333,t.attack],['0.5',0.538,t.agent],['5.0',0.667,t.ok]].map(([a,v,c]) => ({
+      a, v: v.toFixed(3),
+      dot: 'width: 14px; height: 14px; border-radius: 50%; background: ' + c + '; box-shadow: 0 0 0 4px ' + t.s1 + ';',
+      pos: 'position: absolute; bottom: 0; left: ' + (v*100) + '%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;'
+    }));
+    const eff = [
+      { label: 'PER-FLOW LATENCY', value: '45.7 µs', sub: 'ONNX fp32 p50 vs 186.5 µs PyTorch; identical predictions', kind: '3 SESSIONS · BATCH 1024: PYTORCH FASTER' },
+      { label: 'UPLOAD SIZE', value: '−50% / −74.9%', sub: 'fp16 / int8 updates; mean Δ −0.0007 / −0.0011', kind: '3 SEEDS · NO DETECTABLE EFFECT' },
+      { label: 'TRAFFIC PER ROUND', value: '1,587,920 B', sub: '19,849 params × 10 orgs × 2 directions', kind: 'COMPUTED · MATCHES LOGS' },
+      { label: 'TIME PER ROUND', value: '51.4 s', sub: 'median over 25 runs, CPU', kind: 'EXISTING RUNS' }
+    ];
+    const themes = [['deep', '#5FD4B4', '#061316'], ['aub', '#B8E986', '#120B17'], ['porc', '#2448E8', '#EEF1F5']].map(([id, a, b]) => ({
+      label: T[id].name, on: this.state.theme === id ? 'true' : 'false',
+      pick: () => { this.setState({ theme: id }); this.load(); },
+      sw: 'width: 10px; height: 10px; border-radius: 50%; background: ' + b + '; box-shadow: inset 0 0 0 3px ' + a + ';',
+      style: 'display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 6px; border: 0; font: inherit; font-size: 12px; cursor: pointer; ' +
+        (this.state.theme === id ? 'background: ' + t.s2 + '; color: ' + t.ink + '; box-shadow: inset 0 0 0 1px ' + t.line2 + ';' : 'background: transparent; color: ' + t.body + ';')
+    }));
+    return { t, st, sk, org, orgBtns, toc, acc, pts, eff, themes, skelSections, loading: L, ready: !L, reload: () => this.load() };
+  }
+}
+</script>
+</body>
+</html>

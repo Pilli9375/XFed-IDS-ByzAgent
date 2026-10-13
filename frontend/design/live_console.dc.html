@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live console</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz@1,6..72&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes xfArrive{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes xfShimmer{from{background-position:150% 0}to{background-position:-50% 0}}
+@keyframes xfBloom{0%,100%{box-shadow:0 0 0 1px var(--b1),0 24px 70px -26px var(--g1)}50%{box-shadow:0 0 0 1px var(--b2),0 24px 96px -18px var(--g2)}}
+@keyframes xfPulse{0%,100%{opacity:var(--o1);transform:scale(1)}50%{opacity:var(--o2);transform:scale(1.08)}}
+@keyframes xfFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+</helmet>
+<div style="{{st.page}}">
+
+<div aria-hidden="true" style="{{st.ambientA}}"></div>
+<div aria-hidden="true" style="{{st.ambientB}}"></div>
+
+<div style="position: relative; z-index: 1;">
+<header style="{{st.header}}">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" rx="5" fill="none" stroke="{{t.ok}}" stroke-width="1.5"></rect><path d="M6 6l10 10M16 6L6 16" stroke="{{t.ink}}" stroke-width="1.5" stroke-linecap="round"></path></svg>
+    <span style="font-weight: 600; font-size: 15px;">XFed-IDS</span>
+  </div>
+  <nav aria-label="Views" style="{{st.seg}}">
+    <a href="#" style="{{st.segOn}}">Live</a>
+    <a href="Investigate.dc.html" style="{{st.segOff}}">Investigate</a>
+    <a href="#" style="{{st.segOff}}">Limits</a>
+  </nav>
+  <div style="flex: 1 1 60px;"></div>
+  <div role="group" aria-label="Theme" style="{{st.seg}}">
+    <sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+      <button type="button" aria-pressed="{{th.on}}" onClick="{{th.pick}}" style="{{th.style}}"><span style="{{th.sw}}"></span>{{th.label}}</button>
+    </sc-for>
+  </div>
+  <div style="{{st.status}}">
+    <span style="{{st.liveDot}}"></span><span>{{liveLabel}}</span>
+    <span style="color: {{t.mute}};">fedavg_a0.5_s42 · r18 · onnx_fp32</span>
+  </div>
+</header>
+
+<main style="max-width: 1560px; margin: 0 auto; padding: 22px 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px;">
+<sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+  <div aria-busy="true" aria-label="Loading the console" style="display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px;">
+      <sc-for list="{{skelKpis}}" as="s" hint-placeholder-count="4">
+        <div style="{{sk.card}}">
+          <div style="{{sk.lineSm}}"></div>
+          <div style="{{sk.lineBig}}"></div>
+          <div style="{{sk.lineMd}}"></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+      <div style="{{sk.panelA}}">
+        <div style="{{sk.lineMd}}"></div>
+        <sc-for list="{{skelRows}}" as="r" hint-placeholder-count="10">
+          <div style="display: flex; gap: 10px; align-items: center;"><div style="{{sk.dot}}"></div><div style="{{r.w}}"></div></div>
+        </sc-for>
+      </div>
+      <div style="{{sk.panelB}}">
+        <div style="display: flex; gap: 18px; align-items: center;"><div style="{{sk.ring}}"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 10px;"><div style="{{sk.lineSm}}"></div><div style="{{sk.lineTitle}}"></div></div></div>
+        <div style="{{sk.lineFull}}"></div><div style="{{sk.lineFull}}"></div><div style="{{sk.lineMd}}"></div>
+        <sc-for list="{{skelBars}}" as="b" hint-placeholder-count="9">
+          <div style="display: grid; grid-template-columns: 190px minmax(0,1fr); gap: 14px;"><div style="{{sk.lineSm}}"></div><div style="{{b.w}}"></div></div>
+        </sc-for>
+      </div>
+      <div style="{{sk.panelC}}">
+        <div style="{{sk.lineMd}}"></div>
+        <sc-for list="{{skelRows}}" as="r" hint-placeholder-count="10">
+          <div style="display: grid; grid-template-columns: 48px minmax(0,1fr) 36px; gap: 10px; align-items: center;"><div style="{{sk.lineSm}}"></div><div style="{{sk.track}}"></div><div style="{{sk.lineSm}}"></div></div>
+        </sc-for>
+      </div>
+    </div>
+    <p style="{{st.foot}}">{{loadMsg}}</p>
+  </div>
+</sc-if>
+<sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px; animation: xfFadeIn .6s ease-out;">
+
+  <section aria-label="Key figures" style="{{st.kpiWrap}}">
+    <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+      <div style="{{st.kpi}}">
+        <span style="{{st.eyebrow}}">{{k.label}}</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 30px; font-weight: 500; letter-spacing: -0.03em;">{{k.value}}<span style="{{st.unit}}">{{k.unit}}</span></span>
+        <span style="{{st.small}}">{{k.sub}}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start;">
+
+  <section aria-labelledby="stream-h" style="{{st.panelStream}}">
+    <div style="{{st.panelHead}}">
+      <h2 id="stream-h" style="margin: 0; font-size: 14px; font-weight: 600;">Flow stream</h2>
+      <div style="display: flex; gap: 6px;">
+        <button type="button" onClick="{{togglePlay}}" style="{{st.btn}}">{{playLabel}}</button>
+        <button type="button" style="{{st.btn}}">Next miss</button>
+      </div>
+    </div>
+    <div style="{{st.nowBar}}">
+      <span style="{{st.eyebrow}}">JUST ARRIVED</span>
+      <span style="{{st.nowFam}}">{{now.fam}}</span>
+      <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: {{t.body}};">{{now.conf}} · {{now.verdict}}</span>
+    </div>
+    <ol style="list-style: none; margin: 0; padding: 6px 8px 10px; display: flex; flex-direction: column; gap: 1px;">
+      <sc-for list="{{feed}}" as="a" hint-placeholder-count="12">
+        <li style="{{a.row}}">
+          <span style="{{a.time}}">{{a.t}}</span>
+          <span style="{{a.dot}}"></span>
+          <span style="font-size: 13px; flex: 1 1 auto;">{{a.fam}}</span>
+          <span style="{{a.conf}}">{{a.c}}</span>
+          <span style="{{a.markStyle}}">{{a.mark}}</span>
+        </li>
+      </sc-for>
+    </ol>
+  </section>
+
+  <section aria-labelledby="why-h" style="{{st.panelWhy}}">
+    <div style="{{st.whyHead}}">
+      <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Confidence 100 percent"><circle cx="32" cy="32" r="27" fill="none" stroke="{{t.line}}" stroke-width="5"></circle><circle cx="32" cy="32" r="27" fill="none" stroke="{{t.ok}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="169.6 169.6" transform="rotate(-90 32 32)"></circle><text x="32" y="36" text-anchor="middle" font-family="Geist Mono, monospace" font-size="12" fill="{{t.ink}}">100%</text></svg>
+      <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px;">
+        <span style="{{st.eyebrow}}">SELECTED · FLOW 23:54:40</span>
+        <h2 id="why-h" style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">Benign <span style="{{st.okNote}}">✓ matches true label</span></h2>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button type="button" style="{{st.btnLg}}">Mark reviewed</button>
+        <button type="button" style="{{st.btnPrimary}}">Hot-swap model…</button>
+      </div>
+    </div>
+    <div style="padding: 20px 22px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="{{st.agentEyebrow}}">LLM SUMMARY · READING AID, NOT A RESEARCH RESULT</span>
+        <p style="margin: 0; font-family: 'Newsreader', serif; font-style: italic; font-size: 20px; line-height: 1.4;">The network flow was classified as Benign due to a combination of normal packet transmission characteristics, including a long flow duration and a maximum forward packet length of 311 bytes.</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline;">
+        <h3 style="margin: 0; font-size: 13px; font-weight: 600;">Why — SHAP contribution toward Benign</h3>
+        <span style="{{st.monoMute}}">logit · base −8.724 → +0.424 · residual 0.471</span>
+      </div>
+      <div role="img" aria-label="Top SHAP contributions toward Benign for this flow" style="display: flex; flex-direction: column; gap: 6px;">
+        <sc-for list="{{shap}}" as="s" hint-placeholder-count="11">
+          <div style="display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; align-items: center;">
+            <span style="{{st.shapLabel}}">{{s.name}}</span>
+            <div style="{{st.shapTrack}}"><div style="{{s.bar}}"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="trust-h" style="{{st.panelTrust}}">
+    <div style="{{st.panelHeadCol}}">
+      <h2 id="trust-h" style="margin: 0; font-size: 14px; font-weight: 600;">Trust check</h2>
+      <span style="{{st.monoMute}}">α=0.5 · seed 1337 · f=3 sudden</span>
+    </div>
+    <div style="padding: 10px 16px 8px; display: flex; flex-direction: column;">
+      <sc-for list="{{orgs}}" as="o" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 58px minmax(0,1fr) 46px; gap: 10px; align-items: center; height: 30px;">
+          <span style="{{o.lab}}">{{o.id}}</span>
+          <div style="position: relative; height: 12px;">
+            <div style="{{st.trustTrack}}"></div>
+            <div style="{{o.seg}}"></div>
+            <div style="{{o.c}}"></div>
+            <div style="{{o.a}}"></div>
+          </div>
+          <span style="{{o.liftStyle}}">{{o.lift}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="{{st.trustFoot}}">
+      <span>○ clean run · <span style="color: {{t.agent}};">●</span> attack run · lift = attack − clean</span>
+      <span><span style="color: {{t.attackText}};">●</span> poisoned (ground truth, never shown to the agent). Orgs 1, 4, 7 are flagged with no attack at all: the compositional confound.</span>
+    </div>
+  </section>
+  </div>
+
+  <p style="{{st.foot}}">Design mock · the stream replays the 13 captured alerts in a loop; ambient light follows each arriving flow. Values from the 13 Oct capture and results files. <button type="button" onClick="{{reload}}" style="{{st.linkBtn}}">Replay loading</button></p>
+</div>
+</sc-if>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { i: 0, theme: 'deep', playing: true, loading: true }; }
+  componentDidMount() {
+    let reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    this.reduce = reduce;
+    this.load();
+    if (!reduce) this.timer = setInterval(() => { if (this.state.playing && !this.state.loading) this.setState({ i: this.state.i + 1 }); }, 1700);
+  }
+  load() {
+    clearTimeout(this.loadT);
+    this.setState({ loading: true });
+    this.loadT = setTimeout(() => this.setState({ loading: false }), this.reduce ? 300 : 2400);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.loadT); }
+  renderVals() {
+    const T = {
+      deep: { name: 'Deep Sea', bg: '#061316', s1: '#0A1B1F', s2: '#0F2328', line: '#12292E', line2: '#1C383D', ink: '#E7F2F0', body: '#9DB8B5', mute: '#7C9A97', attack: '#FF6A4D', attackText: '#FF8E75', ok: '#5FD4B4', agent: '#F6B54A', away: '#3E6A70', inv: '#E7F2F0', invInk: '#061316', glow: 0.55 },
+      aub:  { name: 'Aubergine', bg: '#120B17', s1: '#1C1322', s2: '#241929', line: '#2A1E32', line2: '#3A2B44', ink: '#F3ECF5', body: '#C2B2C8', mute: '#9A879F', attack: '#FF5E3A', attackText: '#FF8466', ok: '#B8E986', agent: '#C9A7FF', away: '#5A4763', inv: '#F3ECF5', invInk: '#120B17', glow: 0.55 },
+      porc: { name: 'Porcelain', bg: '#EEF1F5', s1: '#FFFFFF', s2: '#F5F7FA', line: '#E1E6ED', line2: '#D3DAE3', ink: '#0B1221', body: '#3F4A5C', mute: '#5E6A7D', attack: '#E2441F', attackText: '#C23710', ok: '#2448E8', agent: '#B7791F', away: '#9AA7BA', inv: '#0B1221', invInk: '#FFFFFF', glow: 0.28 }
+    };
+    const t = T[this.state.theme];
+    const hex = (h, a) => h + Math.round(a * 255).toString(16).padStart(2, '0');
+    const raw = [
+      ['23:54:34','Benign','84.7%',0,'Bot'],['23:54:35','BruteForce','100.0%',1],['23:54:36','Benign','100.0%',1],
+      ['23:54:37','PortScan','100.0%',1],['23:54:38','DDoS','100.0%',1],['23:54:39','DoS','100.0%',1],
+      ['23:54:40','Benign','100.0%',1],['23:54:41','DoS','100.0%',1],['23:54:42','BruteForce','100.0%',1],
+      ['23:54:43','DoS','100.0%',1],['23:54:44','DDoS','100.0%',1],['23:54:45','Benign','100.0%',1],['23:54:46','Bot','94.1%',1]
+    ];
+    const n = raw.length, head = this.state.i % n;
+    const order = []; for (let k = 0; k < 12; k++) order.push(raw[(head - k + n * 4) % n]);
+    const cur = order[0];
+    const kind = !cur[3] ? 'miss' : (cur[1] === 'Benign' ? 'ok' : 'attack');
+    const amb = kind === 'ok' ? t.ok : t.attack;
+    const ambA = kind === 'miss' ? t.glow * 1.35 : t.glow;
+    const mono = "font-family: 'Geist Mono', monospace;";
+    const feed = order.map((r, k) => {
+      const benign = r[1] === 'Benign';
+      return {
+        t: r[0], fam: r[1], c: r[2],
+        mark: r[3] ? '✓' : '✗ ' + r[4],
+        time: mono + ' font-size: 11px; width: 58px; color: ' + t.mute + ';',
+        conf: mono + ' font-size: 12px; color: ' + t.body + ';',
+        markStyle: mono + ' font-size: 11px; width: 48px; text-align: right; color: ' + (r[3] ? t.ok : t.attackText) + ';',
+        dot: 'width: 8px; height: 8px; border-radius: 2px; flex: none; background: ' + (benign ? t.ok : t.attack) + ';',
+        row: 'display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border-radius: 7px; transition: background .6s; ' +
+          (k === 0 ? 'animation: xfArrive .5s ease-out; background: ' + hex(amb, 0.12) + ';' : '') +
+          (!r[3] ? ' box-shadow: inset 0 0 0 1px ' + hex(t.attack, 0.45) + ';' : '') +
+          (k > 7 ? ' opacity: ' + (1 - (k - 7) * 0.18) + ';' : '')
+      };
+    });
+    const sh = [['Bwd IAT Total',2.1],['Other 72 features (sum)',1.6],['FIN Flag Count',1.15],['Flow Duration',0.9],['Fwd IAT Total',0.75],['Fwd Packet Length Max',0.65],['Fwd PSH Flags',0.6],['Fwd Packet Length Std',0.35],['Fwd Act Data Pkts',0.25],['Packet Length Mean',-0.3],['RST Flag Count',-0.3]];
+    const shap = sh.map(([name, v]) => ({ name, bar: 'position: absolute; top: 3px; height: 12px; border-radius: 3px; width: ' + (Math.abs(v) / 2.8 * 50) + '%; ' + (v >= 0 ? 'left: 50%; background: ' + t.ok + ';' : 'right: 50%; background: ' + t.away + ';') }));
+    const tr = [[0,0.05,0.10,1],[1,1.00,1.00],[2,1.00,0.90],[3,0.00,0.40,1],[4,1.00,1.00],[5,0.00,0.95,1],[6,0.00,0.00],[7,1.00,1.00],[8,0.00,0.05],[9,0.10,0.15]];
+    const orgs = tr.map(([id,c,a,m]) => {
+      const lift = a - c, lo = Math.min(c,a), hi = Math.max(c,a);
+      return {
+        id: (m ? '● ' : '') + 'Org ' + id,
+        lab: 'font-size: 12px; white-space: nowrap; color: ' + (m ? t.attackText : t.body) + ';',
+        seg: 'position: absolute; top: 5px; height: 2px; left: ' + (lo*100) + '%; width: ' + ((hi-lo)*100) + '%; background: ' + hex(t.agent, 0.55) + ';',
+        c: 'position: absolute; top: 1px; width: 10px; height: 10px; border-radius: 50%; margin-left: -5px; box-sizing: border-box; left: ' + (c*100) + '%; background: ' + t.s1 + '; border: 1.5px solid ' + t.body + ';',
+        a: 'position: absolute; top: 1px; width: 10px; height: 10px; border-radius: 50%; margin-left: -5px; left: ' + (a*100) + '%; background: ' + t.agent + ';',
+        lift: (lift >= 0 ? '+' : '−') + Math.abs(lift).toFixed(2),
+        liftStyle: mono + ' font-size: 12px; text-align: right; ' + (lift >= 0.3 ? 'color: ' + t.agent + '; font-weight: 600;' : 'color: ' + t.mute + ';')
+      };
+    });
+    const panel = 'min-width: 0; background: ' + t.s1 + '; border: 1px solid ' + t.line + '; border-radius: 14px; display: flex; flex-direction: column; transition: box-shadow 1.2s ease, border-color 1.2s ease;';
+    const glowRing = 'box-shadow: 0 0 0 1px ' + hex(amb, 0.35) + ', 0 24px 80px -24px ' + hex(amb, ambA) + ';';
+    const st = {
+      page: 'position: relative; overflow: hidden; min-height: 100vh; background: ' + t.bg + '; color: ' + t.ink + "; font-family: 'Instrument Sans', sans-serif; font-size: 14px; line-height: 1.45; letter-spacing: -0.005em; transition: background .6s;",
+      ambientA: 'position: absolute; z-index: 0; left: 18%; top: 120px; width: 64%; height: 70%; border-radius: 50%; filter: blur(120px); opacity: ' + ambA + '; background: radial-gradient(closest-side, ' + amb + ', transparent); transition: background 1.2s ease, opacity 1.2s ease; pointer-events: none;',
+      ambientB: 'position: absolute; z-index: 0; left: -10%; top: -20%; width: 50%; height: 60%; border-radius: 50%; filter: blur(140px); opacity: ' + (ambA * 0.5) + '; background: radial-gradient(closest-side, ' + amb + ', transparent); transition: background 1.6s ease, opacity 1.6s ease; pointer-events: none;',
+      header: 'display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 28px; border-bottom: 1px solid ' + t.line + '; background: ' + hex(t.bg, 0.6) + '; backdrop-filter: blur(8px);',
+      seg: 'display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: ' + t.s1 + '; border: 1px solid ' + t.line + ';',
+      segOn: 'padding: 7px 14px; border-radius: 6px; background: ' + t.s2 + '; box-shadow: inset 0 0 0 1px ' + t.line2 + '; color: ' + t.ink + '; text-decoration: none; font-weight: 500; font-size: 13px;',
+      segOff: 'padding: 7px 14px; border-radius: 6px; color: ' + t.body + '; text-decoration: none; font-size: 13px;',
+      status: 'display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; ' + mono + ' font-size: 12px; color: ' + amb + '; transition: color 1s;',
+      liveDot: 'width: 7px; height: 7px; border-radius: 50%; background: ' + amb + '; box-shadow: 0 0 0 3px ' + hex(amb, 0.2) + '; transition: background 1s;',
+      kpiWrap: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: ' + t.line + '; border: 1px solid ' + t.line + '; border-radius: 14px; overflow: hidden;',
+      kpi: 'background: ' + t.s1 + '; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;',
+      eyebrow: mono + ' font-size: 11px; letter-spacing: 0.06em; color: ' + t.mute + ';',
+      agentEyebrow: mono + ' font-size: 10px; letter-spacing: 0.08em; color: ' + t.agent + ';',
+      unit: 'font-size: 14px; margin-left: 4px; color: ' + t.mute + ';',
+      small: 'font-size: 12px; color: ' + t.body + ';',
+      monoMute: mono + ' font-size: 11px; color: ' + t.mute + ';',
+      panelStream: 'flex: 1 1 330px; ' + panel + ' ' + glowRing,
+      panelWhy: 'flex: 2.2 1 560px; ' + panel,
+      panelTrust: 'flex: 1 1 340px; ' + panel,
+      panelHead: 'display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid ' + t.line + ';',
+      panelHeadCol: 'display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-bottom: 1px solid ' + t.line + ';',
+      nowBar: 'display: flex; align-items: baseline; gap: 10px; padding: 14px 16px; border-bottom: 1px solid ' + t.line + '; background: ' + hex(amb, 0.08) + '; transition: background 1s;',
+      nowFam: 'font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: ' + (kind === 'ok' ? t.ink : t.attackText) + '; transition: color .6s;',
+      btn: 'height: 32px; padding: 0 10px; border-radius: 7px; border: 1px solid ' + t.line2 + '; background: transparent; color: ' + t.ink + '; font: inherit; font-size: 12px; cursor: pointer;',
+      btnLg: 'height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid ' + t.line2 + '; background: transparent; color: ' + t.ink + '; font: inherit; font-size: 13px;',
+      btnPrimary: 'height: 40px; padding: 0 14px; border-radius: 8px; border: 0; background: ' + t.inv + '; color: ' + t.invInk + '; font: inherit; font-size: 13px; font-weight: 600;',
+      whyHead: 'display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding: 20px 22px; border-bottom: 1px solid ' + t.line + ';',
+      okNote: 'font-size: 14px; font-weight: 500; vertical-align: 6px; color: ' + t.ok + ';',
+      shapLabel: 'font-size: 12.5px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ' + t.body + ';',
+      shapTrack: 'position: relative; height: 18px; background: linear-gradient(' + t.line2 + ',' + t.line2 + ') 50% 0 / 1px 100% no-repeat;',
+      trustTrack: 'position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: ' + t.line + ';',
+      trustFoot: 'margin-top: auto; padding: 12px 16px 16px; border-top: 1px solid ' + t.line + '; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: ' + t.body + ';',
+      foot: 'margin: 0; font-size: 11px; color: ' + t.mute + ';'
+    };
+    const themes = [['deep', '#5FD4B4', '#061316'], ['aub', '#B8E986', '#120B17'], ['porc', '#2448E8', '#EEF1F5']].map(([id, a, b]) => ({
+      label: T[id].name, on: this.state.theme === id ? 'true' : 'false',
+      pick: () => { this.setState({ theme: id }); this.load(); },
+      sw: 'width: 10px; height: 10px; border-radius: 50%; background: ' + b + '; box-shadow: inset 0 0 0 3px ' + a + ';',
+      style: 'display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 6px; border: 0; font: inherit; font-size: 12px; cursor: pointer; ' +
+        (this.state.theme === id ? 'background: ' + t.s2 + '; color: ' + t.ink + '; box-shadow: inset 0 0 0 1px ' + t.line2 + ';' : 'background: transparent; color: ' + t.body + ';')
+    }));
+    const kpis = [
+      { label: 'MACRO-F1 · α=0.5', value: '0.9852', unit: '± 0.0005', sub: 'FedAvgM, preregistered · FedAvg 0.941 ± 0.057' },
+      { label: 'PER-FLOW LATENCY', value: '45.7', unit: 'µs', sub: 'ONNX fp32 p50 · PyTorch 186.5 µs' },
+      { label: 'UPLOAD PER ROUND', value: '−50', unit: '%', sub: 'fp16 updates · mean Δ −0.0007, n=3' },
+      { label: 'TRAFFIC PER ROUND', value: '1,587,920', unit: 'B', sub: '10 orgs, both directions' }
+    ];
+    const L = this.state.loading;
+    if (L) {
+      st.ambientA = 'position: absolute; z-index: 0; left: 8%; top: 140px; width: 46%; height: 62%; border-radius: 50%; filter: blur(120px); background: radial-gradient(closest-side, ' + t.ok + ', transparent); --o1: ' + (t.glow * 0.5) + '; --o2: ' + t.glow + '; animation: xfPulse 2.4s ease-in-out infinite; pointer-events: none;';
+      st.ambientB = 'position: absolute; z-index: 0; left: 46%; top: 220px; width: 46%; height: 62%; border-radius: 50%; filter: blur(130px); background: radial-gradient(closest-side, ' + t.agent + ', transparent); --o1: ' + t.glow + '; --o2: ' + (t.glow * 0.45) + '; animation: xfPulse 2.4s ease-in-out infinite; pointer-events: none;';
+      st.status = 'display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; ' + mono + ' font-size: 12px; color: ' + t.agent + ';';
+      st.liveDot = 'width: 7px; height: 7px; border-radius: 50%; background: ' + t.agent + '; box-shadow: 0 0 0 3px ' + hex(t.agent, 0.2) + ';';
+    }
+    st.linkBtn = 'border: 0; background: none; padding: 0 0 0 8px; font: inherit; font-size: 11px; color: ' + t.ok + '; text-decoration: underline; cursor: pointer;';
+    const shim = 'border-radius: 6px; background: linear-gradient(100deg, ' + t.s2 + ' 30%, ' + hex(t.ok, 0.28) + ' 42%, ' + hex(t.agent, 0.32) + ' 50%, ' + hex(t.attack, 0.26) + ' 58%, ' + t.s2 + ' 70%); background-size: 300% 100%; animation: xfShimmer 1.8s linear infinite;';
+    const bloom = (g, delay) => 'min-width: 0; padding: 18px; border-radius: 14px; background: ' + t.s1 + '; display: flex; flex-direction: column; gap: 12px; --b1: ' + t.line + '; --b2: ' + hex(g, 0.45) + '; --g1: ' + hex(g, 0.08) + '; --g2: ' + hex(g, t.glow * 0.8) + '; animation: xfBloom 2.4s ease-in-out ' + delay + 's infinite;';
+    const sk = {
+      card: bloom(t.ok, 0) + ' gap: 10px;',
+      panelA: 'flex: 1 1 330px; ' + bloom(t.ok, 0.2),
+      panelB: 'flex: 2.2 1 560px; ' + bloom(t.agent, 0.4),
+      panelC: 'flex: 1 1 340px; ' + bloom(t.attack, 0.6),
+      lineSm: 'height: 10px; width: 60px; ' + shim,
+      lineMd: 'height: 12px; width: 45%; ' + shim,
+      lineBig: 'height: 28px; width: 70%; ' + shim,
+      lineTitle: 'height: 26px; width: 40%; ' + shim,
+      lineFull: 'height: 14px; width: 100%; ' + shim,
+      dot: 'width: 8px; height: 8px; flex: none; ' + shim,
+      ring: 'width: 64px; height: 64px; border-radius: 50%; flex: none; background: conic-gradient(' + t.ok + ', ' + t.agent + ', ' + t.attack + ', ' + t.ok + '); -webkit-mask: radial-gradient(closest-side, transparent 78%, #000 80%); mask: radial-gradient(closest-side, transparent 78%, #000 80%); animation: xfShimmer 1.8s linear infinite; opacity: .8;',
+      track: 'height: 6px; ' + shim
+    };
+    const widths = [82, 64, 90, 58, 76, 70, 88, 52, 66, 80];
+    const skelRows = widths.map(w => ({ w: 'height: 12px; flex: 1 1 auto; max-width: ' + w + '%; ' + shim }));
+    const skelBars = [78, 62, 50, 44, 38, 34, 30, 22, 18].map(w => ({ w: 'height: 12px; width: ' + w + '%; ' + shim }));
+    return {
+      t, st, sk, themes, feed, shap, orgs, kpis,
+      loading: L, ready: !L, skelKpis: [1,2,3,4], skelRows, skelBars,
+      loadMsg: 'Verifying the served model against 143,513 validation rows…',
+      reload: () => this.load(),
+      now: { fam: cur[1], conf: cur[2], verdict: cur[3] ? 'matches true label' : 'missed — true ' + cur[4] },
+      liveLabel: this.state.playing ? (kind === 'ok' ? 'LIVE · quiet' : kind === 'miss' ? 'LIVE · missed flow' : 'LIVE · attack flow') : 'PAUSED',
+      playLabel: this.state.playing ? 'Pause' : 'Play',
+      togglePlay: () => this.setState({ playing: !this.state.playing })
+    };
+  }
+}
+</script>
+</body>
+</html>
