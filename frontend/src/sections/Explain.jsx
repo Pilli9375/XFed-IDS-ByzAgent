@@ -117,12 +117,24 @@ function ExplainBody({ rows, complete }) {
               match the reported methodology exactly.
             </div>
             <div style={{ height: 'var(--sp-md)' }} />
-            <Stat
-              label="Additivity residual"
-              value={row.additivity_max_diff.toFixed(3)}
-              sub="Background size not exposed by this endpoint"
-              tone={WARN}
-            />
+            {/* additivity_max_diff is one batch-wide scalar for the curated
+                set (global_shap.npz), the same value for every row here. */}
+            <div className="xf-grid-2">
+              <Stat
+                label="Additivity residual"
+                value={row.additivity_max_diff.toFixed(3)}
+                sub="Largest absolute residual across the 14 rows (logit units)"
+                tone={WARN}
+                small
+              />
+              <Stat
+                label="Relative residual"
+                value="~3–8%"
+                sub="Project-wide figure, bounded by a KernelExplainer check. Source: PROJECT_INSTRUCTIONS.md, “Findings that limit what can be claimed”"
+                tone={WARN}
+                small
+              />
+            </div>
           </>
         )}
       </div>
