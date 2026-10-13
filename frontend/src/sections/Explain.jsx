@@ -127,10 +127,13 @@ function ExplainBody({ rows, complete }) {
                 tone={WARN}
                 small
               />
+              {/* From results/shap/fedavg_a0.5_s42/val_pool_summary.json
+                  (additivity_relative). Not computable for the 14 rows
+                  above: their stored SHAP files hold no model outputs. */}
               <Stat
-                label="Relative residual"
-                value="~3–8%"
-                sub="Project-wide figure, bounded by a KernelExplainer check. Source: PROJECT_INSTRUCTIONS.md, “Findings that limit what can be claimed”"
+                label="Relative residual, 500 validation rows"
+                value="median 3.2%"
+                sub="p95 7.7%, max 21.2%; 18 rows above 8%. Relative = max over classes of |ΣSHAP − (f(x) − E[f])| ÷ max over classes of |f(x) − E[f]|. Source: val_pool_summary.json. Not computable for these 14 rows (no stored model outputs)."
                 tone={WARN}
                 small
               />

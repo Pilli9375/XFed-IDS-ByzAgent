@@ -330,8 +330,9 @@ here, not changed)
      now come precomputed from `eval_rows_sidecar.npz`.
 10. **Explain additivity tile.** It shows 1.076: one batch-wide max-abs
     residual in logit space for all 14 rows. Its only sub-text is
-    "Background size not exposed". CLAUDE.md states the residual as ~3–8 %
-    relative. A bare 1.076 next to it can read as a large error. This needs
+    "Background size not exposed". CLAUDE.md then stated the residual as
+    "~3–8 %" relative (since replaced by the file-backed validation-pool
+    figures in `val_pool_summary.json`). A bare 1.076 next to it can read as a large error. This needs
     labelling (absolute, logit, max over 14), not necessarily a fix.
 
 **Not broken, but worth knowing**

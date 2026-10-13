@@ -196,8 +196,8 @@ def build(limit: int | None = None) -> Path:
     predicted_y = f_eval.argmax(axis=1).astype(np.int64)
     # Relative residual, defined here as: largest |sum(SHAP) - (f(x) - E[f])|
     # over the 9 classes, divided by the largest |f(x) - E[f]| over the same
-    # classes. This script's own definition; not necessarily the one behind
-    # the project-wide ~3-8% figure.
+    # classes. This is the definition the project's relative-residual figure
+    # now uses (CLAUDE.md / PROJECT_INSTRUCTIONS.md cite this file's summary).
     relative = additivity / np.abs(f_eval - f_bg_mean[None, :]).max(axis=1)
 
     class_names = [vocab_info["idx_to_name"][i] for i in range(n_classes)]
