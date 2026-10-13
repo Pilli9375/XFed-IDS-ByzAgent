@@ -1,0 +1,67 @@
+{
+  "rule": {
+    "metric": "val_macro_f1_headline",
+    "round_selection": "best_by_validation",
+    "aggregate": "mean_over_seeds",
+    "primary_alpha": "0.1",
+    "guard_alpha": "0.5",
+    "guard_max_drop": 0.01,
+    "min_improvement": 0.02,
+    "centralized_ceiling": 0.99
+  },
+  "fedavg_baseline": {
+    "mean_a0.1": 0.5228234486686868,
+    "mean_a0.5": 0.9424930221775073
+  },
+  "threshold_primary": 0.5428234486686868,
+  "threshold_guard": 0.9324930221775073,
+  "dropped_by_budget_guard": [
+    "fedprox_mu0.001",
+    "fedprox_mu0.01",
+    "fedadam_lr0.001",
+    "fedyogi_lr0.001"
+  ],
+  "candidates": [
+    {
+      "method": "fedavgm_m0.5",
+      "order": 0,
+      "mean_a0.1": 0.5385547726340311,
+      "mean_a0.5": 0.9501954591665798,
+      "delta_a0.1_vs_fedavg": 0.015731323965344268,
+      "delta_a0.5_vs_fedavg": 0.00770243698907247,
+      "guard_pass": true
+    },
+    {
+      "method": "fedavgm_m0.9",
+      "order": 1,
+      "mean_a0.1": 0.6067675012046844,
+      "mean_a0.5": 0.9860776485507693,
+      "delta_a0.1_vs_fedavg": 0.08394405253599757,
+      "delta_a0.5_vs_fedavg": 0.04358462637326199,
+      "guard_pass": true
+    },
+    {
+      "method": "fedadam_lr0.01",
+      "order": 2,
+      "mean_a0.1": 0.4582700466300221,
+      "mean_a0.5": 0.8481892420764493,
+      "delta_a0.1_vs_fedavg": -0.06455340203866472,
+      "delta_a0.5_vs_fedavg": -0.094303780101058,
+      "guard_pass": false
+    },
+    {
+      "method": "fedyogi_lr0.01",
+      "order": 3,
+      "mean_a0.1": 0.46270828592656654,
+      "mean_a0.5": 0.9003559619985074,
+      "delta_a0.1_vs_fedavg": -0.060115162742120254,
+      "delta_a0.5_vs_fedavg": -0.042137060178999874,
+      "guard_pass": false
+    }
+  ],
+  "outcome": "selected",
+  "chosen": "fedavgm_m0.9",
+  "best_eligible": "fedavgm_m0.9",
+  "reason": "fedavgm_m0.9 alpha=0.1 mean 0.6068 >= 0.5428; alpha=0.5 mean 0.9861 >= 0.9325",
+  "flags": []
+}

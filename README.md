@@ -116,6 +116,26 @@ project's locked wording:
 ByzAgent produces decisions plus a rationale of measured fidelity. Giving it
 a rolling history of past rounds failed its pre-registered test.
 
+### Test-set use
+
+All model and round selection used validation data. Three early design choices
+were recorded with test-set numbers as their justification: 3 local epochs,
+FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
+scaler are selected; for local epochs, validation also selects 3 epochs over 1
+at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
+0.8602). Headline test metrics come from one evaluation of each run's
+validation-selected checkpoint. The test set was also read, without informing
+any later choice, in these ways: (a) legacy client-side per-round scoring in
+35 runs, unread by any analysis; (b) round-20 scoring for an earlier
+round-lottery comparison, since replaced by a validation-based one; (c) 14
+fixed rows as SHAP explanation inputs; (d) display-only use: 514 extracted
+rows, and the dashboard simulator before 2026-10-13 (not logged, no
+aggregate); (e) centralized pilot and baseline runs (18) and XGBoost seeds (3)
+scored on test during development; (f) one preregistered re-evaluation of a
+single validation-selected configuration
+([`docs/preregistration_accuracy.md`](docs/preregistration_accuracy.md)). Full
+table: [`docs/test_set_exposure_audit.md`](docs/test_set_exposure_audit.md).
+
 ## How this differs from prior work
 
 - Oki et al. (IEEE Networking Letters, 2024) showed that federated training
@@ -152,9 +172,10 @@ The ones most likely to matter to a reader:
 
 - The α=0.1 below-floor result is directional, not significant (intervals
   overlap, see above).
-- The round lottery is real: macro-F1 can differ by up to 0.118 between the
-  best-by-validation round and the final round, so every number uses
-  validation-based round selection.
+- The round lottery is real: validation macro-F1 can differ by up to 0.118
+  (α=5.0, seed 42) between the best-by-validation round and the final round
+  ([`round_lottery_val.csv`](results/federated/round_lottery_val.csv)), so
+  every number uses validation-based round selection.
 - Silo size is not independent of label skew under Dirichlet partitioning;
   it is largely determined by it, and size-controlled partitions were proven
   impossible with this partitioner. After conditioning on log(size), KL
@@ -251,6 +272,13 @@ was developed and run on Windows 11 with an RTX 4050 (6 GB VRAM, a hard
 ceiling that shaped several choices) and 24 GB RAM. Full runs are long: the
 SHAP pipeline alone is about 3.7 hours for all 9 configurations.
 
+What ran where: the GPU trained the centralized MLP (baselines and pilots)
+and XGBoost, and ran the Ollama model behind ByzAgent. Federated training ran
+on CPU: Flower installs its own isolated environment with torch 2.13.0+cpu
+(verified in the two August environments and in every run made on
+2026-10-12/13). SHAP, the dashboard backend and hot-swap retraining also run
+on CPU.
+
 ### 1. Environment
 
 The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
@@ -282,7 +310,9 @@ Flower reads its simulation settings from your user-level Flower config
 `[superlink.local-simulation]` block from
 [`federated/flwr_config.example.toml`](federated/flwr_config.example.toml)
 into that file. The example requests one GPU per client, which makes the
-simulation run one client at a time so it fits in 6 GB of VRAM. Also set
+simulation run one client at a time. Training itself runs on CPU (Flower's
+isolated environment installs the CPU build of torch), so in practice this
+setting only serializes the clients. Also set
 `$env:PYTHONIOENCODING = "utf-8"` in the shell; otherwise Flower's summary
 output crashes on the default Windows code page.
 
@@ -363,6 +393,13 @@ powershell -ExecutionPolicy Bypass -File tools\run_sweep_fedprox.ps1
 python scripts/aggregate_federated.py
 ```
 
+Legacy client-side evaluation, which scores each silo on its own test rows
+every round, is off by default (`legacy-client-test-eval = false` in
+`federated/pyproject.toml`); training is the same either way. The published
+runs were made with it on. To reproduce their `silo_metrics.jsonl` evaluate
+rows, pass `-LegacyClientTestEval` to either sweep script, or
+`--run-config "legacy-client-test-eval=true"` to `flwr run`.
+
 ### 5. Explanation check (SHAP export and agreement)
 
 ```powershell
@@ -389,7 +426,9 @@ their committed state all three leave plain FedAvg untouched.
    (locked primary: `f: 3`, `malicious_silos: [0, 3, 5]`, `mode: sudden`,
    `flip_fraction: 0.40`), then run the same `flwr run federated
    local-simulation` command at α=0.5, seed 42. Poisoned runs get their own
-   result directory and are hard-blocked from evaluating on the test set.
+   result directory. The server-side test pass is blocked for poisoned
+   runs; legacy client-side per-round test scores were still logged and are
+   unused.
 2. **Behaviour statistics.** Runs that predate the statistics logger are
    replayed, then checked with the Phase 1 gate:
    ```powershell

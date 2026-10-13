@@ -795,30 +795,31 @@ def render_methods() -> None:
         "FedAvg's global macro-F1 can swing substantially between "
         "consecutive late rounds under non-IID partitioning — this is why "
         "every reported number uses the validation-selected round, never "
-        "just whatever round training happened to stop on. Computed live "
-        "per config from final_metrics.json, across all 9 configs, not a "
-        "single historical example."
+        "just whatever round training happened to stop on. Validation "
+        "macro-F1 only, best-by-validation round vs round 20, all 9 configs "
+        "(results/federated/round_lottery_val.csv)."
     )
     lottery = loaders.get_round_lottery_table()
     if lottery is None:
-        st.warning("No final_metrics.json files found under results/federated/.")
+        st.warning("results/federated/round_lottery_val.csv not found -- run "
+                   "scripts/aggregate_federated.py --only-val-lottery.")
     else:
         display = lottery.copy()
         display["α"] = display["alpha"]
         display["Seed"] = display["seed"]
         display["Best Round"] = display["best_round"]
-        display["Best-Round Test F1"] = display["best_round_test_f1"].map("{:.4f}".format)
-        display["Final-Round Test F1"] = display["final_round_test_f1"].map("{:.4f}".format)
+        display["Best-Round Val F1"] = display["best_val"].map("{:.4f}".format)
+        display["Round-20 Val F1"] = display["final_val"].map("{:.4f}".format)
         display["Gap"] = display["gap"].map("{:+.4f}".format)
         st.dataframe(
             display[
-                ["α", "Seed", "Best Round", "Best-Round Test F1", "Final-Round Test F1", "Gap"]
+                ["α", "Seed", "Best Round", "Best-Round Val F1", "Round-20 Val F1", "Gap"]
             ],
             use_container_width=True,
             hide_index=True,
         )
         max_gap = lottery["gap"].abs().max()
-        st.caption(f"Largest observed gap across all 9 configs: {max_gap:.4f}.")
+        st.caption(f"Largest observed gap across all 9 configs: {max_gap:.4f} (validation macro-F1).")
 
     theme.rule()
 

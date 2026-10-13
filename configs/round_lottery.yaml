@@ -1,0 +1,16 @@
+# configs/round_lottery.yaml
+# Validation-based round lottery (planning chat, 2026-10-13). Replaces the
+# earlier test-based version (results/aggregated/round_lottery.csv, which
+# used a round-20 test score) as the primary round-lottery claim.
+#
+# Per run: best-by-validation round vs the final round, both scored by
+# validation macro-F1 from round_history.json. No test score is read.
+
+round_lottery_val:
+  runs_dir: results/federated
+  tag_pattern: "fedavg_a{alpha}_s{seed}"   # the 9 published FedAvg runs
+  alphas: ["0.1", "0.5", "5.0"]
+  seeds: [42, 1337, 2024]
+  metric: val_macro_f1_headline            # 7 headline families
+  final_round: 20                          # last of the locked 20 rounds
+  out_csv: results/federated/round_lottery_val.csv

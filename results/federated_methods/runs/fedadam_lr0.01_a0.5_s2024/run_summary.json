@@ -1,0 +1,30 @@
+{
+  "method": "fedadam_lr0.01",
+  "alpha": "0.5",
+  "seed": 2024,
+  "run_group": "runs",
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "server": "fedadam",
+  "server_params": {
+    "eta": 0.01,
+    "beta_1": 0.9,
+    "beta_2": 0.99,
+    "tau": 0.001
+  },
+  "client_mu": 0.0,
+  "fraction_train": 1.0,
+  "fraction_evaluate": 0.0,
+  "partition_manifest_check": {
+    "tag": "a0.5_s2024",
+    "hash_train": "24f00a1f3e55e65c8a221346b6bde44e5ef0aff7fbdb372596470bab34a5ed98",
+    "hash_test": "4a9fbaae838794c767586c87bd11311aa714423b750e4c1a5543b7d75beda736"
+  },
+  "best_round": 20,
+  "best_val_macro_f1_headline": 0.8498482348768206,
+  "final_round_val_macro_f1_headline": 0.8498482348768206,
+  "model_best_state_sha256": "0f261b64dc1f0fd1acbf9bddfeec1851e724d2f79d5c5781de35a03d9d45aa2d",
+  "strategy_wall_time_s": 1064.4463584998157,
+  "test_evaluated": false,
+  "note": "Validation only. No test-set metric exists for this run."
+}

@@ -266,6 +266,11 @@ test-macro-F1 for reference: clean FedAvg (locked) = 0.9753; Multi-Krum
 (f=3-oracle) = 0.9261; FedTrimmedAvg (f=3-oracle) = 0.9590; classical Krum
 (f=3-oracle) = 0.7480.
 
+*Disclosure (2026-10-13):* each clean run's `final_metrics.json` also holds
+a round-20 (unselected) test score, `test_final_round_unselected`, written
+by the legacy harness's end-of-run test pass. No claim in this document uses
+it, and it is no longer exported to the site (`baselines.json`).
+
 **Mechanism-level: does the exclusion/trim actually target the malicious
 silos?** No, at either f, for either Krum variant:
 

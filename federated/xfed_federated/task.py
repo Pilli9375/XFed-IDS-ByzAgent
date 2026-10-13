@@ -186,6 +186,75 @@ def evaluate_arrays(
 
 class_names = _class_names
 
+
+# ---------------------------------------------------------------------------
+# Preregistered federated optimizer comparison (2026-10-12).
+# configs/federated_methods.yaml holds every method parameter; a run selects
+# one by name via --run-config "method='<name>'". An empty method name means
+# the legacy path (FedAvg/FedProx via run-config mu, defense.yaml strategies),
+# which is left exactly as it was.
+# ---------------------------------------------------------------------------
+
+def get_method_name(run_config) -> str:
+    return str(run_config.get("method", "")).strip()
+
+
+def load_method(method_name: str) -> tuple[dict, dict]:
+    """(full federated_methods.yaml, that method's entry). Raises on an
+    unknown name rather than falling back to FedAvg."""
+    cfg = load_yaml("configs/federated_methods.yaml")
+    if method_name not in cfg["methods"]:
+        raise KeyError(
+            f"method {method_name!r} not in configs/federated_methods.yaml. "
+            f"Known: {sorted(cfg['methods'])}"
+        )
+    return cfg, cfg["methods"][method_name]
+
+
+def verify_partition_manifest(alpha: str, seed: int) -> dict:
+    """SHA256 of the on-disk train/test silo assignments against
+    data/processed/partitions/manifest.json, computed exactly as
+    src/data/partition.py does (int16 assignment bytes). Raises on mismatch.
+    Reads only the row->silo assignment files, never test features or labels.
+    """
+    import hashlib
+    import pandas as pd
+
+    part_dir = _PROJECT_ROOT / "data" / "processed" / "partitions"
+    manifest = json.loads((part_dir / "manifest.json").read_text())
+    tag = f"a{alpha}_s{seed}"
+    entry = manifest["configs"][tag]
+    out = {"tag": tag}
+    for split in ("train", "test"):
+        assign = pd.read_parquet(part_dir / f"assign_{tag}_{split}.parquet")["silo"].to_numpy(np.int16)
+        got = hashlib.sha256(assign.tobytes()).hexdigest()
+        if got != entry[f"hash_{split}"]:
+            raise RuntimeError(
+                f"MANIFEST MISMATCH for {tag} ({split}): disk {got} != manifest "
+                f"{entry[f'hash_{split}']}. Stop: do not train on this partition."
+            )
+        out[f"hash_{split}"] = got
+    return out
+
+
+def arrayrecord_nbytes(record) -> int:
+    """Payload bytes of an ArrayRecord: tensor data only, no message framing."""
+    return int(sum(arr.numpy().nbytes for arr in record.values()))
+
+
+def state_dict_sha256(state_dict: dict) -> str:
+    """Content hash of a state_dict: sorted keys + raw tensor bytes. Same
+    construction as src/hotswap/retrain.py's _state_dict_sha256, so it does
+    not depend on torch.save's pickle bytes."""
+    import hashlib
+
+    h = hashlib.sha256()
+    for k in sorted(state_dict.keys()):
+        h.update(k.encode("utf-8"))
+        h.update(state_dict[k].detach().cpu().contiguous().numpy().tobytes())
+    return h.hexdigest()
+
+
 __all__ = [
     "DEVICE", "load_yaml", "load_global_class_weights", "load_silo_for_client",
     "load_centralized_for_server", "local_train_epochs", "evaluate_arrays",
@@ -195,4 +264,6 @@ __all__ = [
     "ClientStatsRecorder",
     "AgentConfig", "AgentResponseError", "decide_round", "decide_round_history",
     "build_client_history", "decisions_to_weights", "log_decisions",
+    "get_method_name", "load_method", "verify_partition_manifest",
+    "arrayrecord_nbytes", "state_dict_sha256",
 ]

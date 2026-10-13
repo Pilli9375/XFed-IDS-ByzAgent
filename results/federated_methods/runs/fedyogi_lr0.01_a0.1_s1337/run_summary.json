@@ -1,0 +1,30 @@
+{
+  "method": "fedyogi_lr0.01",
+  "alpha": "0.1",
+  "seed": 1337,
+  "run_group": "runs",
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "server": "fedyogi",
+  "server_params": {
+    "eta": 0.01,
+    "beta_1": 0.9,
+    "beta_2": 0.99,
+    "tau": 0.001
+  },
+  "client_mu": 0.0,
+  "fraction_train": 1.0,
+  "fraction_evaluate": 0.0,
+  "partition_manifest_check": {
+    "tag": "a0.1_s1337",
+    "hash_train": "aedceebd51c12b80cbf69b3b65fb5ff9af328abc88d0b40914bac2078510a1f8",
+    "hash_test": "5d7af0a0a64b66fbba234af0153ca4b0007e6c79fb538265434b52f564b96ce8"
+  },
+  "best_round": 19,
+  "best_val_macro_f1_headline": 0.41399331820557184,
+  "final_round_val_macro_f1_headline": 0.4136738963228068,
+  "model_best_state_sha256": "02a250a45ac6a4710da6f5800aa1cd16602f66887e12994d121846954b0df2d9",
+  "strategy_wall_time_s": 1052.1192717000376,
+  "test_evaluated": false,
+  "note": "Validation only. No test-set metric exists for this run."
+}

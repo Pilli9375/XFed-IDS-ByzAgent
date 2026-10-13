@@ -1,0 +1,38 @@
+{
+  "question": "Does validation agree with the 3-local-epoch lock? (planning chat, 2026-10-13)",
+  "preregistered": "Whatever the result, no locked choice or headline changes; only validation agreement is reported.",
+  "setup": "FedAvg, alpha=0.5, seeds 42/1337/2024, local_epochs=1 via the validation-only method path (fedavg_epochs1; no test, no client eval) vs the published local_epochs=3 runs. Metric: best-by-validation val_macro_f1_headline.",
+  "per_seed": [
+    {
+      "seed": 42,
+      "epochs1_best_round": 19,
+      "epochs1_best_val": 0.8644334321460515,
+      "epochs3_best_round": 18,
+      "epochs3_best_val": 0.9759668074383557,
+      "diff_3_minus_1": 0.11153337529230423
+    },
+    {
+      "seed": 1337,
+      "epochs1_best_round": 19,
+      "epochs1_best_val": 0.8653827767854256,
+      "epochs3_best_round": 11,
+      "epochs3_best_val": 0.9871291446306404,
+      "diff_3_minus_1": 0.12174636784521475
+    },
+    {
+      "seed": 2024,
+      "epochs1_best_round": 16,
+      "epochs1_best_val": 0.8507718181629303,
+      "epochs3_best_round": 17,
+      "epochs3_best_val": 0.864383114463526,
+      "diff_3_minus_1": 0.013611296300595654
+    }
+  ],
+  "epochs1_mean": 0.8601960090314692,
+  "epochs3_mean": 0.9424930221775074,
+  "validation_agrees_with_3_epochs": true,
+  "sources": [
+    "results/federated_methods/provenance/fedavg_epochs1_a0.5_s*/round_history.json",
+    "results/federated/fedavg_a0.5_s*/round_history.json"
+  ]
+}

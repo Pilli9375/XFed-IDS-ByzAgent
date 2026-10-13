@@ -40,6 +40,10 @@ with them, they win.
 ## Environment
 
 - Hardware: RTX 4050 6GB VRAM (hard ceiling), 24GB RAM, Windows 11.
+- What ran where: the GPU ran the centralized MLP (baselines, pilots),
+  XGBoost and Ollama (ByzAgent). Federated training ran on CPU: torch
+  2.13.0+cpu in Flower's isolated env, verified for the August envs and all
+  runs from 2026-10-12 on. SHAP, serving and hot-swap also run on CPU.
 - Conda env `xfed`. `conda activate` is a no-op in cmd.exe on this machine;
   use PowerShell.
 - Project root `C:\Pilli\Capstone\xfed-ids\`. Raw dataset stays outside the repo
@@ -88,9 +92,25 @@ features), effective-number class weights β=0.999, MLP [128, 64], dropout 0.1,
 LayerNorm (BatchNorm statistics don't aggregate in FL), 3 local epochs, 9-wide
 frozen label vocabulary, best-by-validation round selection.
 
-**The test set is evaluated exactly once.** Two later read-only extractions of
-raw features (514 already-explained rows, for demo display) are documented in
-`docs/contribution_a_results.md`; no metric derives from them.
+**Test-set use.** All model and round selection used validation data. Three early design choices
+were recorded with test-set numbers as their justification: 3 local epochs,
+FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
+scaler are selected; for local epochs, validation also selects 3 epochs over 1
+at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
+0.8602). Headline test metrics come from one evaluation of each run's
+validation-selected checkpoint. The test set was also read, without informing
+any later choice, in these ways: (a) legacy client-side per-round scoring in
+35 runs, unread by any analysis; (b) round-20 scoring for an earlier
+round-lottery comparison, since replaced by a validation-based one; (c) 14 fixed
+rows as SHAP explanation inputs; (d) display-only use: 514 extracted rows, and
+the dashboard simulator before 2026-10-13 (not logged, no aggregate); (e)
+centralized pilot and baseline runs (18) and XGBoost seeds (3) scored on test
+during development; (f) one preregistered re-evaluation of a single
+validation-selected configuration (`docs/preregistration_accuracy.md`). Full
+table: `docs/test_set_exposure_audit.md`.
+
+**Rule going forward** (team decision, planning chat, 2026-10-12): no
+configuration other than the preregistered one is ever scored on the test set.
 
 The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
 
@@ -117,8 +137,10 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 ## Findings that limit what can be claimed
 
 **Explanation check**
-- Round lottery is real: up to 0.118 between best-by-validation and final-round
-  numbers. Validation-based selection is required.
+- Round lottery is real: up to 0.118 (α=5.0, seed 42, validation macro-F1)
+  between the best-by-validation round and round 20
+  (`results/federated/round_lottery_val.csv`). Validation-based selection is
+  required.
 - The below-floor result at α=0.1 is directional, not significant
   (cluster-bootstrap CIs overlap: [0.250, 0.429] vs floor [0.429, 0.484]).
 - Silo size is not independent of label skew under Dirichlet partitioning; it
@@ -182,7 +204,8 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 
 ## Stop and flag immediately
 
-- Anything that would touch the test set again
+- Anything that would touch the test set again, beyond the one preregistered
+  evaluation in `docs/preregistration_accuracy.md`
 - A locked decision under pressure
 - Federated explanation quality beating centralized (possible leakage)
 - A result that looks too good

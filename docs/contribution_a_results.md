@@ -178,9 +178,11 @@ This is stated as an **open pattern, with no mechanism proposed**. Three analyse
 
 ## Test-set access note
 
-**Test-set access note.** The test set was evaluated exactly once, for model evaluation. Separately, raw feature values for 514 rows (a 14-row eval sidecar and a 500-row streamed SHAP pool) were read from `test_global.parquet` for display in the demo dashboard only, because SHAP values for those rows had already been computed. No metric was recomputed, no model was selected, and no reported number derives from these reads. Both reads were one-time and logged.
+**Test-set access note.** All model and round selection used validation data. Three early design choices were recorded with test-set numbers as their justification: 3 local epochs, FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and scaler are selected; for local epochs, validation also selects 3 epochs over 1 at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs 0.8602). Headline test metrics come from one evaluation of each run's validation-selected checkpoint. The test set was also read, without informing any later choice, in these ways: (a) legacy client-side per-round scoring in 35 runs, unread by any analysis; (b) round-20 scoring for an earlier round-lottery comparison, since replaced by a validation-based one; (c) 14 fixed rows as SHAP explanation inputs; (d) display-only use: 514 extracted rows, and the dashboard simulator before 2026-10-13 (not logged, no aggregate); (e) centralized pilot and baseline runs (18) and XGBoost seeds (3) scored on test during development; (f) one preregistered re-evaluation of a single validation-selected configuration ([`docs/preregistration_accuracy.md`](preregistration_accuracy.md)). Full table: [`docs/test_set_exposure_audit.md`](test_set_exposure_audit.md).
 
 The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
+
+**Rule change, 2026-10-12 (team decision, planning chat).** The test set is evaluated one further time, once, for a single federated configuration selected beforehand on validation data only. The selection is recorded in `docs/preregistration_accuracy.md` and committed before that evaluation. No other configuration is ever scored on the test set. Every number in this document above the section "Added result: federated optimizer comparison (preregistered)" predates this change and is unaffected by it.
 
 ---
 
@@ -190,7 +192,7 @@ Consolidated from `PROJECT_INSTRUCTIONS.md` ("Findings that limit what can be cl
 
 | # | Limitation | Source(s) |
 |---|---|---|
-| 1 | **Round lottery is real** — FedAvg's global macro-F1 can swing up to 0.118 between best-by-validation and the final-round (unselected) test number under non-IID partitioning. Validation-round selection is not optional; every reported number in this project uses it. | `PROJECT_INSTRUCTIONS.md` "Findings that limit what can be claimed"; dashboard "Round-lottery gap" (computed live from `final_metrics.json` across all 9 configs) |
+| 1 | **Round lottery is real** — FedAvg's global macro-F1 can differ by up to 0.118 (α=5.0, seed 42, validation macro-F1) between the best-by-validation round and round 20 under non-IID partitioning. Validation-round selection is not optional; every reported number in this project uses it. *Earlier analysis, kept as a record:* the comparison was first made with test scores (best-by-validation test score vs a round-20 test score of the unselected checkpoint, `results/aggregated/round_lottery.csv`); its maximum is 0.1199 (α=0.5, seed 1337), previously quoted as 0.118. It is superseded by the validation-only version. | `results/federated/round_lottery_val.csv` (all 9 configs, from `round_history.json`; `scripts/aggregate_federated.py --only-val-lottery`) |
 | 2 | **Bot/WebAttack near-duplication was tested, not confirmed.** A nearest-neighbor audit found train/test rows for these families are nearly identical (test-NN ≈ 0.0), raising a pre-registered inflation caveat for their agreement numbers — but the caveat was tested and **not confirmed**; thin dataset support (Bot=3,527, WebAttack=1,542 rows) is the likelier explanation for their behavior. State as tested-and-not-confirmed, not as a live caveat. | `PROJECT_INSTRUCTIONS.md` "Findings that limit what can be claimed"; dashboard "Known limitations" |
 | 3 | **α=0.1 below-floor reading is directional, not significant.** Cluster-bootstrap CIs overlap: α=0.1 [0.250, 0.429] vs. floor range [0.429, 0.484]. Never state the below-floor result as confirmed. | `PROJECT_INSTRUCTIONS.md` "Findings that limit what can be claimed"; dashboard "Is the α=0.1 agreement drop real, or seed noise?" callout |
 | 4 | **Silo size and heterogeneity cannot be independently varied by this partitioner** — size is a deterministic output of the same Dirichlet label-skew draw that produces heterogeneity (`dirichlet_assign()`). A raw size correlation restates the label-skew effect; the KL-from-global partial correlation (conditioned on log-size) is the recommended covariate, and it survives conditioning, but the underlying draw still jointly determines both — no covariate check substitutes for an experimental control (e.g. size-equalized partitions). | `PROJECT_INSTRUCTIONS.md` "Findings that limit what can be claimed"; dashboard "Known limitations"; `docs/measurement_protocol.md` §10 item 5 (fullest account); §5 above |
@@ -216,3 +218,61 @@ Consolidated from `PROJECT_INSTRUCTIONS.md` ("Findings that limit what can be cl
 ---
 
 *Numbers in this document were current as of the FedProx μ=0.0005 sweep (2026-08-25). If any upstream CSV, manifest, or script referenced above changes, this document is the one to re-derive from and update — the other three locations defer to it.*
+
+---
+---
+
+## Added result: federated optimizer comparison (preregistered)
+
+*Added 2026-10-12. Separate from everything above: no number above this line was changed, and the explanation check (SHAP, agreement, the instability floor) and the trust check stay on the published FedAvg runs. Nothing in this section was recomputed for the new optimizer. Protocol, selection rule and sealed checkpoints: [`docs/preregistration_accuracy.md`](preregistration_accuracy.md).*
+
+**Question.** Does a different federated optimizer raise macro-F1 over FedAvg under non-IID data, mainly at α=0.1?
+
+**Protocol.** Selection used validation data only. Four candidates were compared at α ∈ {0.1, 0.5} × seeds {42, 1337, 2024}: FedAvgM momentum 0.5 and 0.9, FedAdam η=0.01, FedYogi η=0.01. The model, partitions (SHA256-checked), 3 local epochs, 20 rounds and best-by-validation round selection are unchanged. 4 of the 9 requested candidates were run. The other 5 were cut on wall-time grounds only, each recorded in the preregistration before that candidate started: fedprox_mu0.1 by the budget estimate before any candidate ran, and fedprox_mu0.001, fedprox_mu0.01, fedadam_lr0.001 and fedyogi_lr0.001 by a timing-only budget guard (added after one fedavgm_m0.5 validation score had been seen; disclosed in the preregistration). SCAFFOLD was not run: no Flower strategy exists for it, it needs persistent client state, and the locked local optimizer is AdamW. A FedAvg re-run on the new code path reproduced the published α=0.1 seed 42 validation curve exactly (all 21 rounds). The rule picked **FedAvgM, server momentum 0.9, server lr 1.0**. Its 9 best-by-validation checkpoints (α ∈ {0.1, 0.5, 5.0} × 3 seeds) were sealed by SHA256 in commit `1a17277`. They were then scored on the test set once, the single additional test evaluation allowed by the 2026-10-12 rule change.
+
+**Validation (selection).** Source: `results/federated_methods/selection.json`.
+
+| | α=0.1 val mean | α=0.5 val mean |
+|---|---|---|
+| FedAvg (published runs) | 0.5228 | 0.9425 |
+| FedAvgM m=0.5 | 0.5386 | 0.9502 |
+| **FedAvgM m=0.9 (chosen)** | **0.6068** | **0.9861** |
+| FedAdam η=0.01 | 0.4583 | 0.8482 (fails guard) |
+| FedYogi η=0.01 | 0.4627 | 0.9004 (fails guard) |
+
+**Test (single preregistered evaluation).** Source: `results/federated_methods/test_once/result.json` (prereg commit `1a172773523e9ce549952631fe3b89797af83bb7`). Macro-F1 over the 7 headline families, mean ± std over 3 seeds (population std, as in the published table). The FedAvg column is the published result (`results/aggregated/federated_headline.csv`), not re-run.
+
+| α | FedAvg (published) | FedAvgM m=0.9 | Per seed, 42 / 1337 / 2024 (FedAvg → FedAvgM) |
+|---|---|---|---|
+| 0.1 | 0.516 ± 0.048 | **0.593 ± 0.063** | 0.5426→0.6558 / 0.4481→0.5065 / 0.5572→0.6167 |
+| 0.5 | 0.941 ± 0.057 | **0.985 ± 0.001** | 0.9753→0.9846 / 0.9866→0.9856 / 0.8605→0.9856 |
+| 5.0 | 0.990 ± 0.001 | **0.991 ± 0.001** | 0.9900→0.9918 / 0.9905→0.9906 / 0.9889→0.9910 |
+
+Unrounded: 0.5930 ± 0.0632, 0.9852 ± 0.0005, 0.9911 ± 0.0005.
+
+**Per-class test F1, FedAvgM m=0.9** (mean over 3 seeds; Infiltration and Heartbleed per class only, not in the headline):
+
+| Class | α=0.1 | α=0.5 | α=5.0 |
+|---|---|---|---|
+| Benign | 0.9417 | 0.9988 | 0.9993 |
+| Bot | 0.3949 | 0.9646 | 0.9705 |
+| BruteForce | 0.5708 | 0.9947 | 0.9964 |
+| DDoS | 0.9897 | 0.9999 | 0.9999 |
+| DoS | 0.6487 | 0.9946 | 0.9979 |
+| PortScan | 0.2964 | 0.9967 | 0.9977 |
+| WebAttack | 0.3088 | 0.9475 | 0.9762 |
+| Heartbleed (per class only) | 0.0000 | 0.6000 | 0.9333 |
+| Infiltration (per class only) | 0.0000 | 0.4843 | 0.6239 |
+
+**What this supports.**
+- **α=0.5: stability.** The mean rose from 0.941 to 0.985, and the seed spread shrank from 0.057 to 0.0005. Most of the change is one seed that FedAvg handled badly (seed 2024: 0.8605 → 0.9856); seed 1337 moved −0.001. The main effect is removing a bad seed, not raising good ones.
+- **α=0.1: consistent but modest.** Server momentum 0.9 raised test macro-F1 in each of the 3 seeds (+0.113, +0.058, +0.060), mean 0.516 → 0.593. That is n=3, and the validation curves oscillate strongly at this α, so the best-by-validation rounds are often spikes. α=0.1 remains far below centralized (0.990): whole families still get F1 near 0 in some seeds (per-class std 0.31–0.46 for Bot, BruteForce, DoS, PortScan and WebAttack).
+- **α=5.0: parity.** The change is +0.0001 to +0.0021 per seed, within the centralized MLP's own seed spread (0.9900 ± 0.0022).
+
+**Limits.**
+- n=3 seeds per α. No significance test is claimed.
+- Only 4 of the 9 requested candidates were compared (budget), so this is "the best of these four", not a tuned optimum. In particular, server momentum is not swept beyond {0.5, 0.9}, and server lr is fixed at 1.0.
+- The validation gain at α=0.1 (+0.084) was larger than the test gain (+0.077). FedAvgM m=0.9's α=0.1 validation curves oscillate strongly. Its best-by-validation rounds are often spikes, and its final-round α=0.1 val mean (0.5248) is close to FedAvg's (0.5062). This was recorded in the prereg before the test.
+- These are not GPU results. Flower's isolated runtime trains with torch 2.13.0+cpu. The two August runtime envs still on disk (2026-08-10 and 2026-08-26) used the same build, so the published federated runs most likely trained on CPU too. The Flower app's dependencies are now pinned to those versions.
+- Flower 1.33's FedAdam sends float64 global weights from round 2 on (1.5× the per-round payload: 2,381,880 vs 1,587,920 bytes). It was not selected; noted for anyone reusing it. Every other method sends 1,587,920 bytes per round. Per-round wall time and bytes for every run are in `results/federated_methods/runs/*/round_timing_comm.jsonl`.
+- The explanation and trust findings above are FedAvg findings. Whether momentum changes explanation agreement is untested.
