@@ -128,14 +128,15 @@ inference:
 # ---------------------------------------------------------------------------
 # Part B (optional) -- predict engine for backend/main.py POST /predict
 # ---------------------------------------------------------------------------
-# torch      -- unchanged serving path (default).
 # onnx_fp32  -- base model exported to ONNX at startup and served with ONNX
 #               Runtime; startup fails unless all validation predictions equal
-#               torch's (backend/onnx_engine.py). int8 is not offered: its
-#               validation macro-F1 moved by more than 0.005.
+#               torch's (backend/onnx_engine.py). Default since the planning
+#               chat's 2026-10-13 decision (0 differences on 143,513 val rows).
+# torch      -- the original serving path, still available.
+# int8 is dropped (validation macro-F1 -0.1428) and not offered.
 # A hot-swapped model always uses the torch path.
 serving:
-  engine: torch
+  engine: onnx_fp32
   onnx_opset: 17
   intra_op_threads: 8
   verify_batch_size: 1024

@@ -1,7 +1,7 @@
-"""Optional ONNX Runtime fp32 engine for POST /predict (efficiency Part B).
+"""ONNX Runtime fp32 engine for POST /predict (efficiency Part B).
 
-Off by default: configs/efficiency.yaml serving.engine is `torch`, and the
-backend then behaves exactly as before. With `onnx_fp32`, startup exports the
+Default since 2026-10-13 (configs/efficiency.yaml serving.engine: onnx_fp32);
+with `torch` the backend behaves exactly as before. With `onnx_fp32`, startup exports the
 already-verified base model to ONNX in memory (so the graph can never drift
 from the served weights), runs it over the full validation split, and refuses
 to start unless every prediction matches the torch model and validation
