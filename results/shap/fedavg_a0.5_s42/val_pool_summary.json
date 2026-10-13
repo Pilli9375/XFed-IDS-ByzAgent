@@ -1,0 +1,44 @@
+{
+  "tag": "fedavg_a0.5_s42",
+  "source": "val",
+  "source_file": "data/processed/train_pool.parquet (val_mask.is_val rows)",
+  "sample_id_meaning": "row position in train_pool.parquet",
+  "n_rows": 500,
+  "limit": null,
+  "pool_size": 500,
+  "sample_seed": 6006,
+  "explainer_seed": 6006,
+  "nsamples": 4000,
+  "background": "200 rows, pooled centralized X_train, seed 777",
+  "checkpoint": "results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt",
+  "best_round": 18,
+  "class_counts": {
+    "Benign": 71,
+    "Bot": 71,
+    "BruteForce": 71,
+    "DDoS": 71,
+    "DoS": 70,
+    "Heartbleed": 1,
+    "Infiltration": 5,
+    "PortScan": 70,
+    "WebAttack": 70
+  },
+  "additivity_abs_logit": {
+    "mean": 0.5534042716026306,
+    "median": 0.47208982706069946,
+    "p95": 1.104581594467163,
+    "max": 3.3358242511749268,
+    "min": 0.12447623163461685
+  },
+  "additivity_relative": {
+    "mean": 0.036161866039037704,
+    "median": 0.03228474035859108,
+    "p95": 0.07686905562877655,
+    "max": 0.2124655693769455,
+    "min": 0.008412329480051994
+  },
+  "relative_definition": "max_c |sum_f SHAP[f,c] - (f(x)_c - E[f]_c)| / max_c |f(x)_c - E[f]_c|",
+  "raw_values_sha256": "25123cbfd9109385565473783947c3f0fc3a6636923fd0a6a5bb79a7de5aada7",
+  "written_at": "2026-10-13T17:37:21+00:00",
+  "elapsed_s": 2645.7
+}
