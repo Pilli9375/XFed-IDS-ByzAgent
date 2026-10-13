@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import Src, { Srcs } from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { fixed, pct, signed } from '../../lib/format';
 import { buildCleanVsAttackRows } from '../../lib/trust';
 import { LIFT_HIGHLIGHT, conditionLabel, conditionSources, orgTone } from '../../lib/trust2';
@@ -99,7 +99,7 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div className={`org-card tone-${tone}`}>
           <span className="org-tag">ORG {sel.silo} · {tag}</span>
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
@@ -109,20 +109,18 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
           </div>
           <p className="small">{note}</p>
         </div>
-        <div className="tiles">
+        <div className="tiles-3">
           <div className="tile">
             <p className="small">Multi-Krum excluded a poisoned org</p>
             <p className="tile-num text-attack">{pct(mkExcl / mkSlots, 0)}</p>
             <p className="tiny">
               seed {base.seed}, told f exactly · {mkExcl} of {mkSlots} poisoned org-rounds
             </p>
-            <Srcs paths={base.multikrum_exclusions.map((x) => x.source)} />
           </div>
           <div className="tile">
             <p className="small">Cost with no attack</p>
             <p className="tile-num tile-num--sm">{base.defence_costs.map((c) => fixed(c.cost_pp, 1)).join(' / ')} pp</p>
             <p className="tiny">{base.defence_costs.map((c) => c.label).join(' / ')} · logged test macro-F1 vs clean FedAvg</p>
-            <Srcs paths={[base.clean_reference_source, ...base.defence_costs.map((c) => c.source)]} />
           </div>
           <div className="tile">
             <p className="small">Decision stability</p>
@@ -130,7 +128,6 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
             <p className="tiny">
               round {p3[0]?.round}, {p3[0]?.repeats}× repeats · trust-vs-flag {p3Boundary}/{p3N} · the LLM is nondeterministic
             </p>
-            <Srcs paths={p3.map((c) => c.source)} />
           </div>
         </div>
       </div>
@@ -197,9 +194,8 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
       <p className="small">
         The agent produces decisions plus a rationale of measured fidelity; ~{fixed(fid.adjusted_error_rate_low * 100, 0)}–
         {fixed(fid.automated_error_rate * 100, 0)}% of its trend claims contradicted the data it was given ({fid.n_trend_claims} claims;
-        range adjusted by a {fid.handcheck_n}-claim hand-check). <Srcs paths={fid.sources} />
+        range adjusted by a {fid.handcheck_n}-claim hand-check).
       </p>
-      <span className="src-list">{conditionSources(cond).map((p) => <Src key={p} path={p} />)}</span>
 
       <details className="disc">
         <summary>All orgs, all rounds <span className="mono-mute">decision grids, clean and attack</span></summary>
@@ -242,7 +238,6 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
             </tbody>
           </table>
         </div>
-        <Srcs paths={trust.decision_variance.map((c) => c.source)} />
       </details>
 
       <details className="disc">
@@ -253,6 +248,16 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
           and composition, not the attack. Classical Krum keeps one org per round, so its exclusions are chance-level.
         </p>
       </details>
+      <Sources
+        paths={[
+          ...conditionSources(cond),
+          ...base.multikrum_exclusions.flatMap((x) => [x.source, x.attack_config]),
+          base.clean_reference_source,
+          ...base.defence_costs.map((c) => c.source),
+          ...trust.decision_variance.map((c) => c.source),
+          ...fid.sources,
+        ]}
+      />
       {trust.excluded_conditions.length > 0 && (
         <p className="tiny">
           Not shown: {trust.excluded_conditions.map((x) => `${x.attack_tag} (${x.reason})`).join('; ')}

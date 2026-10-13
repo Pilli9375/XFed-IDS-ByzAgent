@@ -1,4 +1,4 @@
-import Src, { Srcs } from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { fixed, meanSd } from '../../lib/format';
 
 // 01: FedAvg (aggregated CSV) vs FedAvgM (the one preregistered test
@@ -31,7 +31,6 @@ export default function AccuracyQ({ acc, federation }) {
         <span className="num">{meanSd(x.mean, x.std, 4)}</span>. FedAvgM: {acc.fedavgm_kind}; chosen on validation from{' '}
         {acc.selection.n_candidates_compared} candidates compared ({acc.selection.n_dropped_by_budget_guard} more dropped by the budget guard).
       </p>
-      <Srcs paths={[acc.fedavg_source, acc.fedavgm_source, acc.selection.source, c.source, x.source]} />
 
       <details className="disc">
         <summary>Per-class F1 <span className="mono-mute">test, mean over seeds</span></summary>
@@ -65,7 +64,6 @@ export default function AccuracyQ({ acc, federation }) {
           Headline macro-F1 averages {acc.headline_classes.join(', ')}. {acc.per_class_only.join(' and ')} are reported per class
           only.
         </p>
-        <Srcs paths={acc.per_class_sources} />
       </details>
 
       {federation && (
@@ -88,9 +86,19 @@ export default function AccuracyQ({ acc, federation }) {
               </tbody>
             </table>
           </div>
-          <Src path="results/inspection/best_rounds_manifest.json" />
         </details>
       )}
+      <Sources
+        paths={[
+          acc.fedavgm_source,
+          acc.fedavg_source,
+          acc.selection.source,
+          c.source,
+          x.source,
+          ...acc.per_class_sources,
+          federation && 'results/inspection/best_rounds_manifest.json',
+        ]}
+      />
     </section>
   );
 }

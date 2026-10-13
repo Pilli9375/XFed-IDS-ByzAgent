@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { faithfulnessFigureUrl } from '../../api/client';
-import Src, { Srcs } from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { computeHeadlineAgreement, computePerFamilyAgreement } from '../../lib/agreement';
 import { alphaStr, fixed } from '../../lib/format';
 import { medianSorted, sortedNums } from '../../lib/stats';
@@ -8,6 +8,7 @@ import DataEligibility from './DataEligibility';
 
 const AGREEMENT_SRC = 'results/inspection/agreement_metrics.csv';
 const ROUNDWISE_SRC = 'results/inspection/round_wise_agreement.csv';
+const SIZES_SRC = 'results/inspection/silo_sizes.csv';
 const FAITH_SRC = ['results/inspection/deletion_auc.csv', 'results/inspection/insertion_auc.csv'];
 
 // 02: silo-vs-global explanation agreement against alpha, the seed-noise
@@ -63,13 +64,11 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
         {fixed(Math.min(...multiples), 1)}×–{fixed(Math.max(...multiples), 1)}× chance. The floor is how much rankings differ
         between centralized models that differ only by random seed (median {fixed(floor.median)}, range over seed pairs).
       </p>
-      <Srcs paths={[AGREEMENT_SRC, floor.source, summary.chance.source]} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
         <div className="tile">
           <p className="eyebrow">Weighted <span className="keep">τ</span></p>
           <p className="tile-num tile-num--sm">{headline.map((h) => fixed(h.tau_median)).join(' → ')}</p>
           <p className="tiny">median, α = {alphas.join(' / ')}</p>
-          <Src path={AGREEMENT_SRC} />
         </div>
         <div className="tile">
           <p className="eyebrow"><span className="keep">α={ci.alpha}</span> CI vs floor</p>
@@ -80,13 +79,11 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
             {summary.overlap ? 'Overlapping — directional, not significant' : 'Not overlapping'}
           </p>
           <p className="tiny">cluster bootstrap by silo, {ci.n_boot.toLocaleString('en-US')} resamples, {ci.n_clusters} silos</p>
-          <Srcs paths={[ci.source, floor.source]} />
         </div>
         <div className="tile">
           <p className="eyebrow">Faithfulness · global</p>
           <p className="tile-num tile-num--sm">deletion {fixed(global.deletion_auc)} · insertion {fixed(global.insertion_auc)}</p>
           <p className="tiny">{faith.config_label} spot check, not a gate</p>
-          <Srcs paths={FAITH_SRC} />
         </div>
       </div>
 
@@ -119,14 +116,12 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
           </table>
         </div>
         <p className="tiny">— = family not eligible at that α (too few flows in too few orgs).</p>
-        <Src path={AGREEMENT_SRC} />
       </details>
 
       <details className="disc">
         <summary>Round-wise agreement <span className="mono-mute">median Jaccard@10 across orgs and seeds, by round</span></summary>
         <RoundWise data={roundWise} />
         <p className="tiny">Directional; computed at reduced SHAP fidelity (see Limits).</p>
-        <Src path={ROUNDWISE_SRC} />
       </details>
 
       <details className="disc">
@@ -145,7 +140,6 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
           <img src={faithfulnessFigureUrl('deletion')} alt="Deletion curves: model confidence as top-ranked features are removed" loading="lazy" width="640" height="420" />
           <img src={faithfulnessFigureUrl('insertion')} alt="Insertion curves: model confidence as top-ranked features are reinserted" loading="lazy" width="640" height="420" />
         </div>
-        <Srcs paths={FAITH_SRC} />
       </details>
 
       {federation && (
@@ -154,6 +148,9 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
           <DataEligibility federation={federation} />
         </details>
       )}
+      <Sources
+        paths={[AGREEMENT_SRC, floor.source, summary.chance.source, ROUNDWISE_SRC, ...FAITH_SRC, federation && SIZES_SRC]}
+      />
     </section>
   );
 }

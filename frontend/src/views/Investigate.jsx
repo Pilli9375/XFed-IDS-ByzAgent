@@ -48,8 +48,10 @@ export default function Investigate({ hs }) {
 
   const cond = trust.data?.conditions[condIdx];
   const rows = cond ? buildCleanVsAttackRows(cond.clean.per_silo, cond.attack.per_silo, cond.true_malicious_silos) : [];
-  // Until an org is picked, show the condition's first poisoned org.
-  const orgId = org ?? cond?.true_malicious_silos[0] ?? 0;
+  // Until an org is picked, show the condition's poisoned org with the
+  // largest lift (attack-run flag rate minus clean-run flag rate).
+  const topPoisoned = rows.filter((r) => r.malicious).sort((a, b) => b.lift - a.lift)[0];
+  const orgId = org ?? topPoisoned?.silo ?? rows[0]?.silo ?? 0;
   const selRow = rows.find((r) => r.silo === orgId);
   const tone = selRow ? orgTone(selRow) : 'ok';
 

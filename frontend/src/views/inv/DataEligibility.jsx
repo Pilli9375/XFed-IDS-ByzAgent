@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react';
-import Src from '../../components/Src';
 import { int } from '../../lib/format';
 
-const SIZES_SRC = 'results/inspection/silo_sizes.csv';
 
 // Folded in from the old Federation Status page. The label-skew heatmap is
 // fixed (inventory 5.4): column labels sit above the grid, unrotated, and a
@@ -95,7 +93,6 @@ export default function DataEligibility({ federation: fed }) {
         </div>
         <p className="tiny">flows per cell, log scale · max {int(grid.max)}</p>
       </div>
-      <Src path={SIZES_SRC} />
 
       <div className="tiles" style={{ flex: 'none' }}>
         <div className="tile">
@@ -140,7 +137,6 @@ export default function DataEligibility({ federation: fed }) {
         </table>
       </div>
       <p className="tiny">Cells: orgs eligible for that family. ✗ = family excluded for that configuration.</p>
-      <Src path={SIZES_SRC} />
     </div>
   );
 }

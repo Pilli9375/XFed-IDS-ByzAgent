@@ -21,3 +21,19 @@ export function Srcs({ paths }) {
     </span>
   );
 }
+
+// One per panel: the panel's source files, folded behind "Sources (n) ▸".
+export function Sources({ paths }) {
+  const unique = [...new Set(paths.filter(Boolean))];
+  if (unique.length === 0) return null;
+  return (
+    <details className="srcs">
+      <summary>Sources ({unique.length})</summary>
+      <span className="src-list src-list--col">
+        {unique.map((p) => (
+          <Src key={p} path={p} label={p} />
+        ))}
+      </span>
+    </details>
+  );
+}

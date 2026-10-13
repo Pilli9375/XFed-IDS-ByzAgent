@@ -1,4 +1,4 @@
-import Src from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { CONFOUND_CLEAN_RATE, LIFT_HIGHLIGHT, conditionLabel, conditionSources } from '../../lib/trust2';
 import { buildCleanVsAttackRows } from '../../lib/trust';
 import { fixed, signed } from '../../lib/format';
@@ -63,9 +63,7 @@ export default function TrustDumbbell({ trust, condIdx, onCond }) {
             ? `Org${confound.length > 1 ? 's' : ''} ${confound.join(', ')} ${confound.length > 1 ? 'are' : 'is'} flagged in at least ${fixed(CONFOUND_CLEAN_RATE * 100, 0)}% of rounds with no attack at all: the compositional confound.`
             : `No clean org is flagged in ${fixed(CONFOUND_CLEAN_RATE * 100, 0)}% or more of rounds without an attack in this condition.`}
         </span>
-        <span className="src-list">
-          {conditionSources(cond).map((p) => <Src key={p} path={p} />)}
-        </span>
+        <Sources paths={conditionSources(cond)} />
       </div>
     </section>
   );

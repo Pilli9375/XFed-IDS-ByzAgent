@@ -1,4 +1,4 @@
-import { Srcs } from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { fixed, int, signed } from '../../lib/format';
 
 // 04: four tiles from GET /figures, plus what was tested and dropped.
@@ -53,7 +53,6 @@ export default function EfficiencyQ({ f }) {
             <span className="num" style={{ fontSize: 24, letterSpacing: '-0.03em' }}>{t.value}</span>
             <span className="small">{t.sub}</span>
             <span className="eyebrow" style={{ fontSize: 10, marginTop: 4 }}>{t.kind}</span>
-            <Srcs paths={t.src} />
           </div>
         ))}
       </div>
@@ -66,8 +65,9 @@ export default function EfficiencyQ({ f }) {
             {fixed(s1337.flag_rate_poisoned_logged, 3)})
           </>
         )}
-        . <Srcs paths={[f.int8_inference.source, pre.source]} />
+        .
       </p>
+      <Sources paths={[...tiles.flatMap((t) => t.src), f.int8_inference.source, pre.source]} />
     </section>
   );
 }

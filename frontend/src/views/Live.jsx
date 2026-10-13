@@ -10,7 +10,7 @@ import ScoreFlowDrawer from '../components/ScoreFlowDrawer';
 import { useLoadingGate } from '../hooks/useLoadingGate';
 import { useResource } from '../hooks/useResource';
 import { useTheme } from '../hooks/useTheme';
-import { kindOf } from '../lib/alerts';
+import { isAttack, kindOf } from '../lib/alerts';
 import FlowStream from './live/FlowStream';
 import KeyFigures from './live/KeyFigures';
 import LiveSkeleton from './live/LiveSkeleton';
@@ -25,7 +25,7 @@ export default function Live({ hs }) {
   const { epoch } = useTheme();
   const swapActive = !!hs.status?.hotswap?.active;
   // /config changes when a hot-swap toggles (engine), so key it on that.
-  const config = useResource(`config:${swapActive}`, getConfig);
+  const config = useResource(`config:${swapActive}`, getConfig, 'config');
   const health = useResource('health', getHealth);
   const figures = useResource('figures', getFigures);
   const trust = useResource('trust', getTrust);
@@ -70,7 +70,9 @@ export default function Live({ hs }) {
   };
 
   const cfg = config.data;
-  const statusTone = loading ? 'agent' : kind;
+  // Text follows the predicted family (Benign → ok, attack → attack-text);
+  // a miss shows in the words and in the light, not by recolouring benign text.
+  const statusTone = loading ? 'agent' : newest && isAttack(newest) ? 'attack' : 'ok';
   const liveLabel = loading
     ? 'LOADING'
     : !playing

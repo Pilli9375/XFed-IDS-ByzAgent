@@ -67,7 +67,7 @@ export default function FlowStream({ alerts, newest, selectedTs, onSelect, filte
       </div>
       <div className="now-bar" aria-live="polite">
         <span className="eyebrow">Just arrived</span>
-        <span className="now-fam">{newest ? newest.predicted_family : '—'}</span>
+        <span className={`now-fam${newest && isAttack(newest) ? ' is-attack' : ''}`}>{newest ? newest.predicted_family : '—'}</span>
         {newest && (
           <span className="now-meta">
             {pct(newest.confidence)} · {verdict}

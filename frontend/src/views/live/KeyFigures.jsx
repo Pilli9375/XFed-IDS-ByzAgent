@@ -54,11 +54,7 @@ export default function KeyFigures({ figures: f }) {
             <span className="kpi-unit">{k.unit}</span>
           </span>
           <span className="small">{k.sub}</span>
-          <span className="src-list">
-            {[...new Set(k.src)].map((p) => (
-              <Src key={p} path={p} />
-            ))}
-          </span>
+          <Src path={k.src[0]} />
         </div>
       ))}
     </section>

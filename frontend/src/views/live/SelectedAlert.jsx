@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useAlertExplanation } from '../../api/useAlertExplanation';
-import Src from '../../components/Src';
+import { Sources } from '../../components/Src';
 import { BENIGN, isMiss } from '../../lib/alerts';
 import { fixed, pct, signed, timeOf } from '../../lib/format';
 import { buildShapView } from '../../lib/shap';
@@ -117,9 +117,6 @@ function ExplanationView({ alert, shap, explain, sources }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <span className="eyebrow eyebrow--agent">LLM-generated summary · not a research result</span>
         <p className="llm-text">{explain.sentence}</p>
-        <span className="src-list">
-          <Src path={sources.sentences} />
-        </span>
       </div>
       {family !== alert.predicted_family && (
         <p className="note text-agent">
@@ -154,8 +151,8 @@ function ExplanationView({ alert, shap, explain, sources }) {
         <span><i style={{ background: toward }} />pushes toward {family}</span>
         <span><i style={{ background: 'var(--away)' }} />pushes away</span>
         <span className="text-mute">residual = max |ΣSHAP − (f(x) − E f)| over classes, logit</span>
-        <Src path={sources.shap} />
       </div>
+      <Sources paths={[sources.sentences, sources.shap]} />
     </div>
   );
 }
