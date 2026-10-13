@@ -1,0 +1,185 @@
+# configs/efficiency.yaml
+# Efficiency session (branch `efficiency`). Kept separate from the
+# explanation-check and trust-check configs. Nothing here reads test rows:
+# Part A replays existing agent decision logs, Part B uses validation rows
+# only, Part C uses validation macro-F1 only.
+
+# ---------------------------------------------------------------------------
+# Part A -- ByzAgent train_loss pre-screen, offline replay
+# ---------------------------------------------------------------------------
+# The agent makes ONE batched LLM call per round covering every org
+# (src/agents/byz_agent.py decide_round). The pre-screen sends an org to the
+# LLM only if train_loss / median(train_loss over all orgs that round) > t;
+# every other org is auto-assigned `auto_decision`. A round in which no org
+# passes the screen makes no LLM call at all.
+#
+# Replay assumption: an org that passes the screen receives the decision the
+# LLM actually logged for it with all 10 orgs in the prompt. A live run would
+# show the LLM fewer orgs, which may change its answer (stated as a limit).
+agent_prescreen:
+  signal: train_loss
+  reference: round_median        # median over all orgs in the same round
+  comparison: strictly_greater   # sent to LLM iff ratio > t
+  auto_decision: trust
+  flag_decisions: [downweight, quarantine]
+  malicious_silos: [0, 3, 5]
+  # t = 0.0 sends every org (no pre-screen) and is the reference row.
+  threshold_grid: [0.0, 1.0, 1.1, 1.25, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 15.0, 20.0, 30.0, 50.0]
+
+  # Fixed before any ratio distribution was looked at.
+  # Rule: the LARGEST t in threshold_grid such that, in every seed-42 attack
+  # run listed under selection_runs, the pre-screen keeps at least
+  # min_poisoned_flag_retention of the flags the logged LLM placed on
+  # poisoned (org, round) pairs. Rationale: the pre-screen is only worth
+  # having if it does not hide detections the agent already makes; among
+  # thresholds that satisfy that, larger t avoids more LLM calls.
+  selection:
+    seed: 42
+    min_poisoned_flag_retention: 1.0
+    selection_runs: [s42_f3_sudden, s42_f2_sudden]
+
+  # Current-round (Phase 3 prompt) decision logs. Seed-42 files were checked
+  # 200/200 identical to results/inspection/phase3_gate_raw_a0.5_s42.json.
+  runs:
+    s42_clean:
+      seed: 42
+      attack: none
+      log: results/federated/fedavg_a0.5_s42/agent_decisions.jsonl
+    s42_f3_sudden:
+      seed: 42
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5/agent_decisions.jsonl
+    s42_f2_sudden:
+      seed: 42
+      attack: f2_sudden
+      malicious_silos: [0, 3]
+      log: results/federated/fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3/agent_decisions.jsonl
+    # Diagnostic only (not used for selection): the gradual attacker starts at
+    # a 5% flip fraction, i.e. the case where train_loss starts under t.
+    s42_f3_gradual:
+      seed: 42
+      attack: f3_gradual
+      log: results/federated/fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5/agent_decisions_phase4_current_round.jsonl
+    s1337_clean:
+      seed: 1337
+      attack: none
+      log: results/federated/fedavg_a0.5_s1337/agent_decisions_multiseed.jsonl
+    s1337_f3_sudden:
+      seed: 1337
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s1337_poisoned_f3_sudden_silos0-3-5/agent_decisions_multiseed.jsonl
+    s2024_clean:
+      seed: 2024
+      attack: none
+      log: results/federated/fedavg_a0.5_s2024/agent_decisions_multiseed.jsonl
+    s2024_f3_sudden:
+      seed: 2024
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s2024_poisoned_f3_sudden_silos0-3-5/agent_decisions_multiseed.jsonl
+  report_seeds: [1337, 2024]
+
+  # Per-call wall time of the logged (no pre-screen) LLM calls, used only to
+  # convert skipped rounds into seconds. Not a new measurement.
+  call_timing_sources:
+    - results/inspection/phase3_gate_raw_a0.5_s42.json
+    - results/inspection/multiseed_agent_gate_raw.json
+
+  output: results/efficiency/agent_prescreen_replay.json
+
+# ---------------------------------------------------------------------------
+# Part B -- inference speed of the served model, validation rows only
+# ---------------------------------------------------------------------------
+# Model, scaler and validation rows come from backend/model_loader.py
+# load_and_verify(), which re-checks val macro-F1 against round_history.json
+# and never reads test_global.parquet. Timings cover the model forward pass
+# on already-scaled float32 rows; the StandardScaler step is identical for
+# every variant and is not timed.
+inference:
+  backend_config: configs/backend.yaml   # model.tag must be fedavg_a0.5_s42
+  expected_tag: fedavg_a0.5_s42
+  expected_best_round: 18
+  variants: [torch_eager, ort_fp32, ort_int8_dynamic]
+  # Same intra-op thread count for torch and ONNX Runtime (physical cores).
+  intra_op_threads: 8
+  onnx:
+    opset: 17
+    dir: results/efficiency/onnx
+    # Dynamic quantization: int8 weights, activations quantized at run time.
+    int8_weight_type: QInt8
+  latency:
+    batch_size: 1
+    n_rows: 5000          # validation rows drawn with sample_seed
+    sample_seed: 42
+    warmup_calls: 500
+    repeats: 3            # each repeat times all n_rows single-row calls
+  throughput:
+    batch_size: 1024
+    warmup_batches: 20
+    repeats: 5            # each repeat is one full pass over the validation split
+  # Stop-and-flag bound from the session brief.
+  max_abs_macro_f1_delta: 0.005
+  # Backend wiring is allowed only if |delta| rounds to 0 at 3 decimals.
+  backend_wiring_decimals: 3
+  output: results/efficiency/inference_speed.json
+  # One line per timing session (appended).
+  sessions_log: results/efficiency/inference_speed_sessions.jsonl
+  sessions_planned: 3
+
+# ---------------------------------------------------------------------------
+# Part B (optional) -- predict engine for backend/main.py POST /predict
+# ---------------------------------------------------------------------------
+# onnx_fp32  -- base model exported to ONNX at startup and served with ONNX
+#               Runtime; startup fails unless all validation predictions equal
+#               torch's (backend/onnx_engine.py). Default since the planning
+#               chat's 2026-10-13 decision (0 differences on 143,513 val rows).
+# torch      -- the original serving path, still available.
+# int8 is dropped (validation macro-F1 -0.1428) and not offered.
+# A hot-swapped model always uses the torch path.
+serving:
+  engine: onnx_fp32
+  onnx_opset: 17
+  intra_op_threads: 8
+  verify_batch_size: 1024
+  require_equal_decimals: 3
+
+# ---------------------------------------------------------------------------
+# Part C -- communication and compute
+# ---------------------------------------------------------------------------
+communication:
+  # Parameter count is read from this checkpoint (the served model).
+  checkpoint: results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt
+  directions_per_round: 2          # server->client broadcast + client->server upload
+  # Harness-logged bytes and per-round wall time (method path, validation only).
+  method_runs_root: results/federated_methods
+  wall_time_groups: [runs, regression]   # 3-local-epoch runs; provenance (1 epoch) excluded
+  output: results/efficiency/communication.json
+
+# Client->server update compression. Selected per run with
+# --run-config "upload-compression='<scheme>'" on the validation-only method
+# path (federated/xfed_federated/server_app.py::_run_method); empty = off.
+# The client sends q(local_weights - global_weights_it_received); the server
+# adds the dequantized delta back to the global weights it sent that round
+# and then runs the unchanged Flower FedAvg aggregation. The server->client
+# broadcast stays float32.
+compression:
+  schemes:
+    fp16:
+      kind: fp16                   # delta cast to float16
+    int8:
+      kind: int8_per_tensor        # symmetric, round to nearest
+      qmax: 127                    # q = clip(round(delta / s), -127, 127)
+      scale: absmax                # s = max|delta| / qmax per tensor, sent as float32
+  runs:
+    method: fedavg                 # configs/federated_methods.yaml entry
+    alpha: "0.5"
+    seeds: [42, 1337, 2024]
+    schemes: [fp16, int8]
+    run_group: efficiency
+    # One uncompressed FedAvg run on the edited code path, compared with the
+    # published round_history.json to show the default path is unchanged.
+    regression_seeds: [42]
+  baseline:
+    runs_dir: results/federated
+    tag_pattern: "fedavg_a{alpha}_s{seed}"
+  run_log: results/efficiency/compression_run_log.jsonl
+  output: results/efficiency/update_compression.json

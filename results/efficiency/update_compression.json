@@ -1,0 +1,303 @@
+{
+  "source": "Validation-only method-path runs in results/federated_methods/efficiency/ (fedavg, alpha=0.5, seeds [42, 1337, 2024], schemes ['fp16', 'int8']); uncompressed baseline = published results/federated/fedavg_a0.5_s*/round_history.json; run log results/efficiency/compression_run_log.jsonl. Script: tools/efficiency_compression_summary.py. No test rows.",
+  "kind": "3 seeds per scheme, one run each; uncompressed comparison is the published run per seed",
+  "metric": "val_macro_f1_headline; best_by_val = max over rounds 0..20 (selection rule); final_5_mean = rounds 16-20",
+  "regression_uncompressed_vs_published": {
+    "42": {
+      "rounds": 21,
+      "identical": true,
+      "max_abs_diff": 0.0
+    }
+  },
+  "regression_timing": {
+    "42": {
+      "bytes_up_per_round": [
+        793960
+      ],
+      "bytes_down_per_round": [
+        793960
+      ],
+      "wall_s_rounds2plus_median": 51.7054193999993
+    }
+  },
+  "schemes": {
+    "fp16": {
+      "bytes_up_per_round": 396980,
+      "bytes_up_saved_vs_fp32": 396980,
+      "bytes_up_saved_pct": 50.0,
+      "bytes_total_per_round": 1190940,
+      "bytes_total_saved_pct": 25.0,
+      "delta_vs_uncompressed_over_seeds": {
+        "best_by_val": {
+          "mean": -0.0006984166871553121,
+          "sd": 0.005435568836304651,
+          "values": [
+            0.0035935775250561797,
+            0.0011216293023146306,
+            -0.006810456888836747
+          ]
+        },
+        "final_round": {
+          "mean": 0.0034579414553463916,
+          "sd": 0.004987918494012007,
+          "values": [
+            0.0036632906956498568,
+            -0.001629480367025038,
+            0.008340014037414356
+          ]
+        },
+        "final_5_mean": {
+          "mean": -0.009302473418470162,
+          "sd": 0.03470801998522175,
+          "values": [
+            -0.046467138931950536,
+            0.022269754612978532,
+            -0.0037100359364384827
+          ]
+        },
+        "mean_rounds_1_to_20": {
+          "mean": 0.0042956505022843094,
+          "sd": 0.010904166424789946,
+          "values": [
+            -0.002899850259519221,
+            0.016841552759952583,
+            -0.0010547509935804333
+          ]
+        }
+      },
+      "per_seed": {
+        "42": {
+          "compressed": {
+            "best_by_val": 0.9795603849634119,
+            "best_round": 14,
+            "final_round": 0.9781876124898478,
+            "final_5_mean": 0.904797667649679,
+            "mean_rounds_1_to_20": 0.850603636053055
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.9759668074383557,
+            "best_round": 18,
+            "final_round": 0.9745243217941979,
+            "final_5_mean": 0.9512648065816295,
+            "mean_rounds_1_to_20": 0.8535034863125742
+          },
+          "delta": {
+            "best_by_val": 0.0035935775250561797,
+            "final_round": 0.0036632906956498568,
+            "final_5_mean": -0.046467138931950536,
+            "mean_rounds_1_to_20": -0.002899850259519221
+          },
+          "bytes_up_per_round": [
+            396980
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 51.72125310000047,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-fp16_a0.5_s42"
+        },
+        "1337": {
+          "compressed": {
+            "best_by_val": 0.988250773932955,
+            "best_round": 12,
+            "final_round": 0.8682666813400918,
+            "final_5_mean": 0.9574227435170272,
+            "mean_rounds_1_to_20": 0.9395412631513281
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.9871291446306404,
+            "best_round": 11,
+            "final_round": 0.8698961617071168,
+            "final_5_mean": 0.9351529889040486,
+            "mean_rounds_1_to_20": 0.9226997103913755
+          },
+          "delta": {
+            "best_by_val": 0.0011216293023146306,
+            "final_round": -0.001629480367025038,
+            "final_5_mean": 0.022269754612978532,
+            "mean_rounds_1_to_20": 0.016841552759952583
+          },
+          "bytes_up_per_round": [
+            396980
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 27.825907899999947,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-fp16_a0.5_s1337"
+        },
+        "2024": {
+          "compressed": {
+            "best_by_val": 0.8575726575746893,
+            "best_round": 19,
+            "final_round": 0.8575475831514049,
+            "final_5_mean": 0.8530881310818902,
+            "mean_rounds_1_to_20": 0.8331831347709481
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.864383114463526,
+            "best_round": 17,
+            "final_round": 0.8492075691139905,
+            "final_5_mean": 0.8567981670183287,
+            "mean_rounds_1_to_20": 0.8342378857645285
+          },
+          "delta": {
+            "best_by_val": -0.006810456888836747,
+            "final_round": 0.008340014037414356,
+            "final_5_mean": -0.0037100359364384827,
+            "mean_rounds_1_to_20": -0.0010547509935804333
+          },
+          "bytes_up_per_round": [
+            396980
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 50.126276099999814,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-fp16_a0.5_s2024"
+        }
+      }
+    },
+    "int8": {
+      "bytes_up_per_round": 198890,
+      "bytes_up_saved_vs_fp32": 595070,
+      "bytes_up_saved_pct": 74.94961962819285,
+      "bytes_total_per_round": 992850,
+      "bytes_total_saved_pct": 37.474809814096425,
+      "delta_vs_uncompressed_over_seeds": {
+        "best_by_val": {
+          "mean": -0.0011029849468920199,
+          "sd": 0.00479487850456088,
+          "values": [
+            0.002040874341500576,
+            0.0012719793084978726,
+            -0.006621808490674508
+          ]
+        },
+        "final_round": {
+          "mean": 0.01268168122366146,
+          "sd": 0.10252328040578652,
+          "values": [
+            -0.08757321180868616,
+            0.11733197013151486,
+            0.008286285348155675
+          ]
+        },
+        "final_5_mean": {
+          "mean": 0.00813115849546786,
+          "sd": 0.03155596316983949,
+          "values": [
+            -0.0169132821200062,
+            0.04357412938580496,
+            -0.0022673717793951775
+          ]
+        },
+        "mean_rounds_1_to_20": {
+          "mean": 0.0033884746931232,
+          "sd": 0.00343208341188492,
+          "values": [
+            0.003413775996236934,
+            0.006807837507329717,
+            -5.618942419705064e-05
+          ]
+        }
+      },
+      "per_seed": {
+        "42": {
+          "compressed": {
+            "best_by_val": 0.9780076817798563,
+            "best_round": 13,
+            "final_round": 0.8869511099855117,
+            "final_5_mean": 0.9343515244616233,
+            "mean_rounds_1_to_20": 0.8569172623088112
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.9759668074383557,
+            "best_round": 18,
+            "final_round": 0.9745243217941979,
+            "final_5_mean": 0.9512648065816295,
+            "mean_rounds_1_to_20": 0.8535034863125742
+          },
+          "delta": {
+            "best_by_val": 0.002040874341500576,
+            "final_round": -0.08757321180868616,
+            "final_5_mean": -0.0169132821200062,
+            "mean_rounds_1_to_20": 0.003413775996236934
+          },
+          "bytes_up_per_round": [
+            198890
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 51.45118160000129,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-int8_a0.5_s42"
+        },
+        "1337": {
+          "compressed": {
+            "best_by_val": 0.9884011239391383,
+            "best_round": 9,
+            "final_round": 0.9872281318386317,
+            "final_5_mean": 0.9787271182898536,
+            "mean_rounds_1_to_20": 0.9295075478987053
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.9871291446306404,
+            "best_round": 11,
+            "final_round": 0.8698961617071168,
+            "final_5_mean": 0.9351529889040486,
+            "mean_rounds_1_to_20": 0.9226997103913755
+          },
+          "delta": {
+            "best_by_val": 0.0012719793084978726,
+            "final_round": 0.11733197013151486,
+            "final_5_mean": 0.04357412938580496,
+            "mean_rounds_1_to_20": 0.006807837507329717
+          },
+          "bytes_up_per_round": [
+            198890
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 50.93403649999891,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-int8_a0.5_s1337"
+        },
+        "2024": {
+          "compressed": {
+            "best_by_val": 0.8577613059728515,
+            "best_round": 19,
+            "final_round": 0.8574938544621462,
+            "final_5_mean": 0.8545307952389335,
+            "mean_rounds_1_to_20": 0.8341816963403315
+          },
+          "uncompressed_published": {
+            "best_by_val": 0.864383114463526,
+            "best_round": 17,
+            "final_round": 0.8492075691139905,
+            "final_5_mean": 0.8567981670183287,
+            "mean_rounds_1_to_20": 0.8342378857645285
+          },
+          "delta": {
+            "best_by_val": -0.006621808490674508,
+            "final_round": 0.008286285348155675,
+            "final_5_mean": -0.0022673717793951775,
+            "mean_rounds_1_to_20": -5.618942419705064e-05
+          },
+          "bytes_up_per_round": [
+            198890
+          ],
+          "bytes_down_per_round": [
+            793960
+          ],
+          "wall_s_rounds2plus_median": 50.733397299998614,
+          "run_dir": "results/federated_methods/efficiency/fedavg_up-int8_a0.5_s2024"
+        }
+      }
+    }
+  },
+  "flags_delta_over_bound": [
+    "fp16: best-by-val delta per seed [0.0035935775250561797, 0.0011216293023146306, -0.006810456888836747] (mean -0.0007) exceeds 0.005",
+    "int8: best-by-val delta per seed [0.002040874341500576, 0.0012719793084978726, -0.006621808490674508] (mean -0.0011) exceeds 0.005"
+  ]
+}

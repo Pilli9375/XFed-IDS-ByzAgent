@@ -67,7 +67,7 @@ results to a general audience.
 ## Key results
 
 Values are taken as stated in
-[`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) and the two results
+[`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) and the results
 documents, each traced to the linked file. Some are rounded there from the
 raw CSVs; nothing is recomputed here. Macro-F1 is over the 7 headline
 classes (6 attack families + Benign), as mean ± std over 3 seeds. The explanation check and
@@ -86,11 +86,16 @@ the trust check are different experiments; read each block on its own.
 | Chance-level Jaccard@10 (k=10, 82 features) | 0.065; the medians above are 5.1×–10.3× chance | [`agreement_metrics.py`](tools/agreement_metrics.py), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
 | Centralized-seed instability floor (Jaccard@10) | median 0.429, range [0.429, 0.484] | [`centralized_instability_floor.csv`](results/inspection/centralized_instability_floor.csv) |
 | **Trust check (stage 4)** | | |
-| `train_loss` separation, poisoned vs clean control (Glass's delta ratio), f=3 / f=2 | 33.8× / 154.3×; the other four statistics do not separate | [`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md), [results B §3](docs/contribution_b_results.md#3-the-behavioral-statistics-what-each-does-and-doesnt-carry) |
+| `train_loss` separation, poisoned vs clean control (Glass's delta ratio), f=3 / f=2 | 33.8× / 154.3×; the other four statistics do not separate. A seed-42 effect-size ratio, not a per-round detection threshold (see Efficiency below) | [`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md), [results B §3](docs/contribution_b_results.md#3-the-behavioral-statistics-what-each-does-and-doesnt-carry) |
 | Multi-Krum: how often a malicious silo was excluded, f=3 and f=2 | 0% (classical Krum's exclusions are chance-level: it keeps 1 of 10 every round) | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
 | Cost of defending with nobody attacking (test macro-F1 vs clean FedAvg) | Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
 | ByzAgent decision stability (same round sent 3×) | 27/30 identical; 30/30 on the trust-vs-flagged boundary | [`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md), [results B §5](docs/contribution_b_results.md#5-byzagent-the-agent-the-compositional-confound-and-the-impossibility-of-a-matched-control) |
 | ByzAgent trend claims contradicted by the data it was given (rolling history) | ≈35–45% (automated check: 45.00%) | [`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md), [results B §8](docs/contribution_b_results.md#8-explanation-fidelity--the-independent-finding) |
+| **Efficiency (separate experiment; [efficiency results](docs/efficiency_results.md))** | | |
+| Served model per-flow latency, ONNX Runtime fp32 vs PyTorch eager (3 timing sessions, validation rows) | 4× lower per-flow latency (p50 45.7 vs 186.5 µs, batch 1); at batch 1024 PyTorch eager has higher throughput (1,482,368 vs 1,071,700 rows/s). Identical predictions on all 143,513 validation rows | [`inference_speed_summary.json`](results/efficiency/inference_speed_summary.json) |
+| Client→server update compression, FedAvg α = 0.5 (3 seeds, validation) | fp16 −50% / int8 −74.9% uplink; mean best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024 −0.0068 / −0.0066, within round-to-round noise) | [`update_compression.json`](results/efficiency/update_compression.json) |
+| Bytes per round, 10 organizations, both directions (computed, checked against harness logs) | 1,587,920 B (19,849 fp32 parameters); median 51.4 s per round over 25 existing runs (CPU) | [`communication.json`](results/efficiency/communication.json) |
+| train_loss pre-screen before ByzAgent, t chosen on seed 42 (replay of logged decisions) | Negative result: did not transfer; seed 1337 poisoned flag rate 0.017 vs logged 0.483 | [`agent_prescreen_replay.json`](results/efficiency/agent_prescreen_replay.json) |
 
 **Reading the explanation check.** Explanation agreement rises with α, and
 at α=5.0 it sits well above both chance and the seed-noise floor. At α=0.1
@@ -218,6 +223,10 @@ The ones most likely to matter to a reader:
   label-flipping attack an elevated loss is close to definitional. The
   geometry statistics are weak to null, and validation accuracy inverts
   (malicious clients score higher on the Benign-heavy validation set).
+  33.8×–154.3× is a seed-42 effect-size ratio, not a per-round detection
+  threshold; a per-round train_loss threshold chosen on seed 42 did not
+  transfer (seed 1337 poisoned flag rate 0.017 vs logged 0.483,
+  [`efficiency_results.md`](docs/efficiency_results.md)).
 - The Krum/Multi-Krum/trimmed-mean baselines, the Phase 4 rolling-history
   matrix and gradual-mode attacks are n=1 (seed 42) by design.
 - Whether the detectors' failures are general, or entangled with this
@@ -295,7 +304,8 @@ conda activate xfed
 packages in [`requirements.txt`](requirements.txt), including the CUDA 12.4
 build of PyTorch 2.6.0. Key versions: flwr 1.33.0, torch 2.6.0, shap 0.51.0,
 scikit-learn 1.9.0, xgboost 3.2.0, optuna 4.9.0, fastapi 0.138.2, uvicorn
-0.49.0, streamlit 1.61.1, pandas 3.0.3, pyarrow 24.0.0. Node.js 24 is needed
+0.49.0, streamlit 1.61.1, pandas 3.0.3, pyarrow 24.0.0, onnxruntime 1.31.0
+(added 2026-10-13, after the fresh-env test below). Node.js 24 is needed
 for `site/`, `frontend/` and `film/`.
 
 This install was tested in a fresh conda env on the development machine
@@ -487,6 +497,11 @@ The one-sentence alert explanations are committed in
 `results/explanations/fedavg_a0.5_s42/sentences.json`;
 `python -m tools.build_explanations --tag fedavg_a0.5_s42` regenerates them
 with Ollama.
+
+The backend serves the model through ONNX Runtime fp32 by default
+(`serving.engine` in [`configs/efficiency.yaml`](configs/efficiency.yaml);
+set it to `torch` for the original path). At startup it refuses to serve
+unless the ONNX predictions equal PyTorch's on every validation row.
 
 Then, in three terminals:
 
