@@ -17,8 +17,8 @@ headline numbers or the script refuses to write.
 
 The one flagged GLOBAL model (alpha=5.0, seed 1337) is not a silo, so the
 rule does not exclude it. Every silo's agreement in that config is measured
-against that global model, though, so a separately labelled variant drops
-the whole (5.0, 1337) config.
+against that global model, though, so a variant drops the whole (5.0, 1337) config. That variant is
+post-hoc, not part of the pre-specified rule, and is labelled so in the output.
 
 Writes results/inspection/residual_sensitivity.json. Edits no headline number.
 Run as: python -m tools.residual_sensitivity
@@ -103,6 +103,7 @@ def main() -> None:
             seeds = set(int(s) for s in g["seed"])
             kept_v = kept[~kept["seed"].astype(int).isin(seeds)]
             entry["variant_also_drop_configs_with_flagged_global"] = {
+                "label": "post-hoc, not part of the pre-specified rule",
                 "dropped_seeds": sorted(seeds),
                 **_summ(kept_v),
                 "rows_dropped_vs_baseline": int(len(rows) - len(kept_v)),

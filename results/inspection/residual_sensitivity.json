@@ -129,6 +129,7 @@
         "n_silos_rule_applied": 30
       },
       "variant_also_drop_configs_with_flagged_global": {
+        "label": "post-hoc, not part of the pre-specified rule",
         "dropped_seeds": [
           1337
         ],
