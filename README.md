@@ -508,7 +508,14 @@ python -m tools.build_shap_val_pool
 The one-sentence alert explanations are committed in
 `results/explanations/fedavg_a0.5_s42/sentences.json`;
 `python -m tools.build_explanations --tag fedavg_a0.5_s42` regenerates them
-with Ollama.
+with Ollama. The validation pool's sentences are committed in
+`results/explanations/fedavg_a0.5_s42/val_sentences.json`, which also records
+the model tag and digest, temperature, seed and prompt hash. They were made
+with the same model and prompt, and took 35 minutes on the RTX 4050:
+
+```powershell
+python -m tools.build_explanations --tag fedavg_a0.5_s42 --pool val --seed 6006
+```
 
 The backend serves the model through ONNX Runtime fp32 by default
 (`serving.engine` in [`configs/efficiency.yaml`](configs/efficiency.yaml);
@@ -536,8 +543,7 @@ The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
 stream moves. The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
 By default (`simulator.source_split: val_shap_pool` in
 `configs/backend.yaml`) it replays the 500 rows of the validation SHAP pool in
-stored order, so every alert has a SHAP panel. Those rows have no
-one-sentence explanation. Set `source_split: val` to replay the whole
+stored order, so every alert has a SHAP panel and an LLM-generated summary. Set `source_split: val` to replay the whole
 validation split instead; those alerts have no SHAP.
 To replay test rows instead, set `simulator.source_split: test`; the
 simulator refuses unless the served checkpoint's
