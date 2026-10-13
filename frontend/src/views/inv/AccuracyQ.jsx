@@ -35,7 +35,7 @@ export default function AccuracyQ({ acc, federation }) {
 
       <details className="disc">
         <summary>Per-class F1 <span className="mono-mute">test, mean over seeds</span></summary>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Per-class F1 table">
           <table className="v-table">
             <thead>
               <tr>
@@ -71,7 +71,7 @@ export default function AccuracyQ({ acc, federation }) {
       {federation && (
         <details className="disc">
           <summary>Per-run FedAvg results <span className="mono-mute">{federation.manifest_summaries.length} runs, best-by-validation round</span></summary>
-          <div className="scroll-x">
+          <div className="scroll-x" tabIndex={0} role="region" aria-label="Per-run results table">
             <table className="v-table">
               <thead>
                 <tr><th>run</th><th>best round</th><th>val macro-F1</th><th>test macro-F1</th></tr>

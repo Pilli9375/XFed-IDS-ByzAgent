@@ -35,7 +35,7 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
         </div>
         <span className="mono-mute">Jaccard@10 vs global model · median</span>
       </div>
-      <div className="scroll-x">
+      <div className="scroll-x" tabIndex={0} role="region" aria-label="Agreement number line">
         <div
           className="numline"
           role="img"
@@ -92,7 +92,7 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
 
       <details className="disc">
         <summary>Per-family breakdown <span className="mono-mute">median per α, eligible rows</span></summary>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Per-family agreement table">
           <table className="v-table">
             <thead>
               <tr>
@@ -131,7 +131,7 @@ export default function AgreementQ({ agreement, summary, faith, federation }) {
 
       <details className="disc">
         <summary>Faithfulness detail <span className="mono-mute">{faith.config_label}, deletion and insertion AUC</span></summary>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Faithfulness AUC table">
           <table className="v-table" style={{ maxWidth: 520 }}>
             <thead><tr><th>model</th><th>deletion AUC (lower is better)</th><th>insertion AUC (higher is better)</th></tr></thead>
             <tbody>
@@ -183,7 +183,7 @@ function RoundWise({ data }) {
   const y = (v) => H - P - v * (H - 2 * P);
   const dash = ['', '6 3', '2 3'];
   return (
-    <div className="scroll-x">
+    <div className="scroll-x" tabIndex={0} role="region" aria-label="Round-wise agreement">
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label="Median Jaccard at 10 by round for each alpha">
         <line x1={P} x2={W - P} y1={y(0)} y2={y(0)} stroke="var(--line2)" />
         {[0, 0.5, 1].map((v) => (

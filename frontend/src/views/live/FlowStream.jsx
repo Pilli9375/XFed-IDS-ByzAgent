@@ -107,7 +107,6 @@ export default function FlowStream({ alerts, newest, selectedTs, onSelect, filte
                   aria-current={current ? 'true' : undefined}
                   tabIndex={current || (!shown.some((x) => x.timestamp === selectedTs) && k === 0) ? 0 : -1}
                   className={`feed-row tone-${kindOf(a)}${k === 0 ? ' is-new' : ''}${miss ? ' is-miss' : ''}`}
-                  style={k > 7 && !current ? { opacity: Math.max(0.82, 1 - (k - 7) * 0.06) } : undefined}
                   onClick={() => onSelect(a.timestamp)}
                 >
                   <span className="feed-time">{timeOf(a.timestamp)}</span>

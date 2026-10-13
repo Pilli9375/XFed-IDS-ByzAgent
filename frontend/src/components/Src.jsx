@@ -5,7 +5,7 @@ export default function Src({ path, label }) {
   if (!path) return null;
   const name = label ?? path.split('/').slice(-2).join('/');
   return (
-    <a className="src" href={sourceUrl(path)} target="_blank" rel="noopener noreferrer" title={path} aria-label={`Source file ${path}`}>
+    <a className="src" href={sourceUrl(path)} target="_blank" rel="noopener noreferrer" title={path} aria-label={`${name}, source file ${path}`}>
       {name}
     </a>
   );

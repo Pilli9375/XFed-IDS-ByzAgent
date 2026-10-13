@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getConfig, getFigures, getHealth, getTrust } from '../api/client';
+import { fetchExplanation } from '../api/useAlertExplanation';
 import { useAlerts } from '../api/useAlerts';
 import Ambient from '../components/Ambient';
 import Header from '../components/Header';
@@ -38,15 +39,27 @@ export default function Live({ hs }) {
   const [condIdx, setCondIdx] = useState(0);
   const [dialog, setDialog] = useState(null); // 'hotswap' | 'score' | null
 
-  const settled = [config, health, figures, trust].every((r) => r.status !== 'loading') && feed.status !== 'loading';
-  const loading = useLoadingGate(settled, epoch);
-
   const alerts = playing ? feed.alerts : (frozen ?? feed.alerts);
   const newest = alerts[0] ?? null;
   const selected = useMemo(
     () => (pickedTs ? (alerts.find((a) => a.timestamp === pickedTs) ?? null) : null) ?? newest,
     [alerts, pickedTs, newest],
   );
+
+  // The first selected flow's explanation is part of what the skeleton
+  // waits for, fetched in parallel with the rest instead of after it.
+  const [firstExplained, setFirstExplained] = useState(false);
+  const firstId = selected?.shap_available ? `${selected.shap_source}:${selected.shap_sample_id}` : null;
+  useEffect(() => {
+    if (firstExplained || !firstId) return;
+    const [src, id] = firstId.split(':');
+    fetchExplanation(Number(id), src).finally(() => setFirstExplained(true));
+  }, [firstId, firstExplained]);
+  const explainReady = firstExplained || (feed.status !== 'loading' && !firstId);
+
+  const settled =
+    [config, health, figures, trust].every((r) => r.status !== 'loading') && feed.status !== 'loading' && explainReady;
+  const loading = useLoadingGate(settled, epoch);
   const kind = kindOf(newest);
   const tone = kind === 'ok' ? 'ok' : 'attack';
   const strength = kind === 'miss' ? MISS_STRENGTH : 1;

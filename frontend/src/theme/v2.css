@@ -89,7 +89,7 @@
   50% { box-shadow: 0 0 0 1px var(--b2), 0 24px 96px -18px var(--g2); }
 }
 @keyframes xfPulse { 0%, 100% { opacity: var(--o1); transform: scale(1); } 50% { opacity: var(--o2); transform: scale(1.08); } }
-@keyframes xfFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes xfFadeIn { from { opacity: 0.35; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 /* ---- base ------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -175,9 +175,9 @@ button { font: inherit; color: inherit; }
 .text-mute { color: var(--mute); }
 
 /* Source link: the small link every number carries to its file. */
-.src { font-family: var(--mono); font-size: 10px; color: var(--mute); text-decoration: underline; text-decoration-color: var(--line2); text-underline-offset: 2px; overflow-wrap: anywhere; }
+.src { display: inline-block; min-height: 24px; line-height: 24px; font-family: var(--mono); font-size: 10px; color: var(--mute); text-decoration: underline; text-decoration-color: var(--line2); text-underline-offset: 2px; overflow-wrap: anywhere; }
 .src:hover { color: var(--ok); text-decoration-color: currentColor; }
-.src-list { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.src-list { display: flex; flex-wrap: wrap; gap: 0 14px; }
 
 /* ---- buttons ---------------------------------------------------------- */
 .btn {

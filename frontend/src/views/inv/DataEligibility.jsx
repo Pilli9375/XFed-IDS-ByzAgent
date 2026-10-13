@@ -49,7 +49,7 @@ export default function DataEligibility({ federation: fed }) {
           </select>
         </label>
       </div>
-      <div className="heat-wrap">
+      <div className="heat-wrap" tabIndex={0} role="region" aria-label="Label-skew heatmap, scrollable">
         <table style={{ borderCollapse: 'separate', borderSpacing: 3, minWidth: 640 }}>
           <caption className="sr-only">Flows per org and family, α={alpha}, seed {seed}</caption>
           <thead>
@@ -113,7 +113,7 @@ export default function DataEligibility({ federation: fed }) {
         </div>
       </div>
 
-      <div className="scroll-x">
+      <div className="scroll-x" tabIndex={0} role="region" aria-label="Family eligibility table">
         <table className="v-table">
           <caption className="sr-only">Orgs eligible per family and configuration</caption>
           <thead>

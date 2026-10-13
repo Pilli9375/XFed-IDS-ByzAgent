@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 import torch
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
@@ -544,6 +545,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="XFed-IDS Dashboard Backend", lifespan=lifespan)
+# The cached JSON bodies are large (GET /trust ~710 KB) and highly
+# repetitive; compressing them is what keeps the dashboard's first render fast.
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 
 # ---------------------------------------------------------------------------

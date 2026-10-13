@@ -144,7 +144,7 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
             <span><i className="sev-2" />quarantine</span>
           </div>
         </div>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Per-round decisions for the selected org">
           <div role="group" aria-label={`Per-round decisions for org ${sel.silo}; choose a round to read its rationale`}>
             {['clean', 'attack'].map((side) => (
               <div key={side} className="strip" style={{ marginBottom: 4 }}>
@@ -203,7 +203,7 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
 
       <details className="disc">
         <summary>All orgs, all rounds <span className="mono-mute">decision grids, clean and attack</span></summary>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Decision grids, all orgs">
           {['clean', 'attack'].map((side) => (
             <div key={side} style={{ marginBottom: 12 }}>
               <p className="eyebrow" style={{ marginBottom: 6 }}>{side} run · {cond[side].run_tag}</p>
@@ -224,7 +224,7 @@ export default function TrustQ({ trust, condIdx, onCond, org, onOrg }) {
 
       <details className="disc">
         <summary>Decision stability by condition <span className="mono-mute">repeat the same round, compare decisions</span></summary>
-        <div className="scroll-x">
+        <div className="scroll-x" tabIndex={0} role="region" aria-label="Decision stability table">
           <table className="v-table">
             <thead>
               <tr><th>phase · mode</th><th>condition</th><th>round</th><th>exact</th><th>trust vs flag</th></tr>
