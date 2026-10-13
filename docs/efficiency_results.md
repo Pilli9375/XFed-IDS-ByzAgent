@@ -257,5 +257,76 @@ federated training ran on CPU (Flower's runtime torch CPU build), not the GPU.
 
 ### C3. Update compression (α=0.5, 3 seeds)
 
-*Pending: the runs are in progress. This section is filled from
-`results/efficiency/update_compression.json` when they finish.*
+File: `results/efficiency/update_compression.json`
+Run log: `results/efficiency/compression_run_log.jsonl`
+Runs: `results/federated_methods/efficiency/`
+Scripts: `tools/efficiency_compression_runs.py`, `tools/efficiency_compression_summary.py`
+
+**Method.**
+- **Path:** FedAvg on the validation-only method path. No test evaluation
+  exists on this path, client `evaluate()` is off, and no
+  `final_metrics.json` was written by any run.
+- **What is compressed:** the client→server update (local − received
+  global), in two schemes:
+  - **fp16:** the delta cast to float16.
+  - **int8:** symmetric per-tensor int8 with a float32 abs-max scale per
+    tensor, so 10 extra scalars.
+- **Server side:** adds the dequantized delta back to the global it sent,
+  then runs the unchanged Flower FedAvg aggregation.
+- **Broadcast:** server→client stays float32.
+- **Comparison:** each seed's published FedAvg run (`results/federated/fedavg_a0.5_s*`).
+
+**Regression check (single run).** An uncompressed FedAvg run on the edited
+harness (seed 42) reproduces the published validation curve **exactly**:
+21/21 rounds identical, max diff 0.0, best 0.9760 at round 18. The default
+path is unchanged by the compression hook.
+
+**Bytes (harness-logged, every round of every run).**
+
+| | uplink per round | saved vs fp32 uplink | saved vs fp32 total (up + down) |
+|---|---|---|---|
+| fp32 (reference) | 793,960 B | — | — |
+| fp16 | 396,980 B | 50.0% | 25.0% |
+| int8 per-tensor | 198,890 B | 74.9% | 37.5% |
+
+**Validation macro-F1 (3 seeds, one run each).** Compressed − uncompressed;
+all four statistics as required for trust-check comparisons:
+
+| scheme | best-by-validation | final round (20) | final-5 mean (16–20) | mean of rounds 1–20 |
+|---|---|---|---|---|
+| fp16, per seed 42 / 1337 / 2024 | +0.0036 / +0.0011 / **−0.0068** | +0.0037 / −0.0016 / +0.0083 | −0.0465 / +0.0223 / −0.0037 | −0.0029 / +0.0168 / −0.0011 |
+| fp16, mean ± sd | −0.0007 ± 0.0054 | +0.0035 ± 0.0050 | −0.0093 ± 0.0347 | +0.0043 ± 0.0109 |
+| int8, per seed 42 / 1337 / 2024 | +0.0020 / +0.0013 / **−0.0066** | −0.0876 / +0.1173 / +0.0083 | −0.0169 / +0.0436 / −0.0023 | +0.0034 / +0.0068 / −0.0001 |
+| int8, mean ± sd | −0.0011 ± 0.0048 | +0.0127 ± 0.1025 | +0.0081 ± 0.0316 | +0.0034 ± 0.0034 |
+
+Absolute best-by-validation, compressed vs uncompressed: seed 42 fp16 0.9796
+vs 0.9760 (int8 0.9780), seed 1337 0.9883 vs 0.9871 (int8 0.9884), seed
+2024 0.8576 vs 0.8644 (int8 0.8578).
+
+**Stop-and-flag.** At seed 2024 both schemes move best-by-validation macro-F1
+by more than 0.005 (−0.0068 fp16, −0.0066 int8). Reported, not acted on.
+
+What the numbers support:
+- The 3-seed mean change in best-by-validation macro-F1 is small (−0.0007
+  fp16, −0.0011 int8), and its sign is not consistent across seeds (+, +, −).
+- Per-round validation F1 in these runs swings far more than any of these
+  deltas:
+  - int8 final-round deltas reach −0.0876 and +0.1173.
+  - The documented round lottery is up to 0.118.
+  - A float16 rounding of the update is enough to move the trajectory onto a
+    different path.
+- So at n=3 a compression effect of this size cannot be told apart from
+  trajectory noise. The data do not show that compression is harmless within
+  0.005. They do not show that it is harmful either.
+- The bytes saving is exact and deterministic. The accuracy effect is
+  unresolved at this n.
+
+**Wall time.** Rounds 2–20 median per run:
+- uncompressed regression: 51.7 s;
+- fp16: 51.7 / 27.8 / 50.1 s;
+- int8: 51.5 / 50.9 / 50.7 s.
+
+The 27.8 s run (fp16, seed 1337) is an outlier on the fast side; C2 also saw
+rounds as short as 26.8 s on this laptop. Compression has no measurable
+wall-time cost or benefit here. The simulation moves bytes within one
+machine, so a smaller payload cannot show up as a network saving.

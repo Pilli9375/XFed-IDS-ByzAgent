@@ -1,0 +1,32 @@
+{
+  "method": "fedavg",
+  "alpha": "0.5",
+  "seed": 42,
+  "run_group": "efficiency",
+  "num_rounds": 20,
+  "local_epochs": 3,
+  "local_epochs_override": false,
+  "server": "fedavg",
+  "server_params": {},
+  "client_mu": 0.0,
+  "upload_compression": "int8",
+  "upload_compression_scheme": {
+    "kind": "int8_per_tensor",
+    "qmax": 127,
+    "scale": "absmax"
+  },
+  "fraction_train": 1.0,
+  "fraction_evaluate": 0.0,
+  "partition_manifest_check": {
+    "tag": "a0.5_s42",
+    "hash_train": "be02b74723e40bbf27752686ed62e2a2753c10409803500e72ca04bf9affa6b5",
+    "hash_test": "b4c9b7059e52b4f6d26d0dee7ff72841ae246eff60b39e1fef46e67bdc46445b"
+  },
+  "best_round": 13,
+  "best_val_macro_f1_headline": 0.9780076817798563,
+  "final_round_val_macro_f1_headline": 0.8869511099855117,
+  "model_best_state_sha256": "56eecd81003e8543df4fe629c5217bbea5bb8081104ba0a28eab6ad6a3d5ae80",
+  "strategy_wall_time_s": 953.4360397000019,
+  "test_evaluated": false,
+  "note": "Validation only. No test-set metric exists for this run."
+}
