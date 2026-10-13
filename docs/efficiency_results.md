@@ -13,6 +13,20 @@ Every number below names its file. Each claim says what kind of evidence it
 rests on: **replay** (offline, against one logged sample), **single run /
 single session**, **N sessions**, or **3 seeds**.
 
+**Summary (wording agreed in the planning chat, 2026-10-13).**
+
+- **Serving (3 timing sessions):** 4× lower per-flow latency (p50 45.7 vs
+  186.5 µs, batch 1); at batch 1024 PyTorch eager has higher throughput. The
+  backend now serves the model through ONNX Runtime fp32 by default, behind a
+  startup gate that requires identical predictions on all 143,513 validation
+  rows. int8 is dropped.
+- **Update compression (3 seeds):** fp16 −50% / int8 −74.9% uplink; mean
+  best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024
+  −0.0068 / −0.0066, within round-to-round noise).
+- **Agent pre-screen (replay):** a negative result. A per-round train_loss
+  threshold chosen on seed 42 did not transfer (seed 1337 poisoned flag rate
+  0.017 vs logged 0.483). No redesign is planned.
+
 ---
 
 ## Part A — train_loss pre-screen in front of ByzAgent (replay)
@@ -124,6 +138,8 @@ LLM): **1 of 29 at seed 1337** (0.034); 44 of 46 at seed 2024 (0.957).
 **not** done. The brief made it conditional on Part A looking good, and at
 seed 1337 the pre-screen removes 28 of the 29 attack flags.
 
+**Planning chat:** reported as a negative result; no redesign.
+
 ---
 
 ## Part B — inference speed of the served model (3 timing sessions)
@@ -180,9 +196,8 @@ against `round_history.json` (0.9759668074, diff 0) and never reads
   quantization, not the rewrite. The quantized graph has 3 `MatMulInteger`
   nodes.
 
-  Not tested: whether a different scheme would fix it (per-channel weights,
-  static calibration, keeping the first layer in fp32). That would be a new
-  selection on validation data, so it goes back to the planning chat.
+  **Planning chat:** int8 is dropped and not offered; no further
+  quantization schemes are tried.
 - **Size:** int8 is 31% of the fp32 ONNX file. Both ONNX files are about the
   size of the `.pt` checkpoint, because the model only has 19,849 parameters.
 - **Timing spread:** timings varied between sessions (p95 eager 254–369 µs).
@@ -191,8 +206,8 @@ against `round_history.json` (0.9759668074, diff 0) and never reads
 
 **Backend wiring.** ONNX fp32 is the only variant whose validation macro-F1
 equals eager's to 3 decimals, so it is wired into `backend/` behind
-`configs/efficiency.yaml` `serving.engine` (default `torch`, so serving is
-unchanged).
+`configs/efficiency.yaml` `serving.engine`. Per the planning chat the default
+is now `onnx_fp32`; `torch` remains available.
 - With `onnx_fp32`, startup exports the verified model in memory and refuses
   to start unless every validation prediction equals torch's.
 - Checked once: the startup gate passed (0 differences on 143,513 rows), and
@@ -224,13 +239,7 @@ Script: `tools/efficiency_communication.py`
 - **Cross-check against the harness.** The harness logs tensor bytes per
   round (`arrayrecord_nbytes`). Over 500 logged rounds from 25 three-epoch
   method runs, the logs match the parameter-count arithmetic exactly for
-  FedAvg, FedAvgM and FedYogi in both directions.
-- **One exception, FedAdam.** Its downlink from round 2 on is 1,587,920 B,
-  twice the fp32 size. Flower's FedAdam scales the update by `eta_norm`, a
-  numpy float64 scalar (`flwr/serverapp/strategy/fedadam.py`, flwr 1.33.0).
-  That promotes the broadcast global weights to float64; FedYogi uses a Python
-  float and stays float32. Clients load the weights into a float32 model, so
-  training is unaffected. FedAvg and the served model are not affected.
+  FedAvg, FedAvgM and FedYogi in both directions.[^fedadam]
 - **Out of scope.** These counts exclude message metadata, metric and config
   records, and gRPC/TLS framing. The simulation runs on one machine, so no
   real network is involved.
@@ -303,10 +312,12 @@ Absolute best-by-validation, compressed vs uncompressed: seed 42 fp16 0.9796
 vs 0.9760 (int8 0.9780), seed 1337 0.9883 vs 0.9871 (int8 0.9884), seed
 2024 0.8576 vs 0.8644 (int8 0.8578).
 
-**Stop-and-flag.** At seed 2024 both schemes move best-by-validation macro-F1
-by more than 0.005 (−0.0068 fp16, −0.0066 int8). Reported, not acted on.
+**Reported as (planning chat):** fp16 −50% / int8 −74.9% uplink; mean
+best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024
+−0.0068 / −0.0066, within round-to-round noise). No more seeds are run now.
 
-What the numbers support:
+Seed 2024 crossed the session's 0.005 stop-and-flag bound for both schemes;
+it was flagged and is reported, not tuned. What the numbers support:
 - The 3-seed mean change in best-by-validation macro-F1 is small (−0.0007
   fp16, −0.0011 int8), and its sign is not consistent across seeds (+, +, −).
 - Per-round validation F1 in these runs swings far more than any of these
@@ -330,3 +341,10 @@ The 27.8 s run (fp16, seed 1337) is an outlier on the fast side; C2 also saw
 rounds as short as 26.8 s on this laptop. Compression has no measurable
 wall-time cost or benefit here. The simulation moves bytes within one
 machine, so a smaller payload cannot show up as a network saving.
+
+[^fedadam]: FedAdam is the one exception: its downlink from round 2 on is
+    1,587,920 B, twice the fp32 size, because Flower's FedAdam
+    (`flwr/serverapp/strategy/fedadam.py`, flwr 1.33.0) scales the update by
+    `eta_norm`, a numpy float64 scalar, which makes the broadcast global
+    weights float64. Clients load them into a float32 model, so training is
+    unaffected; FedAvg and the served model are not affected.
