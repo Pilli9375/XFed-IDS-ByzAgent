@@ -213,6 +213,8 @@ Consolidated from `PROJECT_INSTRUCTIONS.md` ("Findings that limit what can be cl
 | 19 | **n=3 seeds is a ceiling, not a choice made freely.** Every seed is a full centralized or federated training run; adding a seed multiplies training cost directly. This caps statistical power everywhere a per-seed pattern is reported in this document — §5's partial correlations (n=29/30, silo-level within 3 seeds), §6's FedProx per-seed breakdown (n=3 per α), and §2's instability floor (item 13 above) all inherit this ceiling. | New — this document (generalizes `docs/measurement_protocol.md` §10 item 2 beyond just the instability floor) |
 | 20 | **μ=0.0005 is a single point, not a swept optimum.** §6's FedProx numbers reflect exactly one μ value, carried forward from Chat 03's exploratory run (where μ=0.01 was also tried once and collapsed accuracy). No systematic sweep over μ was performed; "FedProx helps at α=0.5" in this document means "FedProx at μ=0.0005 helps at α=0.5, in this one exploratory-then-confirmed setting," not that μ=0.0005 is a validated optimum or that other μ values would show the same pattern. | New — this document |
 
+*Correction to commit `e798a36`'s message (item 9): its "~0.55 to >4" for the stored federated `additivity_max_diff` values should read 0.156–15.874.*
+
 **Excluded from this table:** the Phase 1 Streamlit app's practical performance ceiling is an engineering note about the old Streamlit dashboard, not a limitation of the explanation check's measurement or claims. It was previously cited from `PROJECT_INSTRUCTIONS.md`, which no longer lists it, and no other file on disk records it, so it is omitted here for topical fit, not overlooked.
 
 ---
