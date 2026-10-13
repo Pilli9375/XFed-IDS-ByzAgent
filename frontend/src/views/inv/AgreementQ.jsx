@@ -187,10 +187,10 @@ function RoundWise({ data }) {
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label="Median Jaccard at 10 by round for each alpha">
         <line x1={P} x2={W - P} y1={y(0)} y2={y(0)} stroke="var(--line2)" />
         {[0, 0.5, 1].map((v) => (
-          <text key={v} x={P - 6} y={y(v) + 4} textAnchor="end" fontSize="10" fill="var(--mute)" fontFamily="Geist Mono, monospace">{fixed(v, 1)}</text>
+          <text key={v} x={P - 6} y={y(v) + 4} textAnchor="end" fontSize="10" fill="var(--mute)">{fixed(v, 1)}</text>
         ))}
         {rounds.map((r) => (
-          <text key={r} x={x(r)} y={H - P + 14} textAnchor="middle" fontSize="10" fill="var(--mute)" fontFamily="Geist Mono, monospace">r{r}</text>
+          <text key={r} x={x(r)} y={H - P + 14} textAnchor="middle" fontSize="10" fill="var(--mute)">r{r}</text>
         ))}
         {alphas.map((a, i) => {
           const pts = data.filter((d) => d.alpha === a);
@@ -199,7 +199,7 @@ function RoundWise({ data }) {
             <g key={a}>
               <polyline points={pts.map((d) => `${x(d.round)},${y(d.median)}`).join(' ')} fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeDasharray={dash[i % 3]} />
               {pts.map((d) => <circle key={d.round} cx={x(d.round)} cy={y(d.median)} r="2.5" fill="var(--ink)" />)}
-              <text x={x(last.round) + 6} y={y(last.median) + 4} fontSize="10" fill="var(--body)" fontFamily="Geist Mono, monospace">α={a}</text>
+              <text x={x(last.round) + 6} y={y(last.median) + 4} fontSize="10" fill="var(--body)">α={a}</text>
             </g>
           );
         })}

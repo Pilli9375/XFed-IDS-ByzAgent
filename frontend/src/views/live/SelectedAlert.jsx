@@ -33,7 +33,7 @@ export default function SelectedAlert({ alert, reviewed, onToggleReviewed, onHot
             cx="32" cy="32" r={RING_R} fill="none" stroke={ringColor} strokeWidth="5" strokeLinecap="round"
             strokeDasharray={`${alert.confidence * RING_C} ${RING_C}`} transform="rotate(-90 32 32)"
           />
-          <text x="32" y="36" textAnchor="middle" fontFamily="Geist Mono, monospace" fontSize="11" fill="var(--ink)">
+          <text x="32" y="36" textAnchor="middle" fontSize="11" fill="var(--ink)">
             {pct(alert.confidence)}
           </text>
         </svg>

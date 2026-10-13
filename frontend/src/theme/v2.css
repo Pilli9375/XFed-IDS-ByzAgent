@@ -45,6 +45,27 @@
   src: url('/fonts/newsreader-latin-wght-italic.woff2') format('woff2-variations');
 }
 
+/* Greek (α, τ, μ…): neither Instrument Sans nor Geist Mono publishes a
+   greek subset, so these two OFL faces cover U+0370-03FF only and sit
+   second in the stacks below. Newsreader is not given one: the serif is
+   used only for the LLM summary and the locked claim. */
+@font-face {
+  font-family: 'Inter Greek';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono Greek';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
 /* ---- themes ---------------------------------------------------------- */
 :root,
 :root[data-theme='deep-sea'] {
@@ -73,8 +94,8 @@
 }
 
 :root {
-  --sans: 'Instrument Sans', system-ui, sans-serif;
-  --mono: 'Geist Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --sans: 'Instrument Sans', 'Inter Greek', system-ui, sans-serif;
+  --mono: 'Geist Mono', 'JetBrains Mono Greek', ui-monospace, 'Cascadia Mono', monospace;
   --serif: 'Newsreader', Georgia, serif;
   --r-lg: 14px; --r-md: 10px; --r-sm: 7px;
   --glow: var(--glow-live);
@@ -98,6 +119,7 @@ body {
   color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45;
   letter-spacing: -0.005em; -webkit-font-smoothing: antialiased;
 }
+svg text { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 #root { min-height: 100vh; }
 a { color: var(--ok); }
 button { font: inherit; color: inherit; }
