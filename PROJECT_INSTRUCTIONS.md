@@ -168,6 +168,16 @@ The dashboard simulator replays validation rows as display traffic and marks eac
   |f(x) − E[f]|. The earlier "~3–8%" figure had no backing file and was dropped;
   it cannot be recomputed for the 14 test rows because their stored SHAP files
   hold no model outputs.
+- Additivity residuals above the validation-pool maximum (3.336) occur mainly
+  at α=0.1: 3 of 90 final-round FedAvg silo files, two of them the smallest
+  silo in their configuration. Within α=0.1, silo residual and Jaccard@10
+  correlate at Spearman r=−0.237 (n=29, final round). Excluding those silos
+  (pre-specified rule; 2 silos, 8 of 220 rows have eligible rows) leaves the
+  α=0.1 headline unchanged: Jaccard@10 0.333 → 0.333, weighted τ 0.592 →
+  0.597. Post-hoc, not part of the pre-specified rule: dropping the whole
+  α=5.0 seed-1337 run (its global model is flagged, 3.500) leaves Jaccard@10
+  0.667 and τ 0.844 (`results/inspection/residual_sensitivity.json`,
+  `residual_audit.csv`).
 - Faithfulness is a single-config spot-check (α=0.5, seed 42), not a gate.
 
 **Trust check (ByzAgent)**
