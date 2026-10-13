@@ -34,6 +34,7 @@ from backend.trust import build_trust_snapshot
 from backend.federation import build_federation_snapshot
 from backend.faithfulness import build_faithfulness_snapshot, load_faithfulness_figures
 from backend.hotswap_service import HotSwapState, new_state, poll, revert, trigger
+from backend.onnx_engine import build_onnx_session, load_serving_config
 
 log = logging.getLogger(__name__)
 
@@ -360,6 +361,14 @@ async def lifespan(app: FastAPI):
     cfg_paths = cfg["paths"]
 
     app.state.loaded = loaded
+    # Efficiency Part B: optional ONNX Runtime fp32 engine for the base
+    # model, off unless configs/efficiency.yaml serving.engine says so.
+    serving_cfg = load_serving_config()
+    engine = serving_cfg["engine"]
+    if engine not in ("torch", "onnx_fp32"):
+        raise RuntimeError(f"configs/efficiency.yaml serving.engine={engine!r}; expected torch or onnx_fp32.")
+    app.state.onnx_session = build_onnx_session(loaded, serving_cfg) if engine == "onnx_fp32" else None
+    log.info("predict engine: %s", engine)
     app.state.shap_arrays = _load_shap_arrays(loaded, cfg_paths)
     app.state.streamed_pool = _load_streamed_shap_pool(loaded, cfg_paths)
     app.state.explanations = _load_explanations(loaded, cfg_paths)
@@ -480,10 +489,15 @@ def predict(request: PredictRequest) -> PredictResponse:
     active_model = hotswap_state.active_model if hotswap_state.active else None
     model = active_model if active_model is not None else loaded.model
 
-    with torch.no_grad():
-        model.eval()
-        logits = model(torch.from_numpy(x_scaled).to(loaded.device))
-        probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
+    onnx_session = app.state.onnx_session
+    if active_model is None and onnx_session is not None:
+        logits = torch.from_numpy(onnx_session.run(None, {"x": x_scaled})[0])
+        probs = torch.softmax(logits, dim=1).numpy()[0]
+    else:
+        with torch.no_grad():
+            model.eval()
+            logits = model(torch.from_numpy(x_scaled).to(loaded.device))
+            probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
 
     class_idx = int(np.argmax(probs))
     # Frozen 9-wide vocab, ordered by class index -- src.data.schema builds
