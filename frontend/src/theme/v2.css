@@ -47,8 +47,7 @@
 
 /* Greek (α, τ, μ…): neither Instrument Sans nor Geist Mono publishes a
    greek subset, so these two OFL faces cover U+0370-03FF only and sit
-   second in the stacks below. Newsreader is not given one: the serif is
-   used only for the LLM summary and the locked claim. */
+   second in the stacks below. Literata covers Greek for Newsreader. */
 @font-face {
   font-family: 'Inter Greek';
   font-style: normal;
@@ -63,6 +62,27 @@
   font-weight: 400 700;
   font-display: swap;
   src: url('/fonts/jetbrains-mono-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+/* Arrows (U+2190-21FF): Instrument Sans's latin subset has none. Noto
+   Sans Math (OFL, no reserved name), subset to this block with fontTools
+   pyftsubset (--unicodes=U+2190-21FF). */
+@font-face {
+  font-family: 'Noto Sans Math Arrows';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-sans-math-arrows-400-normal.woff2') format('woff2');
+  unicode-range: U+2190-21FF;
+}
+/* Greek for the serif (LLM summary, locked claim). */
+@font-face {
+  font-family: 'Literata Greek';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/literata-greek-wght-italic.woff2') format('woff2-variations');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
@@ -94,9 +114,9 @@
 }
 
 :root {
-  --sans: 'Instrument Sans', 'Inter Greek', system-ui, sans-serif;
+  --sans: 'Instrument Sans', 'Inter Greek', 'Noto Sans Math Arrows', system-ui, sans-serif;
   --mono: 'Geist Mono', 'JetBrains Mono Greek', ui-monospace, 'Cascadia Mono', monospace;
-  --serif: 'Newsreader', Georgia, serif;
+  --serif: 'Newsreader', 'Literata Greek', Georgia, serif;
   --r-lg: 14px; --r-md: 10px; --r-sm: 7px;
   --glow: var(--glow-live);
 }
@@ -172,9 +192,9 @@ button { font: inherit; color: inherit; }
 }
 .v-swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .v-spacer { flex: 1 1 60px; }
-.v-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-family: var(--mono); font-size: 12px; color: var(--tone-text, var(--ok)); transition: color 1s; }
+.v-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-family: var(--mono); font-size: 12px; color: var(--tone-text, var(--ok)); }
 .v-status .v-model { color: var(--mute); }
-.v-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--tone, var(--ok)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone, var(--ok)) 20%, transparent); transition: background 1s, box-shadow 1s; }
+.v-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--tone, var(--ok)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone, var(--ok)) 20%, transparent); }
 .tone-ok { --tone: var(--ok); --tone-text: var(--ok); }
 .tone-attack { --tone: var(--attack); --tone-text: var(--attack-text); }
 .tone-miss { --tone: var(--attack); --tone-text: var(--attack-text); }
@@ -200,6 +220,15 @@ button { font: inherit; color: inherit; }
 .src { display: inline-block; min-height: 24px; line-height: 24px; font-family: var(--mono); font-size: 10px; color: var(--mute); text-decoration: underline; text-decoration-color: var(--line2); text-underline-offset: 2px; overflow-wrap: anywhere; }
 .src:hover { color: var(--ok); text-decoration-color: currentColor; }
 .src-list { display: flex; flex-wrap: wrap; gap: 0 14px; }
+.src-list--col { flex-direction: column; }
+details.srcs > summary {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 24px; cursor: pointer; list-style: none;
+  font-family: var(--mono); font-size: 10.5px; color: var(--mute);
+}
+details.srcs > summary::-webkit-details-marker { display: none; }
+details.srcs > summary::after { content: '▸'; font-family: var(--sans); }
+details.srcs[open] > summary::after { content: '▾'; }
+details.srcs > summary:hover { color: var(--ok); }
 
 /* ---- buttons ---------------------------------------------------------- */
 .btn {
@@ -250,8 +279,8 @@ button { font: inherit; color: inherit; }
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 14px 16px; border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--tone) 8%, transparent); transition: background 1s;
 }
-.now-fam { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); transition: color .6s; }
-.tone-attack .now-fam, .tone-miss .now-fam { color: var(--attack-text); }
+.now-fam { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.now-fam.is-attack { color: var(--attack-text); }
 .now-meta { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--body); }
 .stream-tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 16px 0; }
 .feed { list-style: none; margin: 0; padding: 6px 8px 10px; display: flex; flex-direction: column; gap: 1px; max-height: 470px; overflow-y: auto; }
@@ -362,11 +391,13 @@ dialog.v-drawer { margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: m
 .org-btn { min-width: 44px; height: 36px; padding: 0 10px; border-radius: var(--r-sm); font-family: var(--mono); font-size: 12px; cursor: pointer; background: transparent; border: 1px solid var(--line2); color: var(--body); }
 .org-btn.is-poisoned { color: var(--attack-text); }
 .org-btn[aria-pressed='true'] { background: var(--inv); color: var(--inv-ink); border-color: var(--inv); font-weight: 600; }
-.org-card { align-self: flex-start; flex: 1 1 300px; min-width: 0; padding: 18px; border-radius: var(--r-md); background: var(--s2); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 1s; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent); }
-.org-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--tone-text); transition: color .6s; }
+.org-card { flex: 1 1 auto; min-width: 0; padding: 18px; border-radius: var(--r-md); background: var(--s2); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 1s; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent); }
+.org-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--tone-text); }
 .big-num { margin: 2px 0 0; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 30px; letter-spacing: -0.03em; }
 .big-num.is-high { color: var(--agent-text); }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; flex: 1 1 300px; min-width: 0; }
+.tiles-3 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 1100px) { .tiles-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .tile { padding: 14px 16px; border-radius: var(--r-md); background: var(--s2); min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .tile-num { margin: 6px 0 0; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 26px; }
 .tile-num--sm { font-size: 15px; }
