@@ -550,6 +550,26 @@ simulator refuses unless the served checkpoint's
 hash is listed in `simulator.test_split_checkpoint_allowlist` (empty by
 default).
 
+The dashboard has three routes. **Live** (`/`) is the operations console:
+key figures, the flow stream (filters, pause, next miss, a "Score a flow"
+drawer), the selected flow's SHAP contributions with its stored LLM
+summary, a hot-swap dialog, and a clean-vs-attack trust dumbbell.
+**Investigate** (`/investigate`) answers four questions on one page: the
+trust check first, then accuracy, explanation agreement and efficiency,
+with the older pages' detail in disclosures. **Limits** (`/limits`) renders
+the claims section of `PROJECT_INSTRUCTIONS.md` as written. Every number
+links to the results file it was read from (served by `GET /source/{path}`).
+The header switches between three themes (Deep Sea, Aubergine, Porcelain),
+remembered in `localStorage`. Two blurred light pools behind the content
+take the colour of the newest flow on Live (benign, attack, or a stronger
+pulse for a miss) and of the selected organization on Investigate (poisoned,
+flagged without an attack, or clean). On first load and on every theme
+switch, a shimmering skeleton stays up until the view's endpoints have
+answered, for at least 600 ms. With `prefers-reduced-motion` the shimmer,
+pulse and fades are off and the colours change instantly.
+
+![Live console, Deep Sea theme](docs/dashboard_v2/screens/live_deep-sea_1440.png)
+
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 
 ### 8. Showcase site and film

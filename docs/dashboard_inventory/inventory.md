@@ -1,5 +1,12 @@
 # Dashboard inventory (backend/ FastAPI + frontend/ React)
 
+> **Superseded by dashboard v2** (branch `dashboard-v2`, merged 2026-10-14).
+> The eight pages below became three routes: Live (`/`), Investigate
+> (`/investigate`) and Limits (`/limits`); see README §7 and the screenshots
+> in `docs/dashboard_v2/screens/`. v2 closes 5.2 (hot-swap dialog), 5.3
+> (dumbbell replaces the lift chart) and 5.4 (heatmap labels and colour
+> scale); 5.5 went with the old Explain page.
+>
 > Snapshot of `master` at `6e12776`. Items 5.1 and 5.6–5.10 were addressed
 > afterwards on branch `dashboard-fixes`; 5.3–5.5 are left for the redesign.
 
