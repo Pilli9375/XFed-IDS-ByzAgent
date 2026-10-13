@@ -219,6 +219,9 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 | Chance-level Jaccard@10 | 0.065 (5.1×–10.3× chance) |
 | Centralized-seed instability floor | median 0.429, range [0.429, 0.484] |
 | Served demo model | fedavg_a0.5_s42, round 18, val macro-F1 0.9760 |
+| FedAvgM β=0.9 (preregistered, test once) α=0.1 / 0.5 / 5.0 | 0.593 ± 0.063 / 0.985 ± 0.000 / 0.991 ± 0.000 |
+| Per-flow latency p50, ONNX fp32 vs PyTorch (CPU, median of 3 sessions) | 45.7 µs vs 186.5 µs |
+| Bytes per round (10 silos, fp32, up + down) | 1,587,920 (793,960 each way) |
 
 ---
 
