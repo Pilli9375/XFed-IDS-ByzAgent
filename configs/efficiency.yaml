@@ -1,0 +1,87 @@
+# configs/efficiency.yaml
+# Efficiency session (branch `efficiency`). Kept separate from the
+# explanation-check and trust-check configs. Nothing here reads test rows:
+# Part A replays existing agent decision logs, Part B uses validation rows
+# only, Part C uses validation macro-F1 only.
+
+# ---------------------------------------------------------------------------
+# Part A -- ByzAgent train_loss pre-screen, offline replay
+# ---------------------------------------------------------------------------
+# The agent makes ONE batched LLM call per round covering every org
+# (src/agents/byz_agent.py decide_round). The pre-screen sends an org to the
+# LLM only if train_loss / median(train_loss over all orgs that round) > t;
+# every other org is auto-assigned `auto_decision`. A round in which no org
+# passes the screen makes no LLM call at all.
+#
+# Replay assumption: an org that passes the screen receives the decision the
+# LLM actually logged for it with all 10 orgs in the prompt. A live run would
+# show the LLM fewer orgs, which may change its answer (stated as a limit).
+agent_prescreen:
+  signal: train_loss
+  reference: round_median        # median over all orgs in the same round
+  comparison: strictly_greater   # sent to LLM iff ratio > t
+  auto_decision: trust
+  flag_decisions: [downweight, quarantine]
+  malicious_silos: [0, 3, 5]
+  # t = 0.0 sends every org (no pre-screen) and is the reference row.
+  threshold_grid: [0.0, 1.0, 1.1, 1.25, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 15.0, 20.0, 30.0, 50.0]
+
+  # Fixed before any ratio distribution was looked at.
+  # Rule: the LARGEST t in threshold_grid such that, in every seed-42 attack
+  # run listed under selection_runs, the pre-screen keeps at least
+  # min_poisoned_flag_retention of the flags the logged LLM placed on
+  # poisoned (org, round) pairs. Rationale: the pre-screen is only worth
+  # having if it does not hide detections the agent already makes; among
+  # thresholds that satisfy that, larger t avoids more LLM calls.
+  selection:
+    seed: 42
+    min_poisoned_flag_retention: 1.0
+    selection_runs: [s42_f3_sudden, s42_f2_sudden]
+
+  # Current-round (Phase 3 prompt) decision logs. Seed-42 files were checked
+  # 200/200 identical to results/inspection/phase3_gate_raw_a0.5_s42.json.
+  runs:
+    s42_clean:
+      seed: 42
+      attack: none
+      log: results/federated/fedavg_a0.5_s42/agent_decisions.jsonl
+    s42_f3_sudden:
+      seed: 42
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5/agent_decisions.jsonl
+    s42_f2_sudden:
+      seed: 42
+      attack: f2_sudden
+      malicious_silos: [0, 3]
+      log: results/federated/fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3/agent_decisions.jsonl
+    # Diagnostic only (not used for selection): the gradual attacker starts at
+    # a 5% flip fraction, i.e. the case where train_loss starts under t.
+    s42_f3_gradual:
+      seed: 42
+      attack: f3_gradual
+      log: results/federated/fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5/agent_decisions_phase4_current_round.jsonl
+    s1337_clean:
+      seed: 1337
+      attack: none
+      log: results/federated/fedavg_a0.5_s1337/agent_decisions_multiseed.jsonl
+    s1337_f3_sudden:
+      seed: 1337
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s1337_poisoned_f3_sudden_silos0-3-5/agent_decisions_multiseed.jsonl
+    s2024_clean:
+      seed: 2024
+      attack: none
+      log: results/federated/fedavg_a0.5_s2024/agent_decisions_multiseed.jsonl
+    s2024_f3_sudden:
+      seed: 2024
+      attack: f3_sudden
+      log: results/federated/fedavg_a0.5_s2024_poisoned_f3_sudden_silos0-3-5/agent_decisions_multiseed.jsonl
+  report_seeds: [1337, 2024]
+
+  # Per-call wall time of the logged (no pre-screen) LLM calls, used only to
+  # convert skipped rounds into seconds. Not a new measurement.
+  call_timing_sources:
+    - results/inspection/phase3_gate_raw_a0.5_s42.json
+    - results/inspection/multiseed_agent_gate_raw.json
+
+  output: results/efficiency/agent_prescreen_replay.json
