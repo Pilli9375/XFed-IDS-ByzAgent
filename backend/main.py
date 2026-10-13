@@ -321,18 +321,24 @@ def _load_streamed_shap_pool(
     return arrays
 
 
-def _load_explanations(loaded: LoadedModel, cfg_paths: dict) -> dict[int, dict]:
-    """Loads results/explanations/<tag>/sentences.json (Step 8,
+def _load_explanations(
+    loaded: LoadedModel,
+    cfg_paths: dict,
+    filename_key: str = "explanations_filename",
+    build_args: str = "",
+) -> dict[int, dict]:
+    """Loads results/explanations/<tag>/<filename> (Step 8,
     tools/build_explanations.py) fully into memory once, keyed by int
     sample_id -- same dict-lookup-only posture as the SHAP pools above, no
-    model or subprocess anywhere in this path. Required, not optional: if
-    it's missing, run that script by hand first."""
+    model or subprocess anywhere in this path. Used for sentences.json (test
+    rows) and val_sentences.json (validation pool). Required, not optional:
+    if it's missing, run that script by hand first."""
     explanations_dir = resolve_path(cfg_paths, "explanations_dir")
-    path = explanations_dir / loaded.tag / cfg_paths["explanations_filename"]
+    path = explanations_dir / loaded.tag / cfg_paths[filename_key]
     if not path.exists():
         raise RuntimeError(
             f"Explanations file {path} does not exist for tag={loaded.tag}. "
-            f"Run `python -m tools.build_explanations --tag {loaded.tag}` first -- "
+            f"Run `python -m tools.build_explanations --tag {loaded.tag}{build_args}` first -- "
             f"this backend never generates sentences itself."
         )
     payload = json.loads(path.read_text())
@@ -399,6 +405,11 @@ async def lifespan(app: FastAPI):
     if str(app.state.val_pool.get("source", "")) != "val":
         raise RuntimeError(f"{cfg_paths['shap_val_pool_filename']} does not carry source='val'.")
     app.state.explanations = _load_explanations(loaded, cfg_paths)
+    # Same id-space split as the SHAP pools: train_pool positions, only
+    # ever looked up with source="val".
+    app.state.val_explanations = _load_explanations(
+        loaded, cfg_paths, "explanations_val_filename", " --pool val --seed 6006"
+    )
     app.state.agreement_json, app.state.parity_json = _load_cached_endpoints(cfg_paths)
 
     # Trust check: ByzAgent trust panel. Built once here, cached as a
@@ -676,20 +687,22 @@ def _pool_shap_response(pool: dict, sample_id: int, pool_name: str, loaded: Load
 
 
 @app.get("/explain/{sample_id}", response_model=ExplainResponse)
-def explain(sample_id: int) -> ExplainResponse:
+def explain(sample_id: int, source: Literal["test", "val"] = "test") -> ExplainResponse:
     """Dict lookup only -- no model, no subprocess, no network call.
     Step 8's whole point: results/explanations/<tag>/sentences.json was
     generated OFFLINE (tools/build_explanations.py) for exactly the same
     514-row set GET /shap/{sample_id} serves. 404 if sample_id isn't in
     that precomputed set -- same boundary as /shap, not a superset or a
-    fallback to live generation."""
+    fallback to live generation. source="val" looks up val_sentences.json
+    only (the validation SHAP pool, train_pool positions)."""
     loaded: LoadedModel = app.state.loaded
-    row = app.state.explanations.get(sample_id)
+    table = app.state.val_explanations if source == "val" else app.state.explanations
+    row = table.get(sample_id)
     if row is None:
+        covered = "the validation SHAP pool" if source == "val" else "the precomputed SHAP set (curated + streamed pool)"
         raise HTTPException(
             status_code=404,
-            detail=f"sample_id {sample_id} has no precomputed explanation. "
-                    f"Only rows in the precomputed SHAP set (curated + streamed pool) are covered.",
+            detail=f"sample_id {sample_id} has no precomputed explanation. Only rows in {covered} are covered.",
         )
     return ExplainResponse(
         sample_id=sample_id,

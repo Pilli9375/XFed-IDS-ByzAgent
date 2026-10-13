@@ -76,6 +76,9 @@ paths:
   # explanations_dir/<tag>/explanations_filename.
   explanations_dir: results/explanations
   explanations_filename: sentences.json
+  # Same generator (--pool val --seed 6006), same model and prompt, for the
+  # 500 rows of shap_val_pool_filename; served under /explain/{id}?source=val.
+  explanations_val_filename: val_sentences.json
 
 model:
   # Which (algo, alpha, seed) run this backend serves. Must match a "tag"

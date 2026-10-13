@@ -124,6 +124,6 @@ export function getAlerts() {
 // Precomputed one-sentence analyst aid for a row in the precomputed SHAP set
 // (curated + streamed pool). 404 outside that set -- callers only ask when
 // an alert says shap_available.
-export function getExplain(sampleId) {
-  return getJSON(`/explain/${sampleId}`);
+export function getExplain(sampleId, source = 'test') {
+  return getJSON(`/explain/${sampleId}${source === 'val' ? '?source=val' : ''}`);
 }

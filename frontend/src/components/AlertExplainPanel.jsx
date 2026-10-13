@@ -11,8 +11,8 @@ import { ACCENT, ALERT, TEXT_FAINT, WARN, familyColor } from '../theme/tokens';
 //   - selected but no precomputed SHAP exists (the common case: say so
 //     plainly -- no empty chart, no spinner that never resolves),
 //   - selected with SHAP: the same ShapContributionsChart Explain uses, plus
-//     the precomputed sentence in a visually separate "analyst aid" block
-//     when one exists (test-pool rows only; validation-pool rows have none).
+//     the precomputed sentence in a visually separate "LLM-generated
+//     summary" block.
 export default function AlertExplainPanel({ alert }) {
   if (!alert) {
     return (
@@ -74,8 +74,7 @@ function ExplanationBody({ alert }) {
 function ExplanationView({ alert, shap, explain }) {
   // Chart the class the sentence is about (the base model's prediction for
   // this row), not blindly the alert's own label -- see the mismatch note.
-  // Without a sentence (validation pool), chart the alert's own label.
-  const chartFamily = explain ? explain.predicted_family : alert.predicted_family;
+  const chartFamily = explain.predicted_family;
   const classIdx = shap.class_names.indexOf(chartFamily);
   const view = useMemo(
     () =>
@@ -88,30 +87,22 @@ function ExplanationView({ alert, shap, explain }) {
       }),
     [shap, classIdx],
   );
-  const mismatch = explain != null && explain.predicted_family !== alert.predicted_family;
+  const mismatch = explain.predicted_family !== alert.predicted_family;
   const signed = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(3)}`;
 
   return (
     <>
-      {explain ? (
-        <div className="xf-analyst-aid">
-          <div className="xf-analyst-aid__label">Analyst aid · not a research result</div>
-          <p className="xf-analyst-aid__sentence">{explain.sentence}</p>
-          <div className="xf-analyst-aid__note">
-            Written offline by a local language model from this row&apos;s top 5 SHAP features, then
-            stored — not generated live, and its wording is not independently checked against the
-            numbers. The chart below is the evidence; the sentence is a reading aid. Precomputed
-            against <code>{explain.tag}</code>; if a hot-swap is active, the alert itself may have
-            come from a different model.
-          </div>
+      <div className="xf-analyst-aid">
+        <div className="xf-analyst-aid__label">LLM-generated summary · not a research result</div>
+        <p className="xf-analyst-aid__sentence">{explain.sentence}</p>
+        <div className="xf-analyst-aid__note">
+          Written offline by a local language model from this row&apos;s top 5 SHAP features, then
+          stored — not generated live, and its wording is not independently checked against the
+          numbers. The chart below is the evidence; the sentence is a reading aid. Precomputed
+          against <code>{explain.tag}</code>; if a hot-swap is active, the alert itself may have
+          come from a different model.
         </div>
-      ) : (
-        <div className="xf-caption" style={{ marginTop: 0 }}>
-          Validation row from the demo SHAP pool (<code>val_pool.npz</code>, explained offline
-          against <code>{shap.tag}</code>). No one-sentence analyst aid was generated for these
-          rows; the chart is the explanation.
-        </div>
-      )}
+      </div>
 
       {mismatch && (
         <>
