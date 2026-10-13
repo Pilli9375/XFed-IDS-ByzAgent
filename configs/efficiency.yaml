@@ -85,3 +85,58 @@ agent_prescreen:
     - results/inspection/multiseed_agent_gate_raw.json
 
   output: results/efficiency/agent_prescreen_replay.json
+
+# ---------------------------------------------------------------------------
+# Part B -- inference speed of the served model, validation rows only
+# ---------------------------------------------------------------------------
+# Model, scaler and validation rows come from backend/model_loader.py
+# load_and_verify(), which re-checks val macro-F1 against round_history.json
+# and never reads test_global.parquet. Timings cover the model forward pass
+# on already-scaled float32 rows; the StandardScaler step is identical for
+# every variant and is not timed.
+inference:
+  backend_config: configs/backend.yaml   # model.tag must be fedavg_a0.5_s42
+  expected_tag: fedavg_a0.5_s42
+  expected_best_round: 18
+  variants: [torch_eager, ort_fp32, ort_int8_dynamic]
+  # Same intra-op thread count for torch and ONNX Runtime (physical cores).
+  intra_op_threads: 8
+  onnx:
+    opset: 17
+    dir: results/efficiency/onnx
+    # Dynamic quantization: int8 weights, activations quantized at run time.
+    int8_weight_type: QInt8
+  latency:
+    batch_size: 1
+    n_rows: 5000          # validation rows drawn with sample_seed
+    sample_seed: 42
+    warmup_calls: 500
+    repeats: 3            # each repeat times all n_rows single-row calls
+  throughput:
+    batch_size: 1024
+    warmup_batches: 20
+    repeats: 5            # each repeat is one full pass over the validation split
+  # Stop-and-flag bound from the session brief.
+  max_abs_macro_f1_delta: 0.005
+  # Backend wiring is allowed only if |delta| rounds to 0 at 3 decimals.
+  backend_wiring_decimals: 3
+  output: results/efficiency/inference_speed.json
+  # One line per timing session (appended).
+  sessions_log: results/efficiency/inference_speed_sessions.jsonl
+  sessions_planned: 3
+
+# ---------------------------------------------------------------------------
+# Part B (optional) -- predict engine for backend/main.py POST /predict
+# ---------------------------------------------------------------------------
+# torch      -- unchanged serving path (default).
+# onnx_fp32  -- base model exported to ONNX at startup and served with ONNX
+#               Runtime; startup fails unless all validation predictions equal
+#               torch's (backend/onnx_engine.py). int8 is not offered: its
+#               validation macro-F1 moved by more than 0.005.
+# A hot-swapped model always uses the torch path.
+serving:
+  engine: torch
+  onnx_opset: 17
+  intra_op_threads: 8
+  verify_batch_size: 1024
+  require_equal_decimals: 3

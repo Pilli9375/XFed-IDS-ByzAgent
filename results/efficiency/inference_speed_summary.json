@@ -1,0 +1,198 @@
+{
+  "source": "3 timing sessions in results/efficiency/inference_speed_sessions.jsonl (each: 3 latency repeats x 5000 single-row calls after 500 warm-up calls; 5 throughput passes after 20 warm-up batches) plus results/efficiency/inference_speed.json for accuracy, size and hardware. Validation rows only. Script: tools/efficiency_inference_summary.py.",
+  "kind": "3 timing sessions, one machine; accuracy is deterministic (identical in every session)",
+  "n_sessions": 3,
+  "session_times_utc": [
+    "2026-10-13T03:32:53+00:00",
+    "2026-10-13T03:33:12+00:00",
+    "2026-10-13T03:33:31+00:00"
+  ],
+  "hardware": {
+    "cpu": "AMD Ryzen 7 7435HS",
+    "logical_cpus": 16,
+    "os": "Windows-10-10.0.26300-SP0",
+    "python": "3.11.15",
+    "torch": "2.6.0+cu124",
+    "onnxruntime": "1.31.0",
+    "onnx": "1.23.2",
+    "intra_op_threads": 8,
+    "device": "cpu"
+  },
+  "protocol": {
+    "latency": {
+      "batch_size": 1,
+      "n_rows": 5000,
+      "sample_seed": 42,
+      "warmup_calls": 500,
+      "repeats": 3
+    },
+    "throughput": {
+      "batch_size": 1024,
+      "warmup_batches": 20,
+      "repeats": 5
+    },
+    "timed": "forward pass on already-scaled float32 rows (scaler not timed)",
+    "metric": "macro_f1_headline (7 families, Infiltration/Heartbleed excluded)"
+  },
+  "model": {
+    "tag": "fedavg_a0.5_s42",
+    "best_round": 18,
+    "checkpoint": "results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt"
+  },
+  "variants": {
+    "torch_eager": {
+      "p50_us": {
+        "median_of_sessions": 186.5,
+        "min": 172.7,
+        "max": 193.2,
+        "per_session": [
+          193.2,
+          186.5,
+          172.7
+        ]
+      },
+      "p95_us": {
+        "median_of_sessions": 322.105,
+        "min": 254.1,
+        "max": 369.405,
+        "per_session": [
+          322.105,
+          369.405,
+          254.1
+        ]
+      },
+      "rows_per_sec": {
+        "median_of_sessions": 1482368.4392753576,
+        "min": 1411066.6762469546,
+        "max": 1493468.678951243,
+        "per_session": [
+          1493468.678951243,
+          1411066.6762469546,
+          1482368.4392753576
+        ]
+      },
+      "val_macro_f1_headline": 0.9759668074383557,
+      "delta_vs_eager": 0.0,
+      "prediction_agreement_with_eager": 1.0,
+      "per_class_f1": {
+        "Benign": 0.9990378477394047,
+        "Bot": 0.8815165876777251,
+        "BruteForce": 0.9884836852207294,
+        "DDoS": 1.0,
+        "DoS": 0.9982746980721626,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.8888888888888888,
+        "PortScan": 0.997349570200573,
+        "WebAttack": 0.9671052631578947
+      },
+      "size_bytes": 83557,
+      "file": "results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt"
+    },
+    "ort_fp32": {
+      "p50_us": {
+        "median_of_sessions": 45.7,
+        "min": 40.6,
+        "max": 46.9,
+        "per_session": [
+          40.6,
+          46.9,
+          45.7
+        ]
+      },
+      "p95_us": {
+        "median_of_sessions": 83.60500000000002,
+        "min": 75.7,
+        "max": 88.50500000000001,
+        "per_session": [
+          75.7,
+          83.60500000000002,
+          88.50500000000001
+        ]
+      },
+      "rows_per_sec": {
+        "median_of_sessions": 1071699.8283725402,
+        "min": 1044718.2554693128,
+        "max": 1124597.6715786064,
+        "per_session": [
+          1044718.2554693128,
+          1071699.8283725402,
+          1124597.6715786064
+        ]
+      },
+      "val_macro_f1_headline": 0.9759668074383557,
+      "delta_vs_eager": 0.0,
+      "prediction_agreement_with_eager": 1.0,
+      "per_class_f1": {
+        "Benign": 0.9990378477394047,
+        "Bot": 0.8815165876777251,
+        "BruteForce": 0.9884836852207294,
+        "DDoS": 1.0,
+        "DoS": 0.9982746980721626,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.8888888888888888,
+        "PortScan": 0.997349570200573,
+        "WebAttack": 0.9671052631578947
+      },
+      "size_bytes": 80704,
+      "file": "results/efficiency/onnx/fedavg_a0.5_s42_r018_fp32.onnx"
+    },
+    "ort_int8_dynamic": {
+      "p50_us": {
+        "median_of_sessions": 47.85,
+        "min": 45.3,
+        "max": 57.9,
+        "per_session": [
+          45.3,
+          57.9,
+          47.85
+        ]
+      },
+      "p95_us": {
+        "median_of_sessions": 98.1,
+        "min": 65.1,
+        "max": 99.20500000000001,
+        "per_session": [
+          65.1,
+          98.1,
+          99.20500000000001
+        ]
+      },
+      "rows_per_sec": {
+        "median_of_sessions": 1256956.1775087314,
+        "min": 1225153.5928582125,
+        "max": 1260406.3087137155,
+        "per_session": [
+          1225153.5928582125,
+          1256956.1775087314,
+          1260406.3087137155
+        ]
+      },
+      "val_macro_f1_headline": 0.8331971038904372,
+      "delta_vs_eager": -0.14276970354791851,
+      "prediction_agreement_with_eager": 0.9945928243434393,
+      "per_class_f1": {
+        "Benign": 0.996482697738481,
+        "Bot": 0.4509090909090909,
+        "BruteForce": 0.9666011787819253,
+        "DDoS": 0.999859865470852,
+        "DoS": 0.9907099697885197,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.3333333333333333,
+        "PortScan": 0.9877055039313796,
+        "WebAttack": 0.4401114206128134
+      },
+      "size_bytes": 25957,
+      "file": "results/efficiency/onnx/fedavg_a0.5_s42_r018_int8_dynamic.onnx"
+    }
+  },
+  "flag_delta_over_bound": [
+    "ort_int8_dynamic"
+  ],
+  "variants_identical_to_eager_at_3dp": [
+    "ort_fp32"
+  ],
+  "gemm_to_matmul_rewrite_check": {
+    "file": "results/efficiency/onnx/fedavg_a0.5_s42_r018_fp32_matmul.onnx",
+    "prediction_agreement_with_eager": 1.0
+  }
+}
