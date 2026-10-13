@@ -419,7 +419,7 @@ def _source_whitelist(cfg_paths: dict, snapshots: list, loaded: LoadedModel) -> 
     found.add(rel(fed_dir / loaded.tag / "round_history.json"))
     found.add(rel(resolve_path(cfg_paths, "explanations_dir") / loaded.tag / cfg_paths["explanations_val_filename"]))
     found.add(rel(resolve_path(cfg_paths, "shap_dir") / loaded.tag / cfg_paths["shap_val_pool_filename"]))
-    found.update(["configs/backend.yaml", "configs/efficiency.yaml"])
+    found.update(["configs/backend.yaml", "configs/efficiency.yaml", "configs/data.yaml"])
     return {f for f in found if (ROOT / f).is_file()}
 
 
@@ -504,6 +504,10 @@ async def lifespan(app: FastAPI):
     accuracy = build_accuracy_snapshot(cfg_paths, resolve_path)
     agreement_summary = build_agreement_summary(cfg_paths, dash_cfg, resolve_path, len(loaded.feature_cols))
     trust = json.loads(app.state.trust_json)
+    # trust.py records decision-variance sources as absolute paths; make
+    # them repo-relative so they work as /source links.
+    for cell in trust["decision_variance"]:
+        cell["source"] = Path(cell["source"]).resolve().relative_to(ROOT).as_posix()
     trust["baselines"] = build_trust_baselines(cfg_paths, dash_cfg, resolve_path)
     trust["fidelity"] = build_trust_fidelity(cfg_paths, resolve_path)
     app.state.trust_json = json.dumps(trust)

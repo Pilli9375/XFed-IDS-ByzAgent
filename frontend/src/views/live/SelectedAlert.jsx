@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useAlertExplanation } from '../../api/useAlertExplanation';
-import Src from '../../components2/Src';
+import Src from '../../components/Src';
 import { BENIGN, isMiss } from '../../lib/alerts';
 import { fixed, pct, signed, timeOf } from '../../lib/format';
 import { buildShapView } from '../../lib/shap';

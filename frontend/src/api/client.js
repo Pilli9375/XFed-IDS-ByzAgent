@@ -1,8 +1,6 @@
 // Thin fetch wrappers over the FastAPI backend, routed through Vite's /api
 // proxy (see vite.config.js) so the browser never needs CORS to reach
-// http://127.0.0.1:8000 directly. Only /health and /config are needed for
-// the app shell -- other endpoints get their own wrapper here when the
-// section that reads them is built.
+// http://127.0.0.1:8000 directly.
 
 const BASE = '/api';
 
@@ -146,10 +144,6 @@ export function getAgreementSummary() {
   return getJSON('/agreement/summary');
 }
 
-export function getFederation2() {
-  return getJSON('/federation');
-}
-
 // Link target for a number's source file. The backend serves only files on
 // its startup whitelist (GET /source/{path}).
 export function sourceUrl(path) {
@@ -157,3 +151,8 @@ export function sourceUrl(path) {
 }
 
 export const faithfulnessFigureUrl = (kind) => `${BASE}/faithfulness/${kind}_curve.png`;
+
+// Limits view text, served from PROJECT_INSTRUCTIONS.md as written.
+export function getLimits() {
+  return getJSON('/limits');
+}

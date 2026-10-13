@@ -1,4 +1,4 @@
-import Src from '../../components2/Src';
+import Src from '../../components/Src';
 import { fixed, int, meanSd, signed } from '../../lib/format';
 
 // Four figures from GET /figures. Each value and sub-line is formatted from

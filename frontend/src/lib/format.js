@@ -31,3 +31,9 @@ export function timeOf(iso) {
 }
 
 export const ALPHAS = ['0.1', '0.5', '5.0'];
+
+// alpha as the project writes it (0.1, 0.5, 5.0), whether served as a
+// number or a string.
+export function alphaStr(a) {
+  return Number(a).toFixed(1);
+}

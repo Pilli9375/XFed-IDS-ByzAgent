@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { getConfig, getFigures, getHealth, getTrust } from '../api/client';
 import { useAlerts } from '../api/useAlerts';
-import Ambient from '../components2/Ambient';
-import Header from '../components2/Header';
-import HotSwapBanner from '../components2/HotSwapBanner';
-import HotSwapDialog from '../components2/HotSwapDialog';
-import ScoreFlowDrawer from '../components2/ScoreFlowDrawer';
+import Ambient from '../components/Ambient';
+import Header from '../components/Header';
+import HotSwapBanner from '../components/HotSwapBanner';
+import HotSwapDialog from '../components/HotSwapDialog';
+import ScoreFlowDrawer from '../components/ScoreFlowDrawer';
 import { useLoadingGate } from '../hooks/useLoadingGate';
 import { useResource } from '../hooks/useResource';
 import { useTheme } from '../hooks/useTheme';

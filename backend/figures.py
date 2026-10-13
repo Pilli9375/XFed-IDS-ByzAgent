@@ -218,6 +218,7 @@ def build_accuracy_snapshot(cfg_paths: dict, resolve_path) -> dict:
         "per_alpha": per_alpha,
         "fedavg_source": _rel(fed_path),
         "fedavgm_method": prereg["method"],
+        "fedavgm_momentum": prereg["method_yaml"]["server_params"]["server_momentum"],
         "fedavgm_source": _rel(prereg_path),
         "fedavgm_kind": "one preregistered test evaluation",
         "selection": {

@@ -1,4 +1,4 @@
-import Src from '../../components2/Src';
+import Src from '../../components/Src';
 import { CONFOUND_CLEAN_RATE, LIFT_HIGHLIGHT, conditionLabel, conditionSources } from '../../lib/trust2';
 import { buildCleanVsAttackRows } from '../../lib/trust';
 import { fixed, signed } from '../../lib/format';
