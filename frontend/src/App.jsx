@@ -1,49 +1,41 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useBackendStatus } from './api/useBackendStatus';
-import HotSwapBanner from './components/HotSwapBanner';
-import Footer from './layout/Footer';
-import Sidebar from './layout/Sidebar';
-import AlertStream from './sections/AlertStream';
-import ClientTrustMonitor from './sections/ClientTrustMonitor';
-import Detect from './sections/Detect';
-import Explain from './sections/Explain';
-import ExplanationAgreement from './sections/ExplanationAgreement';
-import Faithfulness from './sections/Faithfulness';
-import FederationStatus from './sections/FederationStatus';
-import MethodsLimits from './sections/MethodsLimits';
-import PlaceholderSection from './sections/PlaceholderSection';
-import { SECTIONS } from './sections/registry';
+import { useHotSwapStatus } from './api/useHotSwapStatus';
+import { ThemeContext, useThemeState } from './hooks/useTheme';
+import Live from './views/Live';
 
-// Sections get their real component here as they're built; anything not
-// listed still falls back to PlaceholderSection.
-const SECTION_COMPONENTS = {
-  'federation-status': FederationStatus,
-  detect: Detect,
-  explain: Explain,
-  'explanation-agreement': ExplanationAgreement,
-  'client-trust-monitor': ClientTrustMonitor,
-  faithfulness: Faithfulness,
-  'methods-limits': MethodsLimits,
-  'alert-stream': AlertStream,
-};
+// Three routes replace the eight Streamlit-era pages (see
+// docs/dashboard_inventory/inventory.md for where each old panel went).
+// Investigate and Limits are split out so Live's bundle stays small.
+const Investigate = lazy(() => import('./views/Investigate'));
+const Limits = lazy(() => import('./views/Limits'));
 
 export default function App() {
-  const status = useBackendStatus();
-
+  const theme = useThemeState();
+  const hs = useHotSwapStatus();
   return (
-    <div className="xf-app">
-      <Sidebar status={status} />
-      <main className="xf-main">
-        <HotSwapBanner />
-        <Routes>
-          <Route path="/" element={<Navigate to={SECTIONS[0].path} replace />} />
-          {SECTIONS.map(({ key, path, ...section }) => {
-            const Component = SECTION_COMPONENTS[key] ?? PlaceholderSection;
-            return <Route key={key} path={path} element={<Component {...section} />} />;
-          })}
-        </Routes>
-        <Footer />
-      </main>
-    </div>
+    <ThemeContext.Provider value={theme}>
+      <a className="skip-link" href="#main">Skip to content</a>
+      <Routes>
+        <Route path="/" element={<Live hs={hs} />} />
+        <Route
+          path="/investigate"
+          element={
+            <Suspense fallback={<div className="v-page" />}>
+              <Investigate hs={hs} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/limits"
+          element={
+            <Suspense fallback={<div className="v-page" />}>
+              <Limits hs={hs} />
+            </Suspense>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ThemeContext.Provider>
   );
 }

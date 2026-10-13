@@ -128,3 +128,32 @@ export function getAlerts() {
 export function getExplain(sampleId, source = 'test') {
   return getJSON(`/explain/${sampleId}${source === 'val' ? '?source=val' : ''}`);
 }
+
+// ---- dashboard v2 ---------------------------------------------------------
+
+// Key figures, each with its `source` file (backend/figures.py).
+export function getFigures() {
+  return getJSON('/figures');
+}
+
+// FedAvg vs FedAvgM per alpha, centralized + XGBoost references, per-class F1.
+export function getAccuracy() {
+  return getJSON('/accuracy');
+}
+
+// alpha=0.1 cluster-bootstrap CI, seed-noise floor range, chance level.
+export function getAgreementSummary() {
+  return getJSON('/agreement/summary');
+}
+
+export function getFederation2() {
+  return getJSON('/federation');
+}
+
+// Link target for a number's source file. The backend serves only files on
+// its startup whitelist (GET /source/{path}).
+export function sourceUrl(path) {
+  return `${BASE}/source/${path}`;
+}
+
+export const faithfulnessFigureUrl = (kind) => `${BASE}/faithfulness/${kind}_curve.png`;

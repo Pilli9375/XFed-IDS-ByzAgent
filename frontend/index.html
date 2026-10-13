@@ -5,6 +5,15 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>XFed-IDS</title>
+    <meta name="description" content="Federated intrusion detection console: live detection, explanations and trust decisions." />
+    <link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/geist-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      try {
+        var t = localStorage.getItem('xfed-theme');
+        if (t === 'deep-sea' || t === 'aubergine' || t === 'porcelain') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
