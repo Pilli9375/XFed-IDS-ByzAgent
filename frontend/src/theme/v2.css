@@ -98,7 +98,7 @@
 }
 :root[data-theme='aubergine'] {
   --bg: #120B17; --s1: #1C1322; --s2: #241929; --line: #2A1E32; --line2: #3A2B44;
-  --ink: #F3ECF5; --body: #C2B2C8; --mute: #9A879F;
+  --ink: #F3ECF5; --body: #C2B2C8; --mute: #A18FA6;
   --attack: #FF5E3A; --attack-text: #FF8466; --ok: #B8E986; --agent: #C9A7FF; --agent-text: #C9A7FF;
   --away: #5A4763; --inv: #F3ECF5; --inv-ink: #120B17;
   --glow-live: 55%; --glow-inv: 50%;
