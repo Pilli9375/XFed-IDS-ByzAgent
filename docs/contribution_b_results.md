@@ -205,6 +205,11 @@ different under alpha=0.5 heterogeneity, independent of any attack):
 Source: `PHASE1_SUMMARY.md`, `results/inspection/phase1_gate_a0.5_s42_f3_sudden_silos0-3-5.json`,
 `results/inspection/phase1_gate_a0.5_s42_f2_sudden_silos0-3.json`.
 
+The 33.8x and 154.3x ratios are seed-42 effect-size ratios, not a per-round
+detection threshold; a per-round train_loss threshold chosen on seed 42 did not
+transfer (seed 1337 poisoned flag rate 0.017 vs logged 0.483,
+`docs/efficiency_results.md` Part A).
+
 **Only 1 of 5 stats clearly passes**, at both f=3 and f=2. Two findings from
 this must carry forward into every later phase's design, and did:
 

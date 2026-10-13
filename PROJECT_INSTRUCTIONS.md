@@ -170,6 +170,10 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 - train_loss is the only strong attack signal (33.8×–154.3×); geometry stats
   are weak-to-null; val_accuracy inverts (malicious clients score higher on a
   Benign-heavy validation set).
+  33.8×–154.3× is a seed-42 effect-size ratio, not a per-round detection
+  threshold; a per-round train_loss threshold chosen on seed 42 did not
+  transfer (seed 1337 poisoned flag rate 0.017 vs logged 0.483,
+  `docs/efficiency_results.md`).
 - Multi-Krum excluded a malicious silo 0% of the time (classical Krum's exclusions are chance-level: it keeps 1 of 10 every round); Multi-Krum's f=2 "success"
   was a compositional artifact. Defending with nobody attacking costs Krum
   −22.7pp, Multi-Krum −4.9pp, trimmed-mean −1.6pp.
