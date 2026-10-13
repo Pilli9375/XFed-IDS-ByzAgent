@@ -1,0 +1,221 @@
+{
+  "source": "Parameter count from results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt; serialized sizes from flwr ArrayRecord of that checkpoint; logged bytes and wall time from results/federated_methods/{runs,regression}/*/round_timing_comm.jsonl (3-local-epoch runs). Script: tools/efficiency_communication.py. No training, no test rows.",
+  "kind": "computed from parameter count + existing run logs",
+  "analytic": {
+    "n_parameters": 19849,
+    "bytes_per_parameter_fp32": 4,
+    "model_bytes": 79396,
+    "per_round_bytes": 1587920,
+    "per_round_bytes_down": 793960,
+    "per_round_bytes_up": 793960,
+    "n_silos": 10,
+    "directions_per_round": 2
+  },
+  "serialized": {
+    "array_payload_bytes_per_model": 80676,
+    "array_payload_overhead_vs_tensor_bytes": 1280,
+    "arrayrecord_protobuf_bytes_per_model": 81180,
+    "arrayrecord_protobuf_per_round_bytes": 1623600,
+    "note": "array payload = Flower Array.data (numpy .npy blob incl. header, one per tensor); protobuf = flwr.common.serde.array_record_to_proto(...).ByteSize(). Excludes Message metadata, metrics/config records, gRPC/TLS framing. The simulation runs in one process, so no bytes cross a real network."
+  },
+  "harness_logged": {
+    "rounds_checked": 500,
+    "by_server_strategy": {
+      "fedadam": {
+        "rounds": 120,
+        "bytes_down_round1": [
+          793960
+        ],
+        "bytes_down_round2plus": [
+          1587920
+        ],
+        "bytes_up": [
+          793960
+        ],
+        "matches_analytic": false
+      },
+      "fedavg": {
+        "rounds": 20,
+        "bytes_down_round1": [
+          793960
+        ],
+        "bytes_down_round2plus": [
+          793960
+        ],
+        "bytes_up": [
+          793960
+        ],
+        "matches_analytic": true
+      },
+      "fedavgm": {
+        "rounds": 240,
+        "bytes_down_round1": [
+          793960
+        ],
+        "bytes_down_round2plus": [
+          793960
+        ],
+        "bytes_up": [
+          793960
+        ],
+        "matches_analytic": true
+      },
+      "fedyogi": {
+        "rounds": 120,
+        "bytes_down_round1": [
+          793960
+        ],
+        "bytes_down_round2plus": [
+          793960
+        ],
+        "bytes_up": [
+          793960
+        ],
+        "matches_analytic": true
+      }
+    },
+    "definition": "federated/xfed_federated/task.py arrayrecord_nbytes: sum of tensor nbytes, no framing",
+    "fedadam_note": "FedAdam's downlink from round 2 on is 2x the fp32 size: flwr 1.33 serverapp/strategy/fedadam.py multiplies by eta_norm, a numpy float64 scalar, so the new global arrays are float64 (8 B/param). FedYogi multiplies by a Python float and stays float32. Uplink is float32 for every strategy. FedAvg (served model) unaffected."
+  },
+  "wall_time_per_round": {
+    "n_runs": 25,
+    "n_rounds": 500,
+    "median_s": 51.40531129995361,
+    "min_s": 26.80046910000965,
+    "max_s": 98.70917859999463,
+    "round1_median_s": 84.19756939983927,
+    "rounds2plus_median_s": 51.31344200018793,
+    "by_alpha_median_s": {
+      "0.1": 51.41044284997042,
+      "0.5": 51.39686390012503
+    },
+    "definition": "server_app.py _MethodRunLogging: configure_train(r) to end of the server-side validation pass for r; 10 simulated clients x 3 local epochs on CPU (Flower runtime torch CPU build), one machine",
+    "runs": {
+      "runs/fedadam_lr0.01_a0.1_s1337": {
+        "alpha": "0.1",
+        "seed": 1337,
+        "median_s": 51.353783700149506
+      },
+      "runs/fedadam_lr0.01_a0.1_s2024": {
+        "alpha": "0.1",
+        "seed": 2024,
+        "median_s": 51.40531129995361
+      },
+      "runs/fedadam_lr0.01_a0.1_s42": {
+        "alpha": "0.1",
+        "seed": 42,
+        "median_s": 52.8586254499387
+      },
+      "runs/fedadam_lr0.01_a0.5_s1337": {
+        "alpha": "0.5",
+        "seed": 1337,
+        "median_s": 51.64136675000191
+      },
+      "runs/fedadam_lr0.01_a0.5_s2024": {
+        "alpha": "0.5",
+        "seed": 2024,
+        "median_s": 51.50196134997532
+      },
+      "runs/fedadam_lr0.01_a0.5_s42": {
+        "alpha": "0.5",
+        "seed": 42,
+        "median_s": 51.60675530007575
+      },
+      "runs/fedavgm_m0.5_a0.1_s1337": {
+        "alpha": "0.1",
+        "seed": 1337,
+        "median_s": 27.171624100010376
+      },
+      "runs/fedavgm_m0.5_a0.1_s2024": {
+        "alpha": "0.1",
+        "seed": 2024,
+        "median_s": 47.838585849967785
+      },
+      "runs/fedavgm_m0.5_a0.1_s42": {
+        "alpha": "0.1",
+        "seed": 42,
+        "median_s": 27.812930749962106
+      },
+      "runs/fedavgm_m0.5_a0.5_s1337": {
+        "alpha": "0.5",
+        "seed": 1337,
+        "median_s": 50.85498720000032
+      },
+      "runs/fedavgm_m0.5_a0.5_s2024": {
+        "alpha": "0.5",
+        "seed": 2024,
+        "median_s": 50.544718449993525
+      },
+      "runs/fedavgm_m0.5_a0.5_s42": {
+        "alpha": "0.5",
+        "seed": 42,
+        "median_s": 51.30331940005999
+      },
+      "runs/fedavgm_m0.9_a0.1_s1337": {
+        "alpha": "0.1",
+        "seed": 1337,
+        "median_s": 52.42268680006964
+      },
+      "runs/fedavgm_m0.9_a0.1_s2024": {
+        "alpha": "0.1",
+        "seed": 2024,
+        "median_s": 52.15001109999139
+      },
+      "runs/fedavgm_m0.9_a0.1_s42": {
+        "alpha": "0.1",
+        "seed": 42,
+        "median_s": 52.305917549994774
+      },
+      "runs/fedavgm_m0.9_a0.5_s1337": {
+        "alpha": "0.5",
+        "seed": 1337,
+        "median_s": 50.346187599992845
+      },
+      "runs/fedavgm_m0.9_a0.5_s2024": {
+        "alpha": "0.5",
+        "seed": 2024,
+        "median_s": 50.544309499964584
+      },
+      "runs/fedavgm_m0.9_a0.5_s42": {
+        "alpha": "0.5",
+        "seed": 42,
+        "median_s": 52.71379414998228
+      },
+      "runs/fedyogi_lr0.01_a0.1_s1337": {
+        "alpha": "0.1",
+        "seed": 1337,
+        "median_s": 50.956219949992374
+      },
+      "runs/fedyogi_lr0.01_a0.1_s2024": {
+        "alpha": "0.1",
+        "seed": 2024,
+        "median_s": 52.35549400001764
+      },
+      "runs/fedyogi_lr0.01_a0.1_s42": {
+        "alpha": "0.1",
+        "seed": 42,
+        "median_s": 51.350917349918745
+      },
+      "runs/fedyogi_lr0.01_a0.5_s1337": {
+        "alpha": "0.5",
+        "seed": 1337,
+        "median_s": 50.94730514998082
+      },
+      "runs/fedyogi_lr0.01_a0.5_s2024": {
+        "alpha": "0.5",
+        "seed": 2024,
+        "median_s": 52.00806715001818
+      },
+      "runs/fedyogi_lr0.01_a0.5_s42": {
+        "alpha": "0.5",
+        "seed": 42,
+        "median_s": 52.654356150073
+      },
+      "regression/fedavg_a0.1_s42": {
+        "alpha": "0.1",
+        "seed": 42,
+        "median_s": 27.560097349982243
+      }
+    }
+  }
+}
