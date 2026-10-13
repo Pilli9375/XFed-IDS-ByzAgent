@@ -161,7 +161,13 @@ The dashboard simulator replays validation rows as display traffic and marks eac
 - Bot/WebAttack near-duplication caveat: tested and not confirmed.
 - PortScan is the genuine generalisation family (23× further test-NN distance).
 - GradientExplainer, not DeepExplainer (fails on LayerNorm, additivity error
-  2.43). Additivity residual ~3–8% relative, bounded by a KernelExplainer check.
+  2.43). Relative additivity residual on 500 validation rows: median 3.2%,
+  p95 7.7%, max 21.2% (one Infiltration row); 18 rows above 8%, mostly Bot (7),
+  Benign (4) and WebAttack (4) (`results/shap/fedavg_a0.5_s42/val_pool_summary.json`).
+  Relative = max over classes of |ΣSHAP − (f(x) − E[f])| ÷ max over classes of
+  |f(x) − E[f]|. The earlier "~3–8%" figure had no backing file and was dropped;
+  it cannot be recomputed for the 14 test rows because their stored SHAP files
+  hold no model outputs.
 - Faithfulness is a single-config spot-check (α=0.5, seed 42), not a gate.
 
 **Trust check (ByzAgent)**

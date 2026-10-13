@@ -1,10 +1,11 @@
 """Traffic simulator for the Phase 2 dashboard demo.
 
-Reads rows from the validation split (default) and POSTs each one to the
-backend's POST /predict, at a configurable rate (configs/backend.yaml:
-simulator.*). The source split is simulator.source_split: "val" (rows of
-train_pool.parquet where val_mask.is_val is true) or "test"
-(test_global.parquet). "test" is refused unless the served model's
+Reads rows and POSTs each one to the backend's POST /predict, at a
+configurable rate (configs/backend.yaml: simulator.*). The source is
+simulator.source_split: "val_shap_pool" (default: the 500 validation rows of
+results/shap/<tag>/val_pool.npz, replayed in stored order, every one with
+precomputed SHAP), "val" (all rows of train_pool.parquet where
+val_mask.is_val is true, no SHAP) or "test" (test_global.parquet). "test" is refused unless the served model's
 checkpoint hash is in simulator.test_split_checkpoint_allowlist, which is
 empty by default -- so no unsealed candidate (e.g. a hot-swapped model)
 can ever show test-row correctness.
@@ -99,6 +100,31 @@ def _load_demo_rows(
     return df, feature_cols
 
 
+def _load_val_shap_pool_rows(cfg_paths: dict, tag: str) -> tuple[pd.DataFrame, list[str]]:
+    """source_split "val_shap_pool": exactly the rows in
+    results/shap/<tag>/<shap_val_pool_filename> (tools/build_shap_val_pool.py),
+    in the order stored there -- no shuffle, no resampling. Raw feature values
+    and family come from the .npz itself, the same arrays the backend serves
+    for /shap?source=val, so the posted row is by construction the explained
+    row. The index is sample_id (the train_pool.parquet position)."""
+    data_cfg = load_yaml(resolve_path(cfg_paths, "data_config"))
+    feature_cols = derive_feature_cols(
+        pq.ParquetFile(resolve_path(cfg_paths, "train_pool")).schema_arrow.names, data_cfg
+    )
+    pool_path = resolve_path(cfg_paths, "shap_dir") / tag / cfg_paths["shap_val_pool_filename"]
+    if not pool_path.exists():
+        raise FileNotFoundError(f"{pool_path} does not exist -- run `python -m tools.build_shap_val_pool` first.")
+    with np.load(pool_path) as npz:
+        if str(npz["source"]) != "val":
+            raise RuntimeError(f"{pool_path} does not carry source='val'; refusing to replay it.")
+        if list(npz["feature_names"]) != feature_cols:
+            raise RuntimeError(f"{pool_path} feature order differs from train_pool.parquet's; refusing to replay.")
+        df = pd.DataFrame(npz["raw_values"], columns=feature_cols, index=npz["sample_id"].astype(np.int64))
+        df["family"] = npz["eval_families"].astype(str)
+    log.info("loaded %d validation SHAP-pool rows from %s (stored order)", len(df), pool_path)
+    return df, feature_cols
+
+
 def _state_dict_sha256(state_dict: dict) -> str:
     """Same recipe as backend/hotswap_service.py and src/hotswap/retrain.py
     (the hash the hot-swap audit log records), duplicated here so the
@@ -176,23 +202,29 @@ def run(backend_config_path: str | Path = "configs/backend.yaml") -> None:
     source_split = str(sim_cfg.get("source_split", "val")).lower()
     if source_split == "validation":
         source_split = "val"
-    if source_split not in ("val", "test"):
-        raise SystemExit(f"simulator.source_split={source_split!r} must be 'val' or 'test'.")
+    if source_split not in ("val_shap_pool", "val", "test"):
+        raise SystemExit(f"simulator.source_split={source_split!r} must be 'val_shap_pool', 'val' or 'test'.")
 
     session = requests.Session()
     if source_split == "test":
         digest = _require_test_split_allowed(cfg, session, backend_url)
         log.warning("source_split=test allowed: checkpoint sha256 %s is allowlisted", digest)
-    df, feature_cols = _load_demo_rows(cfg["paths"], shuffle_seed, source_split)
+    if source_split == "val_shap_pool":
+        df, feature_cols = _load_val_shap_pool_rows(cfg["paths"], tag)
+        split_file = f"{cfg['paths']['shap_val_pool_filename']} (validation rows, stored order)"
+    else:
+        df, feature_cols = _load_demo_rows(cfg["paths"], shuffle_seed, source_split)
+        split_file = "test_global.parquet" if source_split == "test" else "train_pool.parquet (val_mask rows)"
+        split_file += f", shuffled once with seed={shuffle_seed}"
     # The streamed SHAP pool is keyed by test_global positions, so it is only
-    # meaningful for the test split; validation rows never claim a SHAP id.
+    # meaningful for the test split; every val_shap_pool row has SHAP by
+    # construction; rows of the full val split never claim a SHAP id.
     streamed_pool_ids = _load_streamed_pool_ids(cfg["paths"], tag) if source_split == "test" else set()
-    split_file = "test_global.parquet" if source_split == "test" else "train_pool.parquet (val_mask rows)"
+    shap_source = "val" if source_split == "val_shap_pool" else "test"
     n_rows = len(df)
     log.info(
-        "loaded %d demo rows (%d features) from %s, shuffled once with seed=%d, "
-        "rate=%.3f/s target=%s/predict",
-        n_rows, len(feature_cols), split_file, shuffle_seed, rate, backend_url,
+        "loaded %d demo rows (%d features) from %s, rate=%.3f/s target=%s/predict",
+        n_rows, len(feature_cols), split_file, rate, backend_url,
     )
 
     i = 0
@@ -207,12 +239,13 @@ def run(backend_config_path: str | Path = "configs/backend.yaml") -> None:
         # row.name is the row's original position in its source parquet
         # (preserved through the shuffle, see _load_demo_rows). For the test
         # split that is the identifier streamed_pool.npz's sample_id array
-        # uses; for the val split streamed_pool_ids is empty, so has_shap is
-        # always False.
+        # uses; for val_shap_pool it is val_pool.npz's sample_id (a
+        # train_pool position); for the val split streamed_pool_ids is
+        # empty, so has_shap is always False.
         if source_split == "test" and i > 0 and i % 50 == 0:
             _require_test_split_allowed(cfg, session, backend_url)
-        test_global_position = int(row.name)
-        has_shap = test_global_position in streamed_pool_ids
+        source_position = int(row.name)
+        has_shap = source_split == "val_shap_pool" or source_position in streamed_pool_ids
         payload = {
             "features": {c: float(row[c]) for c in feature_cols},
             "true_family": str(row["family"]),
@@ -220,11 +253,12 @@ def run(backend_config_path: str | Path = "configs/backend.yaml") -> None:
             # are real replayed traffic with a source row behind them, so it
             # is the one caller that sets this. Everyone else defaults False.
             "record_alert": True,
-            # Only set when this exact row is one of the 500 in the
-            # streamed pool -- ~500 of ~478k rows, so almost always None.
+            # Set when this exact row is in a precomputed SHAP pool: always
+            # for val_shap_pool, ~500 of ~478k rows for test, never for val.
             # The backend re-validates this against its own loaded pool
             # before trusting it (see /predict).
-            "shap_sample_id": test_global_position if has_shap else None,
+            "shap_sample_id": source_position if has_shap else None,
+            "shap_source": shap_source,
         }
         try:
             resp = session.post(f"{backend_url}/predict", json=payload, timeout=5)
@@ -232,7 +266,7 @@ def run(backend_config_path: str | Path = "configs/backend.yaml") -> None:
             body = resp.json()
             log.info(
                 "row=%d (%s pos=%d) true=%s predicted=%s confidence=%.4f%s",
-                i, source_split, test_global_position, payload["true_family"], body["family"], body["confidence"],
+                i, source_split, source_position, payload["true_family"], body["family"], body["confidence"],
                 " [SHAP available]" if has_shap else "",
             )
         except requests.RequestException as e:

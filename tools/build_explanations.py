@@ -30,9 +30,17 @@ Writes results/explanations/<tag>/sentences.json, keyed by sample_id
 (string keys, JSON's only option -- backend/main.py casts back to int on
 load, same pattern as the streamed pool's in-memory index).
 
+--pool val instead covers the 500 validation rows of
+results/shap/<tag>/val_pool.npz (tools/build_shap_val_pool.py), with the same
+model, prompt template, top-k and temperature, and writes
+results/explanations/<tag>/val_sentences.json (source "val", keyed by
+train_pool.parquet position). It also passes --seed to Ollama and logs the
+model digest, which the original 514-row run did not.
+
 Run as:
     python -m tools.build_explanations --tag fedavg_a0.5_s42 --limit 5   # sanity check first
     python -m tools.build_explanations --tag fedavg_a0.5_s42             # full 514-row run
+    python -m tools.build_explanations --tag fedavg_a0.5_s42 --pool val --seed 6006
 """
 
 from __future__ import annotations
@@ -139,13 +147,18 @@ def _build_prompt(family: str, confidence: float, top_features: list[dict]) -> s
     )
 
 
-def _call_ollama(prompt: str, model: str, host: str, temperature: float, keep_alive: str, timeout: int) -> str:
+def _call_ollama(
+    prompt: str, model: str, host: str, temperature: float, keep_alive: str, timeout: int, seed: int | None = None
+) -> str:
+    options = {"temperature": temperature}
+    if seed is not None:
+        options["seed"] = seed
     payload = {
         "model": model,
         "prompt": prompt,
         "stream": False,
         "keep_alive": keep_alive,
-        "options": {"temperature": temperature},
+        "options": options,
     }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(f"{host}/api/generate", data=data, headers={"Content-Type": "application/json"})
@@ -173,13 +186,14 @@ def _violates_framing(sentence: str) -> str | None:
 
 
 def _generate_one(
-    prompt: str, model: str, host: str, temperature: float, keep_alive: str, timeout: int, max_retries: int
+    prompt: str, model: str, host: str, temperature: float, keep_alive: str, timeout: int, max_retries: int,
+    seed: int | None = None,
 ) -> tuple[str | None, str | None]:
     """Returns (sentence, exclusion_reason). Exactly one is None."""
     last_reason = None
     for attempt in range(max_retries + 1):
         try:
-            raw = _call_ollama(prompt, model, host, temperature, keep_alive, timeout)
+            raw = _call_ollama(prompt, model, host, temperature, keep_alive, timeout, seed)
         except (urllib.error.URLError, TimeoutError, OSError) as e:
             last_reason = f"ollama call failed: {e}"
             continue
@@ -325,6 +339,124 @@ def build_explanations(
     return out_path
 
 
+def _ollama_model_digest(host: str, model: str) -> str | None:
+    """The local digest of `model`, from Ollama's /api/tags -- pins exactly
+    which weights a tag pointed at when the sentences were generated."""
+    with urllib.request.urlopen(f"{host}/api/tags", timeout=10) as resp:
+        tags = json.loads(resp.read().decode("utf-8"))
+    return next((m.get("digest") for m in tags.get("models", []) if m.get("name") == model), None)
+
+
+def build_val_explanations(
+    tag: str,
+    model: str,
+    host: str,
+    top_k: int,
+    temperature: float,
+    seed: int,
+    keep_alive: str,
+    timeout: int,
+    max_retries: int,
+    limit: int | None,
+) -> Path:
+    """Same per-row recipe as build_explanations() -- served model's
+    prediction, top-k SHAP features for the predicted class, PROMPT_TEMPLATE,
+    the same retry/banned-word checks -- over the 500 validation rows of
+    val_pool.npz. Only validation rows are read (load_and_verify() reads the
+    validation split; val_pool.npz holds validation rows only)."""
+    t0 = time.time()
+    loaded = load_and_verify()
+    if loaded.tag != tag:
+        raise RuntimeError(f"--tag {tag!r} does not match configs/backend.yaml's model.tag {loaded.tag!r}.")
+
+    pool_path = SHAP_ROOT / tag / "val_pool.npz"
+    with np.load(pool_path) as npz:
+        if str(npz["source"]) != "val":
+            raise RuntimeError(f"{pool_path} does not carry source='val'.")
+        shap_all = npz["shap_values"].copy()
+        raw_all = npz["raw_values"].copy()
+        sample_ids = npz["sample_id"].copy()
+        feature_names = list(npz["feature_names"])
+    _verify_feature_alignment(feature_names, loaded.feature_cols, pool_path.name)
+
+    jobs = list(range(len(sample_ids)))
+    if limit is not None:
+        log.warning("--limit %d set: sanity-check run, NOT the full artifact", limit)
+        jobs = jobs[:limit]
+
+    digest = _ollama_model_digest(host, model)
+    if digest is None:
+        raise RuntimeError(f"Ollama at {host} has no model named {model!r}.")
+    prompt_template_sha256 = hashlib.sha256(PROMPT_TEMPLATE.encode("utf-8")).hexdigest()
+    raw_values_sha256 = hashlib.sha256(np.ascontiguousarray(raw_all).tobytes()).hexdigest()
+    log.info("generating %d validation sentences | model=%s digest=%s temperature=%.2f seed=%d | "
+             "prompt_template sha256=%s", len(jobs), model, digest, temperature, seed, prompt_template_sha256)
+
+    rows: dict[str, dict] = {}
+    excluded: dict[str, str] = {}
+    t_gen0 = time.time()
+    for n, i in enumerate(jobs):
+        sample_id = int(sample_ids[i])
+        x_scaled = loaded.scaler.transform(raw_all[i].reshape(1, -1)).astype(np.float32)
+        with torch.no_grad():
+            loaded.model.eval()
+            logits = loaded.model(torch.from_numpy(x_scaled).to(loaded.device))
+            probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
+        pred_idx = int(np.argmax(probs))
+        family = loaded.class_names[pred_idx]
+        confidence = float(probs[pred_idx])
+
+        top_features = _top_k_features(shap_all[i][:, pred_idx], raw_all[i], loaded.feature_cols, top_k)
+        prompt = _build_prompt(family, confidence, top_features)
+        sentence, reason = _generate_one(prompt, model, host, temperature, keep_alive, timeout, max_retries, seed)
+        if sentence is None:
+            log.error("sample_id=%d EXCLUDED: %s", sample_id, reason)
+            excluded[str(sample_id)] = reason
+        else:
+            rows[str(sample_id)] = {
+                "sample_id": sample_id,
+                "source": "val",
+                "predicted_family": family,
+                "confidence": confidence,
+                "top_features": top_features,
+                "sentence": sentence,
+            }
+        if (n + 1) % 25 == 0 or (n + 1) == len(jobs):
+            elapsed = time.time() - t_gen0
+            log.info("generated %d/%d (%d excluded) (%.2fs/row, elapsed=%.1fs)",
+                     n + 1, len(jobs), len(excluded), elapsed / (n + 1), elapsed)
+
+    out_dir = EXPLANATIONS_ROOT / tag
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / ("val_sentences.json" if limit is None else f"val_sentences_limit{limit}.json")
+    generation_s = time.time() - t_gen0
+    payload = {
+        "tag": tag,
+        "source": "val",
+        "source_file": f"results/shap/{tag}/val_pool.npz (train_pool.parquet validation rows)",
+        "sample_id_meaning": "row position in train_pool.parquet",
+        "model": model,
+        "model_digest": digest,
+        "ollama_host": host,
+        "prompt_template_sha256": prompt_template_sha256,
+        "raw_values_sha256": raw_values_sha256,
+        "top_k": top_k,
+        "temperature": temperature,
+        "seed": seed,
+        "max_retries": max_retries,
+        "generation_seconds": round(generation_s, 1),
+        "total_seconds": round(time.time() - t0, 1),
+        "n_rows": len(rows),
+        "n_excluded": len(excluded),
+        "excluded": excluded,
+        "rows": rows,
+    }
+    out_path.write_text(json.dumps(payload, indent=2))
+    log.info("WROTE %s | rows=%d excluded=%d | generation %.1fs (%.2fmin)",
+             out_path, len(rows), len(excluded), generation_s, generation_s / 60)
+    return out_path
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tag", required=True, help="e.g. fedavg_a0.5_s42")
@@ -332,6 +464,11 @@ def main() -> None:
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--top-k", type=int, default=TOP_K)
     parser.add_argument("--temperature", type=float, default=0.2)
+    parser.add_argument("--pool", choices=("test", "val"), default="test",
+                        help="test (default): the 14 curated + 500 streamed rows -> sentences.json. "
+                             "val: the 500 rows of val_pool.npz -> val_sentences.json.")
+    parser.add_argument("--seed", type=int, default=None,
+                        help="Ollama sampling seed. Required for --pool val (logged in the output).")
     parser.add_argument("--keep-alive", default="10m",
                          help="Ollama keep_alive for this batch run. Safe to keep the model resident "
                               "across all 514 calls here (offline, one-time, not running concurrently "
@@ -345,6 +482,15 @@ def main() -> None:
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    if args.pool == "val":
+        if args.seed is None:
+            parser.error("--pool val requires --seed")
+        build_val_explanations(
+            tag=args.tag, model=args.model, host=args.host, top_k=args.top_k,
+            temperature=args.temperature, seed=args.seed, keep_alive=args.keep_alive,
+            timeout=args.timeout, max_retries=args.max_retries, limit=args.limit,
+        )
+        return
     build_explanations(
         tag=args.tag, model=args.model, host=args.host, top_k=args.top_k,
         temperature=args.temperature, keep_alive=args.keep_alive, timeout=args.timeout,

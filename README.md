@@ -493,10 +493,29 @@ remain in git history (`eval_rows_sidecar.npz` since `0d9a8aa`,
 `streamed_pool.npz` since `2823faf`), so a full clone still fetches those old
 copies. History was not rewritten.
 
+The demo's validation SHAP pool is also rebuilt locally (about 45 minutes on
+CPU). It reads only `train_pool.parquet` and `val_mask.parquet`, never the
+test set. It explains 500 seeded validation rows covering all 9 families,
+with the same explainer, background and checkpoint as the streamed pool
+([`configs/val_shap_pool.yaml`](configs/val_shap_pool.yaml)). Its class
+counts and additivity residuals are written to the tracked
+`results/shap/fedavg_a0.5_s42/val_pool_summary.json`.
+
+```powershell
+python -m tools.build_shap_val_pool
+```
+
 The one-sentence alert explanations are committed in
 `results/explanations/fedavg_a0.5_s42/sentences.json`;
 `python -m tools.build_explanations --tag fedavg_a0.5_s42` regenerates them
-with Ollama.
+with Ollama. The validation pool's sentences are committed in
+`results/explanations/fedavg_a0.5_s42/val_sentences.json`, which also records
+the model tag and digest, temperature, seed and prompt hash. They were made
+with the same model and prompt, and took 35 minutes on the RTX 4050:
+
+```powershell
+python -m tools.build_explanations --tag fedavg_a0.5_s42 --pool val --seed 6006
+```
 
 The backend serves the model through ONNX Runtime fp32 by default
 (`serving.engine` in [`configs/efficiency.yaml`](configs/efficiency.yaml);
@@ -522,11 +541,14 @@ npm run dev
 The API listens on `http://127.0.0.1:8000`, and the Vite dev server proxies
 `/api` to it. The simulator is optional: it replays rows so the alert
 stream moves. The dashboard simulator replays validation rows as display traffic and marks each alert against its true label; no aggregate metric is computed and nothing is selected from it. The public site's replay uses the 500 stored test-row outputs documented above.
-To replay test rows instead, set `simulator.source_split: test` in
-`configs/backend.yaml`; the simulator refuses unless the served checkpoint's
+By default (`simulator.source_split: val_shap_pool` in
+`configs/backend.yaml`) it replays the 500 rows of the validation SHAP pool in
+stored order, so every alert has a SHAP panel and an LLM-generated summary. Set `source_split: val` to replay the whole
+validation split instead; those alerts have no SHAP.
+To replay test rows instead, set `simulator.source_split: test`; the
+simulator refuses unless the served checkpoint's
 hash is listed in `simulator.test_split_checkpoint_allowlist` (empty by
-default). Validation rows have no precomputed SHAP, so replayed alerts show
-no SHAP panel.
+default).
 
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 

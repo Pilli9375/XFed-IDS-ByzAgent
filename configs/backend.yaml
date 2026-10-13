@@ -27,6 +27,13 @@ paths:
   # backend/simulator.py also reads this file's sample_id array directly
   # (not through the API) to know which streamed rows to tag.
   shap_streamed_pool_filename: streamed_pool.npz
+  # Validation-row SHAP pool for the demo simulator, built OFFLINE by
+  # tools/build_shap_val_pool.py from configs/val_shap_pool.yaml (500 seeded
+  # validation rows, all 9 families). sample_id = row position in
+  # train_pool.parquet, so /shap serves it only under ?source=val. Read at
+  # startup like the pools above; the simulator replays it when
+  # simulator.source_split is val_shap_pool.
+  shap_val_pool_filename: val_pool.npz
   agreement_metrics: results/inspection/agreement_metrics.csv
   per_silo_agreement: results/inspection/per_silo_agreement.csv
   round_wise_agreement: results/inspection/round_wise_agreement.csv
@@ -69,6 +76,9 @@ paths:
   # explanations_dir/<tag>/explanations_filename.
   explanations_dir: results/explanations
   explanations_filename: sentences.json
+  # Same generator (--pool val --seed 6006), same model and prompt, for the
+  # 500 rows of shap_val_pool_filename; served under /explain/{id}?source=val.
+  explanations_val_filename: val_sentences.json
 
 model:
   # Which (algo, alpha, seed) run this backend serves. Must match a "tag"
@@ -108,22 +118,27 @@ simulator:
   backend_url: http://127.0.0.1:8000
   rate_per_second: 1.0
   # Which split the replayed rows come from:
-  #   val  -- train_pool.parquet rows where val_mask.is_val is true (default).
+  #   val_shap_pool -- exactly the 500 validation rows in
+  #           results/shap/<tag>/<shap_val_pool_filename>, replayed in stored
+  #           order (no shuffle), each with precomputed SHAP (default).
+  #   val  -- train_pool.parquet rows where val_mask.is_val is true, shuffled
+  #           once with shuffle_seed; no SHAP for any of them.
   #   test -- test_global.parquet. Refused unless the served model's
   #           checkpoint state-dict sha256 (the hash the hot-swap audit log
   #           records) is listed in test_split_checkpoint_allowlist below, and
   #           no hot-swap is active. Reason: a candidate model that has not
   #           been sealed (e.g. a hot-swapped one) must never show per-alert
   #           correctness on test rows.
-  # Validation rows carry no precomputed SHAP, so alerts from the val split
-  # never have shap_available.
-  source_split: val
+  # Rows of the full val split carry no precomputed SHAP; only the
+  # val_shap_pool sample does.
+  source_split: val_shap_pool
   # State-dict sha256 values of checkpoints that may be replayed on the test
   # split. Empty on purpose: add an entry only for a sealed checkpoint.
   test_split_checkpoint_allowlist: []
   # true = restart from row 0 (of the SHUFFLED order below) after the last
   # row of the chosen split so the demo feed never just stops.
   loop: true
+  # source_split val/test only (val_shap_pool keeps its stored order).
   # Row order is shuffled ONCE at simulator startup with this seed (see
   # _load_demo_rows in backend/simulator.py), then replayed sequentially and
   # looped -- not resampled per tick. Sequential file order is 100% Benign

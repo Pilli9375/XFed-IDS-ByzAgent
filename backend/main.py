@@ -20,6 +20,7 @@ import logging
 import threading
 import time
 from collections import deque
+from typing import Literal
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
@@ -139,7 +140,15 @@ class PredictRequest(BaseModel):
     # taken on the caller's word alone.
     shap_sample_id: int | None = Field(
         default=None,
-        description="This row's test_global.parquet position, if the caller knows it's in the streamed SHAP pool. Ignored by the model; re-validated server-side.",
+        description="This row's position in its source parquet, if the caller knows it's in a precomputed SHAP pool. Ignored by the model; re-validated server-side.",
+    )
+    # Which pool shap_sample_id refers to. The two pools key rows by
+    # positions in DIFFERENT files (test_global.parquet vs train_pool.parquet),
+    # so the same integer can name two unrelated rows -- the source is part
+    # of the identifier, never inferred from the number.
+    shap_source: Literal["test", "val"] = Field(
+        default="test",
+        description="'test' = streamed_pool.npz (test_global positions); 'val' = val_pool.npz (train_pool positions).",
     )
 
 
@@ -171,6 +180,9 @@ class Alert(BaseModel):
     # sample_id to pass to GET /shap/{sample_id} when shap_available is
     # true. Null whenever shap_available is false.
     shap_sample_id: int | None = None
+    # Pass as GET /shap/{sample_id}?source=... Null whenever shap_available
+    # is false. Only "test" rows also have a GET /explain sentence.
+    shap_source: Literal["test", "val"] | None = None
 
 
 class ExplainFeature(BaseModel):
@@ -268,19 +280,26 @@ def _load_shap_arrays(loaded: LoadedModel, cfg_paths: dict) -> dict[str, np.ndar
     return arrays
 
 
-def _load_streamed_shap_pool(loaded: LoadedModel, cfg_paths: dict) -> dict:
-    """Loads results/shap/<tag>/<shap_streamed_pool_filename>.npz (Step 7,
-    tools/build_shap_streamed_pool.py) fully into memory once, closes the
-    file, and builds a sample_id -> row-index lookup dict so GET
-    /shap/{sample_id} does an O(1) dict lookup, never a scan, per request.
-    Required, not optional -- same fail-loud posture as the sidecar above:
-    if it's missing, run that script by hand first."""
+def _load_streamed_shap_pool(
+    loaded: LoadedModel,
+    cfg_paths: dict,
+    filename_key: str = "shap_streamed_pool_filename",
+    build_cmd: str = "python -m tools.build_shap_streamed_pool --tag {tag}",
+) -> dict:
+    """Loads one precomputed SHAP pool -- results/shap/<tag>/<filename>.npz
+    -- fully into memory once, closes the file, and builds a sample_id ->
+    row-index lookup dict so GET /shap/{sample_id} does an O(1) dict lookup,
+    never a scan, per request. Used for both the test-row streamed pool
+    (Step 7, tools/build_shap_streamed_pool.py) and the validation pool
+    (tools/build_shap_val_pool.py). Required, not optional -- same fail-loud
+    posture as the sidecar above: if it's missing, run its script by hand
+    first."""
     shap_dir = resolve_path(cfg_paths, "shap_dir")
-    pool_path = shap_dir / loaded.tag / cfg_paths["shap_streamed_pool_filename"]
+    pool_path = shap_dir / loaded.tag / cfg_paths[filename_key]
     if not pool_path.exists():
         raise RuntimeError(
-            f"Streamed SHAP pool {pool_path} does not exist for tag={loaded.tag}. "
-            f"Run `python -m tools.build_shap_streamed_pool --tag {loaded.tag}` first -- "
+            f"SHAP pool {pool_path} does not exist for tag={loaded.tag}. "
+            f"Run `{build_cmd.format(tag=loaded.tag)}` first -- "
             f"this backend never computes it itself."
         )
     with np.load(pool_path) as npz:
@@ -296,24 +315,30 @@ def _load_streamed_shap_pool(loaded: LoadedModel, cfg_paths: dict) -> dict:
     arrays["index"] = index
 
     log.info(
-        "loaded streamed SHAP pool %s: %d rows, sample_id range=[%d, %d]",
+        "loaded SHAP pool %s: %d rows, sample_id range=[%d, %d]",
         pool_path, len(arrays["sample_id"]), int(arrays["sample_id"].min()), int(arrays["sample_id"].max()),
     )
     return arrays
 
 
-def _load_explanations(loaded: LoadedModel, cfg_paths: dict) -> dict[int, dict]:
-    """Loads results/explanations/<tag>/sentences.json (Step 8,
+def _load_explanations(
+    loaded: LoadedModel,
+    cfg_paths: dict,
+    filename_key: str = "explanations_filename",
+    build_args: str = "",
+) -> dict[int, dict]:
+    """Loads results/explanations/<tag>/<filename> (Step 8,
     tools/build_explanations.py) fully into memory once, keyed by int
     sample_id -- same dict-lookup-only posture as the SHAP pools above, no
-    model or subprocess anywhere in this path. Required, not optional: if
-    it's missing, run that script by hand first."""
+    model or subprocess anywhere in this path. Used for sentences.json (test
+    rows) and val_sentences.json (validation pool). Required, not optional:
+    if it's missing, run that script by hand first."""
     explanations_dir = resolve_path(cfg_paths, "explanations_dir")
-    path = explanations_dir / loaded.tag / cfg_paths["explanations_filename"]
+    path = explanations_dir / loaded.tag / cfg_paths[filename_key]
     if not path.exists():
         raise RuntimeError(
             f"Explanations file {path} does not exist for tag={loaded.tag}. "
-            f"Run `python -m tools.build_explanations --tag {loaded.tag}` first -- "
+            f"Run `python -m tools.build_explanations --tag {loaded.tag}{build_args}` first -- "
             f"this backend never generates sentences itself."
         )
     payload = json.loads(path.read_text())
@@ -371,7 +396,20 @@ async def lifespan(app: FastAPI):
     log.info("predict engine: %s", engine)
     app.state.shap_arrays = _load_shap_arrays(loaded, cfg_paths)
     app.state.streamed_pool = _load_streamed_shap_pool(loaded, cfg_paths)
+    # Validation rows for the demo simulator (configs/val_shap_pool.yaml).
+    # Keyed by train_pool.parquet positions, so kept in its own dict and
+    # only ever looked up with source="val".
+    app.state.val_pool = _load_streamed_shap_pool(
+        loaded, cfg_paths, "shap_val_pool_filename", "python -m tools.build_shap_val_pool"
+    )
+    if str(app.state.val_pool.get("source", "")) != "val":
+        raise RuntimeError(f"{cfg_paths['shap_val_pool_filename']} does not carry source='val'.")
     app.state.explanations = _load_explanations(loaded, cfg_paths)
+    # Same id-space split as the SHAP pools: train_pool positions, only
+    # ever looked up with source="val".
+    app.state.val_explanations = _load_explanations(
+        loaded, cfg_paths, "explanations_val_filename", " --pool val --seed 6006"
+    )
     app.state.agreement_json, app.state.parity_json = _load_cached_endpoints(cfg_paths)
 
     # Trust check: ByzAgent trust panel. Built once here, cached as a
@@ -513,7 +551,8 @@ def predict(request: PredictRequest) -> PredictResponse:
     # back to shap_available=False rather than serving/claiming SHAP that
     # doesn't exist for it.
     shap_sample_id = None
-    if request.shap_sample_id is not None and request.shap_sample_id in app.state.streamed_pool["index"]:
+    pool = app.state.val_pool if request.shap_source == "val" else app.state.streamed_pool
+    if request.shap_sample_id is not None and request.shap_sample_id in pool["index"]:
         shap_sample_id = request.shap_sample_id
 
     # Opt-in: only a caller that explicitly asks (the simulator) produces an
@@ -529,6 +568,7 @@ def predict(request: PredictRequest) -> PredictResponse:
             true_family=request.true_family,
             shap_available=shap_sample_id is not None,
             shap_sample_id=shap_sample_id,
+            shap_source=request.shap_source if shap_sample_id is not None else None,
         )
         with app.state.alert_lock:
             app.state.alert_buffer.append(alert)
@@ -578,16 +618,23 @@ def hotswap_revert() -> HotSwapInfo:
 
 
 @app.get("/shap/{sample_id}", response_model=ShapResponse)
-def shap(sample_id: int) -> ShapResponse:
-    """Positional over the curated 14 ([0,13]) first; anything outside that
-    range is looked up in the streamed pool's sample_id array (Step 7) by
-    its actual test_global.parquet row position. 404 only if it's in
-    neither -- this is why the curated range always wins even in the
-    astronomically unlikely case a streamed row's real position also fell
-    inside [0,13]: the priority order itself is the whole disambiguation."""
+def shap(sample_id: int, source: Literal["test", "val"] = "test") -> ShapResponse:
+    """source="test" (default, unchanged behavior): positional over the
+    curated 14 ([0,13]) first; anything outside that range is looked up in
+    the streamed pool's sample_id array (Step 7) by its actual
+    test_global.parquet row position. 404 only if it's in neither -- this is
+    why the curated range always wins even in the astronomically unlikely
+    case a streamed row's real position also fell inside [0,13]: the
+    priority order itself is the whole disambiguation.
+
+    source="val": looked up ONLY in the validation pool, by train_pool.parquet
+    row position. Never falls back to the curated set or the test pool."""
     loaded: LoadedModel = app.state.loaded
     arrays = app.state.shap_arrays
     n_curated = arrays["shap_values"].shape[0]
+
+    if source == "val":
+        return _pool_shap_response(app.state.val_pool, sample_id, "validation", loaded, arrays)
 
     if 0 <= sample_id < n_curated:
         return ShapResponse(
@@ -603,14 +650,22 @@ def shap(sample_id: int) -> ShapResponse:
         )
 
     pool = app.state.streamed_pool
-    idx = pool["index"].get(sample_id)
-    if idx is None:
+    if sample_id not in pool["index"]:
         raise HTTPException(
             status_code=404,
             detail=f"sample_id {sample_id} is not in the curated set [0,{n_curated - 1}] "
                     f"or the {len(pool['index'])}-row streamed pool.",
         )
+    return _pool_shap_response(pool, sample_id, "streamed", loaded, arrays)
 
+
+def _pool_shap_response(pool: dict, sample_id: int, pool_name: str, loaded: LoadedModel, arrays: dict) -> ShapResponse:
+    idx = pool["index"].get(sample_id)
+    if idx is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"sample_id {sample_id} is not in the {len(pool['index'])}-row {pool_name} SHAP pool.",
+        )
     return ShapResponse(
         sample_id=sample_id,
         tag=loaded.tag,
@@ -623,28 +678,31 @@ def shap(sample_id: int) -> ShapResponse:
         additivity_max_diff=float(pool["additivity_max_diff"][idx]),
         raw_values=pool["raw_values"][idx].tolist(),
         # base_values is a property of the model + background, not the row --
-        # the streamed pool reuses the SAME background as the curated set
-        # (get_federated_global_background(), fixed seed 777), so reusing
-        # arrays["base_values"] here is correct, not a placeholder.
+        # both pools reuse the SAME background as the curated set (fixed seed
+        # 777; tools/build_shap_val_pool.py asserts it reproduces these
+        # base_values), so reusing arrays["base_values"] here is correct, not
+        # a placeholder.
         base_values=arrays["base_values"].tolist(),
     )
 
 
 @app.get("/explain/{sample_id}", response_model=ExplainResponse)
-def explain(sample_id: int) -> ExplainResponse:
+def explain(sample_id: int, source: Literal["test", "val"] = "test") -> ExplainResponse:
     """Dict lookup only -- no model, no subprocess, no network call.
     Step 8's whole point: results/explanations/<tag>/sentences.json was
     generated OFFLINE (tools/build_explanations.py) for exactly the same
     514-row set GET /shap/{sample_id} serves. 404 if sample_id isn't in
     that precomputed set -- same boundary as /shap, not a superset or a
-    fallback to live generation."""
+    fallback to live generation. source="val" looks up val_sentences.json
+    only (the validation SHAP pool, train_pool positions)."""
     loaded: LoadedModel = app.state.loaded
-    row = app.state.explanations.get(sample_id)
+    table = app.state.val_explanations if source == "val" else app.state.explanations
+    row = table.get(sample_id)
     if row is None:
+        covered = "the validation SHAP pool" if source == "val" else "the precomputed SHAP set (curated + streamed pool)"
         raise HTTPException(
             status_code=404,
-            detail=f"sample_id {sample_id} has no precomputed explanation. "
-                    f"Only rows in the precomputed SHAP set (curated + streamed pool) are covered.",
+            detail=f"sample_id {sample_id} has no precomputed explanation. Only rows in {covered} are covered.",
         )
     return ExplainResponse(
         sample_id=sample_id,

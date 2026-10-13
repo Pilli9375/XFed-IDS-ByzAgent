@@ -288,14 +288,15 @@ function FloorSection({ headline, floorSummary }) {
             />
           </div>
 
-          {/* Verbatim from app_lib/sections.py's render_methods() callout --
-              do not rephrase: this is the directional-not-significant caveat. */}
+          {/* CIs from docs/contribution_a_results.md §2 and the CLAUDE.md
+              findings list; the bars above are median + IQR, not these CIs. */}
           <Callout tone={WARN}>
-            <b>Directional observation, not a statistical test.</b> The IQR bands above
-            overlap — federated α=0.1 agreement sits close to, not clearly below, the
-            seed-to-seed instability floor measured from centralized models alone. No
-            significance test has been run. Reported as directional, never claimed as
-            significant.
+            <b>Overlapping — directional, not significant.</b> The cluster-bootstrap CI for
+            federated α=0.1 Jaccard@10 is [0.250, 0.429]; the centralized-seed instability
+            floor spans [0.429, 0.484]. The two overlap, so the drop below the floor is
+            reported as directional and never claimed as significant. The bars above show
+            medians with IQR whiskers, not these CIs. Source:{' '}
+            <code>docs/contribution_a_results.md</code> §2.
           </Callout>
         </>
       )}

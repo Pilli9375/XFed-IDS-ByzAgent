@@ -73,3 +73,6 @@ CLAUDE.md
 
 # Veo clips, not committed until the cut is approved
 film/veo/
+
+# Dashboard inventory screenshots (regenerable; inventory.md is tracked)
+docs/dashboard_inventory/*.png
