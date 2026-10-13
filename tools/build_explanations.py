@@ -82,6 +82,9 @@ _BANNED_WORDS = (
     "unprecedented", "pioneering", "revolutionary",
 )
 
+# The prompt asks for at most 30 words, but nothing checks it: outputs are
+# one-sentence LLM summaries (length not enforced). Changing this text
+# changes prompt_template_sha256, which both sentence files record.
 PROMPT_TEMPLATE = """You are writing a one-sentence explanation for a security analyst reviewing an intrusion-detection alert. This is a usability aid describing what the model already computed -- not a research claim, not a discovery.
 
 The model classified this network flow as "{family}" with {confidence_pct:.1f}% confidence.

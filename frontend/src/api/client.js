@@ -121,8 +121,9 @@ export function getAlerts() {
   return getJSON('/alerts');
 }
 
-// Precomputed one-sentence analyst aid for a row in the precomputed SHAP set
-// (curated + streamed pool). 404 outside that set -- callers only ask when
+// Precomputed one-sentence LLM summary (length not enforced) for a row in a
+// precomputed SHAP set (curated + streamed pool, or the validation pool with
+// source 'val'). 404 outside that set -- callers only ask when
 // an alert says shap_available.
 export function getExplain(sampleId, source = 'test') {
   return getJSON(`/explain/${sampleId}${source === 'val' ? '?source=val' : ''}`);
