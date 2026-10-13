@@ -4,6 +4,8 @@ Produced by `python -m tools.residual_audit` (2026-10-14). The data is in
 `residual_audit.csv`, one row per file, and the aggregates are in
 `residual_audit_summary.json`. Only stored SHAP files are read: no model was
 run and no test rows were read.
+Silo rows also carry `n_flows` and `size_rank_in_config` (1 = smallest of the
+10 silos), from `silo_sizes.csv`.
 
 ## Scope
 
@@ -41,8 +43,8 @@ coarse flag, not a like-for-like test.
 silo indices name different partitions in different seeds.
 
 - FedAvg final:
-  - α=0.1 seed 42, silos 3 (4.193) and 9 (11.955)
-  - α=0.1 seed 1337, silo 8 (6.576)
+  - α=0.1 seed 42, silos 3 (4.193; 3,206 flows, 3rd smallest) and 9 (11.955; 143 flows, smallest)
+  - α=0.1 seed 1337, silo 8 (6.576; 836 flows, smallest)
   - α=5.0 seed 1337, global model (3.500)
 - FedProx final: α=0.1 seed 42, silo 9 (4.258)
 - Round-wise: the same few silos recur across rounds.

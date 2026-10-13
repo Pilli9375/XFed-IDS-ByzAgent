@@ -17,6 +17,8 @@ against per_silo_agreement.csv on the FedAvg file first. Round-wise rows use
 results/inspection/round_wise_agreement.csv (already per silo). r and n only,
 no p-values (silos within a seed are not independent).
 
+Adds n_flows and size_rank_in_config per silo from results/inspection/silo_sizes.csv.
+
 Writes results/inspection/residual_audit.csv and residual_audit_summary.json.
 Run as: python -m tools.residual_audit
 """
@@ -35,6 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SHAP_ROOT = ROOT / "results" / "shap"
 INSPECTION = ROOT / "results" / "inspection"
 VAL_POOL_SUMMARY = SHAP_ROOT / "fedavg_a0.5_s42" / "val_pool_summary.json"
+SILO_SIZES = INSPECTION / "silo_sizes.csv"
 
 ALGOS = {"fedavg": "fedavg", "fedprox_mu0.0005": "fedprox_mu0.0005"}
 AGREEMENT_FILES = {
@@ -99,6 +102,12 @@ def main() -> None:
     rw = pd.read_csv(INSPECTION / "round_wise_agreement.csv").rename(columns={"silo_id": "silo"})
 
     audit["exceeds_val_pool_max"] = audit["additivity_max_diff"] > val_max
+    # Silo size (training flows, all families) from the partition summary;
+    # the same partition backs FedAvg and FedProx for a given (alpha, seed).
+    # size_rank_in_config: 1 = smallest of the 10 silos in that (alpha, seed).
+    sizes = pd.read_csv(SILO_SIZES).groupby(["alpha", "seed", "silo"])["n"].sum().rename("n_flows").reset_index()
+    sizes["size_rank_in_config"] = sizes.groupby(["alpha", "seed"])["n_flows"].rank(method="min").astype(int)
+    audit = audit.merge(sizes, on=["alpha", "seed", "silo"], how="left")
     audit = audit.merge(jac.rename(columns={"jaccard_at_10": "jaccard_at_10_final"}),
                         on=["algo", "alpha", "seed", "silo"], how="left")
     audit.loc[audit["pass"] != "final", "jaccard_at_10_final"] = np.nan
