@@ -509,6 +509,8 @@ async def lifespan(app: FastAPI):
     # them repo-relative so they work as /source links.
     for cell in trust["decision_variance"]:
         cell["source"] = Path(cell["source"]).resolve().relative_to(ROOT).as_posix()
+    for ex in trust["excluded_conditions"]:
+        ex["reason"] = ex["reason"].replace(str(ROOT) + "\\", "").replace(str(ROOT) + "/", "")
     trust["baselines"] = build_trust_baselines(cfg_paths, dash_cfg, resolve_path)
     trust["fidelity"] = build_trust_fidelity(cfg_paths, resolve_path)
     app.state.trust_json = json.dumps(trust)

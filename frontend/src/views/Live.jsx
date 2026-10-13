@@ -146,7 +146,11 @@ export default function Live({ hs }) {
                       return next;
                     })
                   }
-                  onHotSwap={() => setDialog('hotswap')}
+                  onHotSwap={() => {
+                    // Pin the selection so the dialog's flow cannot move under it.
+                    setPickedTs(selected.timestamp);
+                    setDialog('hotswap');
+                  }}
                   sources={sources}
                 />
                 <TrustDumbbell trust={trust.data} condIdx={condIdx} onCond={setCondIdx} />

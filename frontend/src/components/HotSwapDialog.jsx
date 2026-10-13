@@ -10,11 +10,14 @@ export default function HotSwapDialog({ open, onClose, alert, classNames, hs }) 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [startedJob, setStartedJob] = useState(null);
+  // The flow as it was when the dialog opened.
+  const [target, setTarget] = useState(null);
 
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) {
+      setTarget(alert);
       setFamily(alert?.predicted_family ?? classNames[0] ?? '');
       setError(null);
       setStartedJob(null);
@@ -22,7 +25,9 @@ export default function HotSwapDialog({ open, onClose, alert, classNames, hs }) 
     } else if (!open && d.open) {
       d.close();
     }
-  }, [open, alert, classNames]);
+    // Only (re)initialise when the dialog opens, not when the feed moves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const job = hs.status;
   const running = job?.status === 'running';
@@ -41,7 +46,7 @@ export default function HotSwapDialog({ open, onClose, alert, classNames, hs }) 
     }
   };
 
-  const confirming = alert && family === alert.predicted_family;
+  const confirming = target && family === target.predicted_family;
   return (
     <dialog ref={ref} className="v-dialog" aria-labelledby="hs-title" onClose={onClose}>
       <form onSubmit={submit}>
@@ -66,10 +71,10 @@ export default function HotSwapDialog({ open, onClose, alert, classNames, hs }) 
               ))}
             </select>
           </label>
-          {alert && (
+          {target && (
             <p className="small">
-              Model predicted <b>{alert.predicted_family}</b>
-              {alert.true_family != null && <> · true label {alert.true_family}</>} ·{' '}
+              Model predicted <b>{target.predicted_family}</b>
+              {target.true_family != null && <> · true label {target.true_family}</>} ·{' '}
               {confirming ? 'you are confirming the prediction' : 'you are correcting the prediction'}
             </p>
           )}
@@ -82,7 +87,7 @@ export default function HotSwapDialog({ open, onClose, alert, classNames, hs }) 
               <>
                 Job {job.status}.{' '}
                 {job.status === 'accepted' && <>Candidate swapped in (event {job.hotswap.event_id}). The banner above the page can revert it.</>}
-                {job.status === 'rejected' && <>The candidate did not clear the gate; the served model is unchanged.</>}
+                {job.status === 'rejected' && <>The candidate did not clear the gate; the served model is unchanged. {job.detail}</>}
                 {(job.status === 'error' || job.status === 'crashed') && <>The served model is unchanged. {job.detail}</>}
               </>
             ) : job?.hotswap?.active ? (

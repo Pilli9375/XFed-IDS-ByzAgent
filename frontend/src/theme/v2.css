@@ -340,7 +340,7 @@ dialog.v-drawer { margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: m
 .org-btn { min-width: 44px; height: 36px; padding: 0 10px; border-radius: var(--r-sm); font-family: var(--mono); font-size: 12px; cursor: pointer; background: transparent; border: 1px solid var(--line2); color: var(--body); }
 .org-btn.is-poisoned { color: var(--attack-text); }
 .org-btn[aria-pressed='true'] { background: var(--inv); color: var(--inv-ink); border-color: var(--inv); font-weight: 600; }
-.org-card { flex: 1 1 300px; min-width: 0; padding: 18px; border-radius: var(--r-md); background: var(--s2); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 1s; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent); }
+.org-card { align-self: flex-start; flex: 1 1 300px; min-width: 0; padding: 18px; border-radius: var(--r-md); background: var(--s2); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 1s; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent); }
 .org-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--tone-text); transition: color .6s; }
 .big-num { margin: 2px 0 0; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 30px; letter-spacing: -0.03em; }
 .big-num.is-high { color: var(--agent-text); }
