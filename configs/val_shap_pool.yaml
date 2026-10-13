@@ -1,0 +1,31 @@
+# configs/val_shap_pool.yaml
+# Validation SHAP pool for the dashboard demo (tools/build_shap_val_pool.py).
+#
+# A fixed, seeded sample of validation rows (train_pool.parquet rows where
+# val_mask.is_val is true), stratified so all 9 families are present, each
+# explained with the same GradientExplainer, background recipe and served
+# checkpoint as results/shap/<tag>/streamed_pool.npz. backend/simulator.py
+# replays exactly this sample, in stored order, when
+# simulator.source_split is val_shap_pool (configs/backend.yaml), so every
+# demo alert has SHAP. No test rows are read: the scaler and background are
+# rebuilt from the training split alone.
+#
+# Display only: nothing is aggregated, scored or selected from these rows.
+
+# Served checkpoint. Must match configs/backend.yaml model.tag.
+tag: fedavg_a0.5_s42
+
+# Rows drawn from the validation split, stratified over all 9 families with
+# the balanced-with-floor algorithm the original eval set and the streamed
+# pool use (tools/local_shap_pipeline.build_stratified_background).
+pool_size: 500
+# Distinct from the streamed pool's 5005 and the eval set's seed.
+sample_seed: 6006
+
+# Seeds torch/numpy before explaining, so GradientExplainer's sampling is
+# reproducible run to run. The original 500-row test pool was not seeded.
+explainer_seed: 6006
+
+# Written to results/shap/<tag>/ (npz is git-ignored; the JSON summary is not).
+output_filename: val_pool.npz
+summary_filename: val_pool_summary.json
