@@ -140,3 +140,45 @@ serving:
   intra_op_threads: 8
   verify_batch_size: 1024
   require_equal_decimals: 3
+
+# ---------------------------------------------------------------------------
+# Part C -- communication and compute
+# ---------------------------------------------------------------------------
+communication:
+  # Parameter count is read from this checkpoint (the served model).
+  checkpoint: results/federated/fedavg_a0.5_s42/round_checkpoints/round_018.pt
+  directions_per_round: 2          # server->client broadcast + client->server upload
+  # Harness-logged bytes and per-round wall time (method path, validation only).
+  method_runs_root: results/federated_methods
+  wall_time_groups: [runs, regression]   # 3-local-epoch runs; provenance (1 epoch) excluded
+  output: results/efficiency/communication.json
+
+# Client->server update compression. Selected per run with
+# --run-config "upload-compression='<scheme>'" on the validation-only method
+# path (federated/xfed_federated/server_app.py::_run_method); empty = off.
+# The client sends q(local_weights - global_weights_it_received); the server
+# adds the dequantized delta back to the global weights it sent that round
+# and then runs the unchanged Flower FedAvg aggregation. The server->client
+# broadcast stays float32.
+compression:
+  schemes:
+    fp16:
+      kind: fp16                   # delta cast to float16
+    int8:
+      kind: int8_per_tensor        # symmetric, round to nearest
+      qmax: 127                    # q = clip(round(delta / s), -127, 127)
+      scale: absmax                # s = max|delta| / qmax per tensor, sent as float32
+  runs:
+    method: fedavg                 # configs/federated_methods.yaml entry
+    alpha: "0.5"
+    seeds: [42, 1337, 2024]
+    schemes: [fp16, int8]
+    run_group: efficiency
+    # One uncompressed FedAvg run on the edited code path, compared with the
+    # published round_history.json to show the default path is unchanged.
+    regression_seeds: [42]
+  baseline:
+    runs_dir: results/federated
+    tag_pattern: "fedavg_a{alpha}_s{seed}"
+  run_log: results/efficiency/compression_run_log.jsonl
+  output: results/efficiency/update_compression.json

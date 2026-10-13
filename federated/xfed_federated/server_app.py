@@ -39,6 +39,9 @@ from xfed_federated.task import (
     decisions_to_weights,
     format_per_class,
     get_method_name,
+    get_upload_compression,
+    load_compression_scheme,
+    decompress_update,
     headline_class_indices,
     load_centralized_for_server,
     load_method,
@@ -542,6 +545,8 @@ def main(grid: Grid, context: Context) -> None:
     if method_name:
         _run_method(grid, context, method_name)
         return
+    if get_upload_compression(context.run_config):
+        raise RuntimeError("upload-compression is only supported on the method path (set method=...)")
 
     data_cfg = load_yaml("configs/data.yaml")
     model_cfg = load_yaml("configs/model.yaml")
@@ -958,14 +963,21 @@ class _MethodRunLogging:
     comparison where one run silently lost a silo would not be like-for-like.
     """
 
-    def __init__(self, *args, expected_clients: int, **kwargs):
+    def __init__(self, *args, expected_clients: int, upload_scheme: dict | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.expected_clients = expected_clients
         self.round_t0: dict[int, float] = {}
         self.round_comm: dict[int, dict] = {}
+        # Efficiency Part C: when set, replies carry a compressed delta that is
+        # decompressed against the global weights sent this round, before the
+        # unchanged library aggregation. bytes_up counts the compressed payload.
+        self.upload_scheme = upload_scheme
+        self.round_global: dict[int, dict] = {}
 
     def configure_train(self, server_round: int, arrays: ArrayRecord, config, grid):
         self.round_t0[server_round] = time.perf_counter()
+        if self.upload_scheme is not None:
+            self.round_global = {server_round: arrays.to_torch_state_dict()}
         messages = list(super().configure_train(server_round, arrays, config, grid))
         if len(messages) != self.expected_clients:
             raise RuntimeError(
@@ -989,6 +1001,12 @@ class _MethodRunLogging:
         self.round_comm[server_round]["bytes_up"] = sum(
             arrayrecord_nbytes(m.content[self.arrayrecord_key]) for m in replies
         )
+        if self.upload_scheme is not None:
+            global_sd = self.round_global[server_round]
+            for m in replies:
+                received = m.content[self.arrayrecord_key].to_torch_state_dict()
+                m.content[self.arrayrecord_key] = ArrayRecord(
+                    decompress_update(received, global_sd, self.upload_scheme))
         return super().aggregate_train(server_round, replies)
 
 
@@ -1027,7 +1045,10 @@ def _run_method(grid: Grid, context: Context, method_name: str) -> None:
 
     manifest_check = verify_partition_manifest(alpha, seed)
 
-    tag = f"{method_name}_a{alpha}_s{seed}"
+    upload_compression = get_upload_compression(context.run_config)
+    upload_scheme = load_compression_scheme(upload_compression) if upload_compression else None
+    method_tag = f"{method_name}_up-{upload_compression}" if upload_compression else method_name
+    tag = f"{method_tag}_a{alpha}_s{seed}"
     out_dir = _PROJECT_ROOT / exp["results_root"] / run_group / tag
     if (out_dir / "run_summary.json").exists():
         raise RuntimeError(f"{out_dir} already holds a finished run; refusing to overwrite it")
@@ -1105,6 +1126,7 @@ def _run_method(grid: Grid, context: Context, method_name: str) -> None:
     strategy_cls = type(f"Method{server_cls.__name__}", (_MethodRunLogging, server_cls), {})
     strategy = strategy_cls(
         expected_clients=n_silos,
+        upload_scheme=upload_scheme,
         fraction_train=float(exp["fraction_train"]),
         fraction_evaluate=float(exp["fraction_evaluate"]),
         min_train_nodes=n_silos,
@@ -1139,6 +1161,8 @@ def _run_method(grid: Grid, context: Context, method_name: str) -> None:
         "server": method["server"],
         "server_params": server_params,
         "client_mu": mu,
+        "upload_compression": upload_compression or None,
+        "upload_compression_scheme": upload_scheme,
         "fraction_train": float(exp["fraction_train"]),
         "fraction_evaluate": float(exp["fraction_evaluate"]),
         "partition_manifest_check": manifest_check,

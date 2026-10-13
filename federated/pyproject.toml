@@ -72,6 +72,11 @@ fraction-evaluate = 1.0
 # reproduce a published run's silo_metrics.jsonl (with its evaluate rows), set it on
 # explicitly: --run-config "legacy-client-test-eval=true"
 legacy-client-test-eval = false
+# Efficiency Part C: client->server update compression on the method path
+# only. Empty = off (every earlier run). Scheme parameters live in
+# configs/efficiency.yaml compression.schemes:
+#   --run-config "method='fedavg' upload-compression='int8'"
+upload-compression = ""
 
 
 #######################################################################

@@ -237,6 +237,64 @@ def verify_partition_manifest(alpha: str, seed: int) -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Efficiency Part C: client->server update compression (configs/efficiency.yaml
+# compression). Off unless --run-config sets upload-compression; method path
+# only. The client sends a quantized delta against the global weights it
+# received; the server adds the dequantized delta back to the same global
+# weights before the unchanged library aggregation.
+# ---------------------------------------------------------------------------
+
+def get_upload_compression(run_config) -> str:
+    return str(run_config.get("upload-compression", "")).strip()
+
+
+def load_compression_scheme(name: str) -> dict:
+    schemes = load_yaml("configs/efficiency.yaml")["compression"]["schemes"]
+    if name not in schemes:
+        raise KeyError(f"upload-compression {name!r} not in configs/efficiency.yaml. Known: {sorted(schemes)}")
+    return schemes[name]
+
+
+def compress_update(local_sd: dict, global_sd: dict, scheme: dict) -> dict:
+    from collections import OrderedDict
+
+    out = OrderedDict()
+    for k, w in local_sd.items():
+        if not torch.is_floating_point(w):
+            raise TypeError(f"{k} is {w.dtype}; update compression expects float tensors only")
+        delta = w.detach().cpu().float() - global_sd[k].detach().cpu().float()
+        if scheme["kind"] == "fp16":
+            out[k] = delta.to(torch.float16)
+        elif scheme["kind"] == "int8_per_tensor":
+            if scheme["scale"] != "absmax":
+                raise ValueError(f"int8 scale {scheme['scale']!r} not implemented")
+            qmax = int(scheme["qmax"])
+            amax = float(delta.abs().max())
+            scale = amax / qmax if amax > 0 else 1.0
+            out[k + ".q"] = torch.clamp(torch.round(delta / scale), -qmax, qmax).to(torch.int8)
+            out[k + ".scale"] = torch.tensor([scale], dtype=torch.float32)
+        else:
+            raise ValueError(f"compression kind {scheme['kind']!r} not implemented")
+    return out
+
+
+def decompress_update(received: dict, global_sd: dict, scheme: dict) -> dict:
+    from collections import OrderedDict
+
+    out = OrderedDict()
+    for k, g in global_sd.items():
+        g = g.detach().cpu().float()
+        if scheme["kind"] == "fp16":
+            delta = received[k].float()
+        elif scheme["kind"] == "int8_per_tensor":
+            delta = received[k + ".q"].float() * received[k + ".scale"].float()
+        else:
+            raise ValueError(f"compression kind {scheme['kind']!r} not implemented")
+        out[k] = g + delta
+    return out
+
+
 def arrayrecord_nbytes(record) -> int:
     """Payload bytes of an ArrayRecord: tensor data only, no message framing."""
     return int(sum(arr.numpy().nbytes for arr in record.values()))
@@ -266,4 +324,5 @@ __all__ = [
     "build_client_history", "decisions_to_weights", "log_decisions",
     "get_method_name", "load_method", "verify_partition_manifest",
     "arrayrecord_nbytes", "state_dict_sha256",
+    "get_upload_compression", "load_compression_scheme", "compress_update", "decompress_update",
 ]

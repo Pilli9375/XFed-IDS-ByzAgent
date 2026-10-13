@@ -23,6 +23,9 @@ from xfed_federated.task import (
     DEVICE,
     PoisonedClient,
     build_model,
+    compress_update,
+    get_upload_compression,
+    load_compression_scheme,
     evaluate_arrays,
     get_method_name,
     get_server_round,
@@ -81,9 +84,18 @@ def train(msg: Message, context: Context) -> Message:
         splits = poisoner.poison_and_log(splits, silo_id, server_round)
 
     model = build_model(model_cfg, seed=seed, device=DEVICE)
-    model.load_state_dict(msg.content["arrays"].to_torch_state_dict())
+    global_sd = msg.content["arrays"].to_torch_state_dict()
+    model.load_state_dict(global_sd)
 
     train_loss = local_train_epochs(model, splits, local_epochs, model_cfg, mu=mu)
+
+    # Efficiency Part C: optional compressed upload (method path only -- the
+    # legacy server path does not decompress).
+    compression = get_upload_compression(context.run_config)
+    if compression and not method_name:
+        raise RuntimeError("upload-compression is only supported on the method path (set method=...)")
+    upload = (compress_update(model.state_dict(), global_sd, load_compression_scheme(compression))
+              if compression else model.state_dict())
 
     metric_record = MetricRecord({
         "train_loss": train_loss,
@@ -91,7 +103,7 @@ def train(msg: Message, context: Context) -> Message:
         "silo_id": int(silo_id),
     })
     content = RecordDict({
-        "arrays": ArrayRecord(model.state_dict()),
+        "arrays": ArrayRecord(upload),
         "metrics": metric_record,
     })
     return Message(content=content, reply_to=msg)
