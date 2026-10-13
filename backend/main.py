@@ -43,6 +43,7 @@ from backend.figures import (
     build_accuracy_snapshot,
     build_agreement_summary,
     build_figures_snapshot,
+    build_limits_snapshot,
     build_trust_baselines,
     build_trust_fidelity,
 )
@@ -100,6 +101,8 @@ class ConfigResponse(BaseModel):
     engine: Literal["onnx_fp32", "torch"]
     # Frozen 9-wide label vocabulary, class-index order (src.data.schema).
     class_names: list[str]
+    # The 82 input feature names, model column order (POST /predict keys).
+    feature_names: list[str]
     hotswap: HotSwapInfo
 
 
@@ -507,7 +510,11 @@ async def lifespan(app: FastAPI):
     app.state.figures_json = json.dumps(figures)
     app.state.accuracy_json = json.dumps(accuracy)
     app.state.agreement_summary_json = json.dumps(agreement_summary)
-    app.state.source_files = _source_whitelist(cfg_paths, [figures, accuracy, agreement_summary, trust], loaded)
+    limits = build_limits_snapshot(cfg["limits"])
+    app.state.limits_json = json.dumps(limits)
+    app.state.source_files = _source_whitelist(
+        cfg_paths, [figures, accuracy, agreement_summary, limits, trust], loaded
+    )
 
     app.state.start_time = time.time()
 
@@ -580,6 +587,7 @@ def config() -> ConfigResponse:
         n_classes=int(loaded.model_cfg["labels"]["n_classes"]),
         engine=_active_engine(),
         class_names=loaded.class_names,
+        feature_names=loaded.feature_cols,
         hotswap=_hotswap_info(),
     )
 
@@ -874,8 +882,17 @@ def agreement_summary() -> Response:
     return Response(content=app.state.agreement_summary_json, media_type="application/json")
 
 
+@app.get("/limits")
+def limits() -> Response:
+    """Limits view text, read at startup from PROJECT_INSTRUCTIONS.md's
+    claims section and test-set paragraphs, plus two verbatim excerpts
+    (configs/backend.yaml limits:). Served as written, Markdown included."""
+    return Response(content=app.state.limits_json, media_type="application/json")
+
+
 _SOURCE_MEDIA = {".json": "application/json", ".csv": "text/plain", ".jsonl": "text/plain",
-                 ".md": "text/plain", ".py": "text/plain", ".yaml": "text/plain"}
+                 ".md": "text/plain", ".py": "text/plain", ".yaml": "text/plain",
+                 ".npz": "application/octet-stream"}
 
 
 @app.get("/source/{path:path}")
@@ -888,6 +905,8 @@ def source(path: str) -> FileResponse:
         raise HTTPException(status_code=404, detail=f"{path} is not a dashboard source file.")
     full = ROOT / path
     media = _SOURCE_MEDIA.get(full.suffix, "text/plain")
+    if not media.startswith(("text/", "application/json")):
+        return FileResponse(full, media_type=media, filename=full.name)
     return FileResponse(full, media_type=f"{media}; charset=utf-8", content_disposition_type="inline",
                         filename=full.name)
 

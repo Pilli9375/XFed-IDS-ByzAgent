@@ -202,3 +202,14 @@ simulator:
   # Deliberately NOT stratified or curated -- the natural class mix (heavily
   # Benign, per real network traffic) is the honest one to show.
   shuffle_seed: 42
+
+limits:
+  # GET /limits (Limits view). Text is read from these files at startup and
+  # rendered as written: the canonical claims section, the test-set
+  # paragraphs, and verbatim excerpts for two engineering notes.
+  claims_file: PROJECT_INSTRUCTIONS.md
+  section: Findings that limit what can be claimed
+  test_set_marker: "**Test-set use.**"
+  excerpts:
+    - {title: "CPU, not GPU, for this model", file: configs/hotswap.yaml, marker: "Model itself is"}
+    - {title: "Family-level conflict detection", file: data/README.md, marker: "Conflicts are evaluated"}

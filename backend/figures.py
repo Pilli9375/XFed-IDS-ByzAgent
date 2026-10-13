@@ -372,3 +372,81 @@ def build_trust_fidelity(cfg_paths: dict, resolve_path) -> dict:
         "handcheck_ambiguous_wrong": len(ambiguous_wrong),
         "sources": [_rel(audit_path), _rel(hand_path)],
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /limits
+# ---------------------------------------------------------------------------
+
+def _section(lines: list[str], title: str) -> list[str]:
+    start = next(i for i, l in enumerate(lines) if l.strip() == f"## {title}")
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    return lines[start + 1:end]
+
+
+def _bullet_groups(body: list[str]) -> list[dict]:
+    """'**Group**' headings, each followed by '- ' bullets whose wrapped
+    continuation lines are indented. Text is kept as written (Markdown)."""
+    groups: list[dict] = []
+    for line in body:
+        s = line.rstrip()
+        if s.startswith("**") and s.endswith("**") and not s.startswith("- "):
+            groups.append({"title": s.strip("*"), "items": []})
+        elif s.startswith("- ") and groups:
+            groups[-1]["items"].append(s[2:])
+        elif s.startswith("  ") and groups and groups[-1]["items"]:
+            groups[-1]["items"][-1] += " " + s.strip()
+    return groups
+
+
+def _paragraphs_from(lines: list[str], marker: str) -> list[str]:
+    """Paragraphs from the line starting with `marker` up to the next '---'."""
+    start = next(i for i, l in enumerate(lines) if l.startswith(marker))
+    paras, cur = [], []
+    for l in lines[start:]:
+        if l.strip() == "---":
+            break
+        if not l.strip():
+            if cur:
+                paras.append(" ".join(cur))
+                cur = []
+        else:
+            cur.append(l.strip())
+    if cur:
+        paras.append(" ".join(cur))
+    return paras
+
+
+def _excerpt(path: Path, marker: str) -> str:
+    """The comment block or paragraph containing `marker`, verbatim, with
+    YAML comment markers removed."""
+    lines = path.read_text(encoding="utf-8").splitlines()
+    i = next(k for k, l in enumerate(lines) if marker in l)
+    is_comment = lines[i].lstrip().startswith("#")
+    out = []
+    for l in lines[i:]:
+        s = l.strip()
+        if not s or (is_comment and not s.startswith("#")):
+            break
+        out.append(s.lstrip("#").strip() if is_comment else s)
+    return " ".join(out)
+
+
+def build_limits_snapshot(limits_cfg: dict) -> dict:
+    claims_path = ROOT / limits_cfg["claims_file"]
+    lines = claims_path.read_text(encoding="utf-8").splitlines()
+    return {
+        "claims": {
+            "title": limits_cfg["section"],
+            "groups": _bullet_groups(_section(lines, limits_cfg["section"])),
+            "source": _rel(claims_path),
+        },
+        "test_set": {
+            "paragraphs": _paragraphs_from(lines, limits_cfg["test_set_marker"]),
+            "source": _rel(claims_path),
+        },
+        "excerpts": [
+            {"title": e["title"], "text": _excerpt(ROOT / e["file"], e["marker"]), "source": e["file"]}
+            for e in limits_cfg["excerpts"]
+        ],
+    }
