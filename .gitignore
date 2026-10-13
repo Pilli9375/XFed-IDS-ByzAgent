@@ -76,3 +76,8 @@ film/veo/
 
 # Dashboard inventory screenshots (regenerable; inventory.md is tracked)
 docs/dashboard_inventory/*.png
+
+# Dashboard v2 screenshots: only the six 1440 px Live/Investigate captures are tracked.
+docs/dashboard_v2/screens/*
+!docs/dashboard_v2/screens/live_*_1440.png
+!docs/dashboard_v2/screens/investigate_*_1440.png
