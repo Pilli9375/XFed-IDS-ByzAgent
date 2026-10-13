@@ -115,10 +115,10 @@ export const SECTIONS = [
     eyebrow: 'Analyst tools',
     title: 'Alert Stream',
     lede:
-      'Alerts recorded by the traffic simulator, which replays validation flows through the ' +
-      'live model. Open an alert to see its precomputed SHAP explanation, when one exists — ' +
-      'a small fixed subset of streamed rows has one, the rest do not, and nothing is computed ' +
-      'on demand. An operational view: <b>not</b> a result of either research contribution.',
+      'Alerts recorded by the traffic simulator, which by default replays a fixed, seeded ' +
+      'sample of 500 validation flows (all 9 families) through the live model. Every one has a ' +
+      'SHAP explanation precomputed offline; open an alert to see it. Nothing is computed on ' +
+      'demand. An operational view: <b>not</b> a result of either research contribution.',
     group: 'analyst',
   },
 ];

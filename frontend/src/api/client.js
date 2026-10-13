@@ -54,9 +54,11 @@ export function getFaithfulness() {
 }
 
 // { sample_id, tag, eval_family, feature_names, class_names, shap_values,
-//   raw_values, base_values, additivity_max_diff } -- sample_id in [0,13] only.
-export function getShap(sampleId) {
-  return getJSON(`/shap/${sampleId}`);
+//   raw_values, base_values, additivity_max_diff }. source 'test' (default):
+// the curated 14 ([0,13]) or the streamed test pool; source 'val': the
+// validation demo pool, keyed by train_pool position -- a different id space.
+export function getShap(sampleId, source = 'test') {
+  return getJSON(`/shap/${sampleId}${source === 'val' ? '?source=val' : ''}`);
 }
 
 // POST /predict. record_alert is never sent -- omitting it relies on the

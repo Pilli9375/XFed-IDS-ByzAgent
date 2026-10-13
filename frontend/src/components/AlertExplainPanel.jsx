@@ -11,7 +11,8 @@ import { ACCENT, ALERT, TEXT_FAINT, WARN, familyColor } from '../theme/tokens';
 //   - selected but no precomputed SHAP exists (the common case: say so
 //     plainly -- no empty chart, no spinner that never resolves),
 //   - selected with SHAP: the same ShapContributionsChart Explain uses, plus
-//     the precomputed sentence in a visually separate "analyst aid" block.
+//     the precomputed sentence in a visually separate "analyst aid" block
+//     when one exists (test-pool rows only; validation-pool rows have none).
 export default function AlertExplainPanel({ alert }) {
   if (!alert) {
     return (
@@ -28,9 +29,9 @@ export default function AlertExplainPanel({ alert }) {
         <ExplanationBody key={alert.timestamp} alert={alert} />
       ) : (
         <div className="xf-alert-nosnap">
-          <b>No SHAP explanation for this alert.</b> SHAP values are precomputed offline for a
-          small fixed set of streamed rows, and this alert&apos;s row is not in it. The dashboard
-          never computes SHAP on demand, so there is nothing to show here — this is not an error.
+          <b>No SHAP explanation for this alert.</b> SHAP values are precomputed offline for fixed
+          sets of rows, and this alert&apos;s row is not in one. The dashboard never computes SHAP
+          on demand, so there is nothing to show here — this is not an error.
         </div>
       )}
     </div>
@@ -57,7 +58,7 @@ function AlertSummary({ alert }) {
 }
 
 function ExplanationBody({ alert }) {
-  const state = useAlertExplanation(alert.shap_sample_id);
+  const state = useAlertExplanation(alert.shap_sample_id, alert.shap_source ?? 'test');
 
   if (state.status === 'loading') return <Callout tone={TEXT_FAINT}>Loading explanation…</Callout>;
   if (state.status === 'error') {
@@ -73,7 +74,9 @@ function ExplanationBody({ alert }) {
 function ExplanationView({ alert, shap, explain }) {
   // Chart the class the sentence is about (the base model's prediction for
   // this row), not blindly the alert's own label -- see the mismatch note.
-  const classIdx = shap.class_names.indexOf(explain.predicted_family);
+  // Without a sentence (validation pool), chart the alert's own label.
+  const chartFamily = explain ? explain.predicted_family : alert.predicted_family;
+  const classIdx = shap.class_names.indexOf(chartFamily);
   const view = useMemo(
     () =>
       buildShapView({
@@ -85,22 +88,30 @@ function ExplanationView({ alert, shap, explain }) {
       }),
     [shap, classIdx],
   );
-  const mismatch = explain.predicted_family !== alert.predicted_family;
+  const mismatch = explain != null && explain.predicted_family !== alert.predicted_family;
   const signed = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(3)}`;
 
   return (
     <>
-      <div className="xf-analyst-aid">
-        <div className="xf-analyst-aid__label">Analyst aid · not a research result</div>
-        <p className="xf-analyst-aid__sentence">{explain.sentence}</p>
-        <div className="xf-analyst-aid__note">
-          Written offline by a local language model from this row&apos;s top 5 SHAP features, then
-          stored — not generated live, and its wording is not independently checked against the
-          numbers. The chart below is the evidence; the sentence is a reading aid. Precomputed
-          against <code>{explain.tag}</code>; if a hot-swap is active, the alert itself may have
-          come from a different model.
+      {explain ? (
+        <div className="xf-analyst-aid">
+          <div className="xf-analyst-aid__label">Analyst aid · not a research result</div>
+          <p className="xf-analyst-aid__sentence">{explain.sentence}</p>
+          <div className="xf-analyst-aid__note">
+            Written offline by a local language model from this row&apos;s top 5 SHAP features, then
+            stored — not generated live, and its wording is not independently checked against the
+            numbers. The chart below is the evidence; the sentence is a reading aid. Precomputed
+            against <code>{explain.tag}</code>; if a hot-swap is active, the alert itself may have
+            come from a different model.
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="xf-caption" style={{ marginTop: 0 }}>
+          Validation row from the demo SHAP pool (<code>val_pool.npz</code>, explained offline
+          against <code>{shap.tag}</code>). No one-sentence analyst aid was generated for these
+          rows; the chart is the explanation.
+        </div>
+      )}
 
       {mismatch && (
         <>
@@ -115,7 +126,7 @@ function ExplanationView({ alert, shap, explain }) {
 
       <div style={{ height: 'var(--sp-md)' }} />
       <div className="xf-caption" style={{ marginTop: 0 }}>
-        SHAP contributions toward <b>{explain.predicted_family}</b> (logit space). Base value{' '}
+        SHAP contributions toward <b>{chartFamily}</b> (logit space). Base value{' '}
         <b>{signed(view.baseValue)}</b> → reconstructed model output{' '}
         <b>{signed(view.reconstructed)}</b>. Additivity residual for this row:{' '}
         {shap.additivity_max_diff.toFixed(3)}.
