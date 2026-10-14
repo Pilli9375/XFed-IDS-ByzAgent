@@ -26,14 +26,6 @@ VIT-AP University capstone project, 2026
 
 ---
 
-The two `contribution_*_results.md` files are the canonical results. Where
-anything else in this repo (including this README) disagrees with them, they
-win: [explanation check](docs/contribution_a_results.md),
-[trust check](docs/contribution_b_results.md),
-[measurement protocol](docs/measurement_protocol.md),
-[data pipeline decision record](data/README.md),
-[explainer film](site/public/film/xfed_film_16x9.mp4).
-
 ## 🎯 Abstract
 
 One system, five stages, built as a VIT-AP capstone. Stages 3 and 4 are
@@ -137,10 +129,10 @@ the trust check are different experiments; read each block on its own.
 
 | Model | α = 0.1 | α = 0.5 | α = 5.0 | Source |
 |---|---|---|---|---|
-| Centralized MLP macro-F1 | 0.9900 ± 0.0022 (single value, not per α) | | | [`centralized_headline.csv`](results/aggregated/centralized_headline.csv) |
-| XGBoost macro-F1 | 0.9946 ± 0.0001 (single value, not per α) | | | [`xgboost_headline.csv`](results/aggregated/xgboost_headline.csv) |
 | FedAvg macro-F1 | 0.516 ± 0.048 | 0.941 ± 0.057 | 0.990 ± 0.001 | [`federated_headline.csv`](results/aggregated/federated_headline.csv) |
 | FedAvgM β=0.9 (preregistered, test scored once) | 0.5930 ± 0.0632 | 0.9852 ± 0.0005 | 0.9911 ± 0.0005 | [results A](docs/contribution_a_results.md), [`preregistration_accuracy.md`](docs/preregistration_accuracy.md) |
+
+References without federation: centralized MLP 0.9900 ± 0.0022 ([`centralized_headline.csv`](results/aggregated/centralized_headline.csv)) · XGBoost 0.9946 ± 0.0001 ([`xgboost_headline.csv`](results/aggregated/xgboost_headline.csv)) (single values, not per α).
 
 Served demo model: `fedavg_a0.5_s42`, round 18, val macro-F1 0.9760
 ([`final_metrics.json`](results/federated/fedavg_a0.5_s42/final_metrics.json),
@@ -197,6 +189,14 @@ a rolling history of past rounds failed its pre-registered test.
 | Client→server update compression, FedAvg α = 0.5 (3 seeds, validation) | fp16 −50% / int8 −74.9% uplink; mean best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024 −0.0068 / −0.0066, within round-to-round noise) | [`update_compression.json`](results/efficiency/update_compression.json) |
 | Bytes per round, 10 organizations, both directions (computed, checked against harness logs) | 1,587,920 B (19,849 fp32 parameters); median 51.4 s per round over 25 existing runs (CPU) | [`communication.json`](results/efficiency/communication.json) |
 | train_loss pre-screen before ByzAgent, t chosen on seed 42 (replay of logged decisions) | Negative result: did not transfer; seed 1337 poisoned flag rate 0.017 vs logged 0.483 | [`agent_prescreen_replay.json`](results/efficiency/agent_prescreen_replay.json) |
+
+The two `contribution_*_results.md` files are the canonical results. Where
+anything else in this repo (including this README) disagrees with them, they
+win: [explanation check](docs/contribution_a_results.md),
+[trust check](docs/contribution_b_results.md),
+[measurement protocol](docs/measurement_protocol.md),
+[data pipeline decision record](data/README.md),
+[explainer film](site/public/film/xfed_film_16x9.mp4).
 
 ## 🧭 How this differs from prior work
 

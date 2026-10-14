@@ -247,7 +247,7 @@ src/          pipeline, attacks/, monitoring/, aggregation/, agents/, hotswap/
 tools/        analysis and export scripts
 results/      shap/, federated/, inspection/, figures/, attacks/, defenses/, agents/
 backend/      FastAPI
-frontend/     React + Recharts dashboard
+frontend/     React dashboard (hand-built SVG/CSS charts)
 docs/         contribution_a_results.md, contribution_b_results.md,
               measurement_protocol.md
 app.py, app_lib/   Streamlit (Phase 1)
