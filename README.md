@@ -1,25 +1,78 @@
+<div align="center">
+
 # XFed-IDS-ByzAgent
 
-A federated intrusion detection system that checks whether its own explanations and its own participants can be trusted.
+**A federated IDS that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted.**
 
-![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+VIT-AP University capstone project, 2026
 
-- Live site: https://xfed-ids-byzagent.vercel.app
-- Explainer film: [`site/public/film/xfed_film_16x9.mp4`](site/public/film/xfed_film_16x9.mp4)
-- Explanation check write-up: [`docs/contribution_a_results.md`](docs/contribution_a_results.md)
-- Trust check write-up: [`docs/contribution_b_results.md`](docs/contribution_b_results.md)
-- Measurement protocol: [`docs/measurement_protocol.md`](docs/measurement_protocol.md)
-- Data pipeline decision record: [`data/README.md`](data/README.md)
+<br>
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.6.0-EE4C2C?logo=pytorch&logoColor=white)
+![Flower](https://img.shields.io/badge/Flower-1.33.0-F2B705)
+![SHAP](https://img.shields.io/badge/SHAP-0.51.0-8A2BE2)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.138.2-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Ollama](https://img.shields.io/badge/Ollama-llama3.1%3A8b-000000)
+[![Live site](https://img.shields.io/badge/Live%20site-xfed--ids--byzagent.vercel.app-black)](https://xfed-ids-byzagent.vercel.app)
+[![Dashboard screenshots](https://img.shields.io/badge/Dashboard-screenshots-blue)](docs/dashboard_v2/screens)
+
+<br>
+
+<img src="docs/dashboard_v2/screens/live_deep-sea_1440.png" alt="Live console of the XFed-IDS dashboard, Deep Sea theme" width="900">
+
+</div>
+
+---
 
 The two `contribution_*_results.md` files are the canonical results. Where
 anything else in this repo (including this README) disagrees with them, they
-win.
+win: [explanation check](docs/contribution_a_results.md),
+[trust check](docs/contribution_b_results.md),
+[measurement protocol](docs/measurement_protocol.md),
+[data pipeline decision record](data/README.md),
+[explainer film](site/public/film/xfed_film_16x9.mp4).
 
-## The system in five stages
+## 🎯 Abstract
 
-The project is one system, built as a VIT-AP capstone. It has five stages.
-Stages 3 and 4 are separate experiments with separate evidence, and their
-findings are reported separately below.
+One system, five stages, built as a VIT-AP capstone. Stages 3 and 4 are
+separate experiments with separate evidence, and their findings are reported
+separately below.
+
+- **Detection.** Ten organizations (silos) train a shared MLP detector with Flower, without sharing traffic, on Distrinet CICIDS2017 V4 cleaned into 8 attack families plus Benign, under Dirichlet non-IID splits (α ∈ {0.1, 0.5, 5.0}).
+- **Explanation check.** Do the silos' models flag attacks for the same reasons? Measured as Jaccard@10 and weighted Kendall's τ against α, compared with chance and with a centralized-seed instability floor (null control).
+- **Trust check (ByzAgent).** Is any organization poisoning the model? A local LLM agent reads per-silo behaviour statistics each round and decides trust, downweight or quarantine; compared against Krum, Multi-Krum and trimmed mean.
+- **Dashboard.** A FastAPI backend and a React frontend show live detection, per-alert SHAP explanations and trust decisions together. The LLM summary sentences are a usability feature, not a research claim.
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  1. DATA                                                             │
+│     Distrinet CICIDS2017 V4 → cleaned → 8 attack families + Benign   │
+│     one global group-aware 75/25 split, SHA256-checked partitions    │
+└──────────────────────────────────┬───────────────────────────────────┘
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  2. FEDERATED TRAINING                                               │
+│     10 organizations · Flower · MLP [128, 64] · Dirichlet α          │
+│     α ∈ {0.1, 0.5, 5.0} · seeds 42, 1337, 2024 · best-by-validation  │
+└────────────────────┬─────────────────────────────┬───────────────────┘
+                     ▼                             ▼
+┌───────────────────────────────────┐ ┌────────────────────────────────┐
+│  3. EXPLANATION CHECK             │ │  4. TRUST CHECK (ByzAgent)     │
+│     client-side SHAP, top-k only  │ │     LLM agent: trust /         │
+│     Jaccard@10, weighted τ        │ │     downweight / quarantine    │
+│     vs chance and seed floor      │ │     vs Krum, Multi-Krum,       │
+│                                   │ │     trimmed mean               │
+└─────────────────┬─────────────────┘ └───────────────┬────────────────┘
+                  ▼                                   ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  5. DASHBOARD                                                        │
+│     FastAPI + React · live detection · SHAP per alert · trust        │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
 **1. Data.** The Distrinet CICIDS2017 V4 dataset (a corrected release of
 CICIDS2017), cleaned from 2,099,976 raw flows to 1,913,502 and mapped into
@@ -56,7 +109,7 @@ downweight or quarantine for each silo and writes a short rationale. The
 agent is compared against Krum, Multi-Krum and coordinate-wise trimmed mean,
 and its rationales are audited against the numbers it was given.
 
-**5. Dashboard.** A FastAPI backend and a React + Recharts frontend show
+**5. Dashboard.** A FastAPI backend and a React frontend show
 live detection on streamed flows, per-alert SHAP explanations, and the
 trust decisions together. The served model is `fedavg_a0.5_s42` at round 18.
 One-sentence LLM summaries of alerts in the dashboard (length not enforced)
@@ -64,7 +117,14 @@ are generated by the same local LLM; they are a usability feature, not a researc
 showcase site (`site/`) and an explainer film (`film/`) present the same
 results to a general audience.
 
-## Key results
+## 📸 Screenshots
+
+| Live (Deep Sea) | Investigate (Aubergine) | Live (Porcelain) |
+|:---:|:---:|:---:|
+| <img src="docs/dashboard_v2/screens/live_deep-sea_1440.png" alt="Live console, Deep Sea theme"> | <img src="docs/dashboard_v2/screens/investigate_aubergine_1440.png" alt="Investigate page, Aubergine theme"> | <img src="docs/dashboard_v2/screens/live_porcelain_1440.png" alt="Live console, Porcelain theme"> |
+| *Flow stream, selected flow's SHAP contributions and stored LLM summary.* | *Trust check first, then accuracy, explanation agreement and efficiency.* | *The same live console in the light theme.* |
+
+## 📊 Key results
 
 Values are taken as stated in
 [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) and the results
@@ -73,29 +133,27 @@ raw CSVs; nothing is recomputed here. Macro-F1 is over the 7 headline
 classes (6 attack families + Benign), as mean ± std over 3 seeds. The explanation check and
 the trust check are different experiments; read each block on its own.
 
-| Result | Value | Source |
+### Detection (stages 1–2)
+
+| Model | α = 0.1 | α = 0.5 | α = 5.0 | Source |
+|---|---|---|---|---|
+| Centralized MLP macro-F1 | 0.9900 ± 0.0022 (single value, not per α) | | | [`centralized_headline.csv`](results/aggregated/centralized_headline.csv) |
+| XGBoost macro-F1 | 0.9946 ± 0.0001 (single value, not per α) | | | [`xgboost_headline.csv`](results/aggregated/xgboost_headline.csv) |
+| FedAvg macro-F1 | 0.516 ± 0.048 | 0.941 ± 0.057 | 0.990 ± 0.001 | [`federated_headline.csv`](results/aggregated/federated_headline.csv) |
+| FedAvgM β=0.9 (preregistered, test scored once) | 0.5930 ± 0.0632 | 0.9852 ± 0.0005 | 0.9911 ± 0.0005 | [results A](docs/contribution_a_results.md), [`preregistration_accuracy.md`](docs/preregistration_accuracy.md) |
+
+Served demo model: `fedavg_a0.5_s42`, round 18, val macro-F1 0.9760
+([`final_metrics.json`](results/federated/fedavg_a0.5_s42/final_metrics.json),
+[`backend.yaml`](configs/backend.yaml)).
+
+### Explanation check (stage 3)
+
+| Quantity | α = 0.1 → 0.5 → 5.0 | Source |
 |---|---|---|
-| **Detection (stages 1–2)** | | |
-| Centralized MLP macro-F1 | 0.9900 ± 0.0022 | [`centralized_headline.csv`](results/aggregated/centralized_headline.csv) |
-| XGBoost macro-F1 | 0.9946 ± 0.0001 | [`xgboost_headline.csv`](results/aggregated/xgboost_headline.csv) |
-| FedAvg macro-F1, α = 0.1 / 0.5 / 5.0 | 0.516 ± 0.048 / 0.941 ± 0.057 / 0.990 ± 0.001 | [`federated_headline.csv`](results/aggregated/federated_headline.csv) |
-| Served demo model | `fedavg_a0.5_s42`, round 18, val macro-F1 0.9760 | [`final_metrics.json`](results/federated/fedavg_a0.5_s42/final_metrics.json), [`backend.yaml`](configs/backend.yaml) |
-| **Explanation check (stage 3)** | | |
-| Jaccard@10 (median), α = 0.1 → 0.5 → 5.0 | 0.333 → 0.538 → 0.667 | [`agreement_metrics.csv`](results/inspection/agreement_metrics.csv), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
-| Weighted Kendall's τ (median), α = 0.1 → 0.5 → 5.0 | 0.592 → 0.787 → 0.844 | [`agreement_metrics.csv`](results/inspection/agreement_metrics.csv), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
+| Jaccard@10 (median) | 0.333 → 0.538 → 0.667 | [`agreement_metrics.csv`](results/inspection/agreement_metrics.csv), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
+| Weighted Kendall's τ (median) | 0.592 → 0.787 → 0.844 | [`agreement_metrics.csv`](results/inspection/agreement_metrics.csv), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
 | Chance-level Jaccard@10 (k=10, 82 features) | 0.065; the medians above are 5.1×–10.3× chance | [`agreement_metrics.py`](tools/agreement_metrics.py), [results A §2](docs/contribution_a_results.md#2-headline-agreement-numbers) |
 | Centralized-seed instability floor (Jaccard@10) | median 0.429, range [0.429, 0.484] | [`centralized_instability_floor.csv`](results/inspection/centralized_instability_floor.csv) |
-| **Trust check (stage 4)** | | |
-| `train_loss` separation, poisoned vs clean control (Glass's delta ratio), f=3 / f=2 | 33.8× / 154.3×; the other four statistics do not separate. A seed-42 effect-size ratio, not a per-round detection threshold (see Efficiency below) | [`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md), [results B §3](docs/contribution_b_results.md#3-the-behavioral-statistics-what-each-does-and-doesnt-carry) |
-| Multi-Krum: how often a malicious silo was excluded, f=3 and f=2 | 0% (classical Krum's exclusions are chance-level: it keeps 1 of 10 every round) | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
-| Cost of defending with nobody attacking (test macro-F1 vs clean FedAvg) | Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
-| ByzAgent decision stability (same round sent 3×) | 27/30 identical; 30/30 on the trust-vs-flagged boundary | [`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md), [results B §5](docs/contribution_b_results.md#5-byzagent-the-agent-the-compositional-confound-and-the-impossibility-of-a-matched-control) |
-| ByzAgent trend claims contradicted by the data it was given (rolling history) | ≈35–45% (automated check: 45.00%) | [`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md), [results B §8](docs/contribution_b_results.md#8-explanation-fidelity--the-independent-finding) |
-| **Efficiency (separate experiment; [efficiency results](docs/efficiency_results.md))** | | |
-| Served model per-flow latency, ONNX Runtime fp32 vs PyTorch eager (3 timing sessions, validation rows) | 4× lower per-flow latency (p50 45.7 vs 186.5 µs, batch 1); at batch 1024 PyTorch eager has higher throughput (1,482,368 vs 1,071,700 rows/s). Identical predictions on all 143,513 validation rows | [`inference_speed_summary.json`](results/efficiency/inference_speed_summary.json) |
-| Client→server update compression, FedAvg α = 0.5 (3 seeds, validation) | fp16 −50% / int8 −74.9% uplink; mean best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024 −0.0068 / −0.0066, within round-to-round noise) | [`update_compression.json`](results/efficiency/update_compression.json) |
-| Bytes per round, 10 organizations, both directions (computed, checked against harness logs) | 1,587,920 B (19,849 fp32 parameters); median 51.4 s per round over 25 existing runs (CPU) | [`communication.json`](results/efficiency/communication.json) |
-| train_loss pre-screen before ByzAgent, t chosen on seed 42 (replay of logged decisions) | Negative result: did not transfer; seed 1337 poisoned flag rate 0.017 vs logged 0.483 | [`agent_prescreen_replay.json`](results/efficiency/agent_prescreen_replay.json) |
 
 **Reading the explanation check.** Explanation agreement rises with α, and
 at α=5.0 it sits well above both chance and the seed-noise floor. At α=0.1
@@ -103,6 +161,16 @@ the median Jaccard@10 (0.333) falls below the floor's lower bound, even
 though FedAvg macro-F1 at that α is 0.516 ± 0.048. That below-floor result is
 directional, not significant: the cluster-bootstrap interval at α=0.1
 ([0.250, 0.429]) overlaps the floor ([0.429, 0.484]).
+
+### Trust check (stage 4)
+
+| Quantity | Value | Source |
+|---|---|---|
+| `train_loss` separation, poisoned vs clean control (Glass's delta ratio), f=3 / f=2 | 33.8× / 154.3×; the other four statistics do not separate. A seed-42 effect-size ratio, not a per-round detection threshold (see Efficiency below) | [`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md), [results B §3](docs/contribution_b_results.md#3-the-behavioral-statistics-what-each-does-and-doesnt-carry) |
+| Multi-Krum: how often a malicious silo was excluded, f=3 and f=2 | 0% (classical Krum's exclusions are chance-level: it keeps 1 of 10 every round) | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
+| Cost of defending with nobody attacking (test macro-F1 vs clean FedAvg) | Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp | [`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md), [results B §4](docs/contribution_b_results.md#4-baselines-krum-multi-krum-trimmed-mean-and-their-compositional-artifact) |
+| ByzAgent decision stability (same round sent 3×) | 27/30 identical; 30/30 on the trust-vs-flagged boundary | [`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md), [results B §5](docs/contribution_b_results.md#5-byzagent-the-agent-the-compositional-confound-and-the-impossibility-of-a-matched-control) |
+| ByzAgent trend claims contradicted by the data it was given (rolling history) | ≈35–45% (automated check: 45.00%) | [`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md), [results B §8](docs/contribution_b_results.md#8-explanation-fidelity--the-independent-finding) |
 
 **Reading the trust check.** Every attack tested is a worst-case adversary
 with full knowledge of the federation's composition, not a realistic
@@ -121,27 +189,16 @@ project's locked wording:
 ByzAgent produces decisions plus a rationale of measured fidelity. Giving it
 a rolling history of past rounds failed its pre-registered test.
 
-### Test-set use
+### ⚡ Efficiency (separate experiment; [efficiency results](docs/efficiency_results.md))
 
-All model and round selection used validation data. Three early design choices
-were recorded with test-set numbers as their justification: 3 local epochs,
-FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
-scaler are selected; for local epochs, validation also selects 3 epochs over 1
-at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
-0.8602). Headline test metrics come from one evaluation of each run's
-validation-selected checkpoint. The test set was also read, without informing
-any later choice, in these ways: (a) legacy client-side per-round scoring in
-35 runs, unread by any analysis; (b) round-20 scoring for an earlier
-round-lottery comparison, since replaced by a validation-based one; (c) 14
-fixed rows as SHAP explanation inputs; (d) display-only use: 514 extracted
-rows, and the dashboard simulator before 2026-10-13 (not logged, no
-aggregate); (e) centralized pilot and baseline runs (18) and XGBoost seeds (3)
-scored on test during development; (f) one preregistered re-evaluation of a
-single validation-selected configuration
-([`docs/preregistration_accuracy.md`](docs/preregistration_accuracy.md)). Full
-table: [`docs/test_set_exposure_audit.md`](docs/test_set_exposure_audit.md).
+| Quantity | Value | Source |
+|---|---|---|
+| Served model per-flow latency, ONNX Runtime fp32 vs PyTorch eager (3 timing sessions, validation rows) | 4× lower per-flow latency (p50 45.7 vs 186.5 µs, batch 1); at batch 1024 PyTorch eager has higher throughput (1,482,368 vs 1,071,700 rows/s). Identical predictions on all 143,513 validation rows | [`inference_speed_summary.json`](results/efficiency/inference_speed_summary.json) |
+| Client→server update compression, FedAvg α = 0.5 (3 seeds, validation) | fp16 −50% / int8 −74.9% uplink; mean best-by-val change −0.0007 / −0.0011, no detectable effect at n=3 (seed 2024 −0.0068 / −0.0066, within round-to-round noise) | [`update_compression.json`](results/efficiency/update_compression.json) |
+| Bytes per round, 10 organizations, both directions (computed, checked against harness logs) | 1,587,920 B (19,849 fp32 parameters); median 51.4 s per round over 25 existing runs (CPU) | [`communication.json`](results/efficiency/communication.json) |
+| train_loss pre-screen before ByzAgent, t chosen on seed 42 (replay of logged decisions) | Negative result: did not transfer; seed 1337 poisoned flag rate 0.017 vs logged 0.483 | [`agent_prescreen_replay.json`](results/efficiency/agent_prescreen_replay.json) |
 
-## How this differs from prior work
+## 🧭 How this differs from prior work
 
 - Oki et al. (IEEE Networking Letters, 2024) showed that federated training
   reduces explanation distance in a distributed IDS. This project does not
@@ -162,11 +219,14 @@ table: [`docs/test_set_exposure_audit.md`](docs/test_set_exposure_audit.md).
 - The LLM explanation sentences in the dashboard are a usability feature, not
   a research claim.
 
+## 🚫 What we did not claim
+
 We do not claim to be the first to measure explanation agreement in
 federated IDS, and we do not claim the broad "federated learning + IDS +
 explainability" combination as new; several 2025–2026 papers cover it.
 
-## What we did not claim, and other limitations
+<details>
+<summary><b>Full limitations</b> (explanation check, trust check, engineering)</summary>
 
 The full lists are in
 [results A, Limitations](docs/contribution_a_results.md#limitations) and
@@ -244,37 +304,52 @@ The ones most likely to matter to a reader:
 - A fresh clone has no processed data (`*.parquet` is git-ignored), so the
   backend only starts after the data pipeline has been run locally.
 
-## Repository layout
+</details>
 
+## 🧪 Test-set use
+
+All model and round selection used validation data. The test set was also read in the ways listed in the disclosure below; no configuration other than the preregistered one is ever scored on it.
+
+<details>
+<summary><b>Full test-set disclosure</b></summary>
+
+All model and round selection used validation data. Three early design choices
+were recorded with test-set numbers as their justification: 3 local epochs,
+FedProx μ=0.0005 and StandardScaler. Re-checked on validation, the same μ and
+scaler are selected; for local epochs, validation also selects 3 epochs over 1
+at α=0.5 in all three seeds (mean best-by-validation macro-F1 0.9425 vs
+0.8602). Headline test metrics come from one evaluation of each run's
+validation-selected checkpoint. The test set was also read, without informing
+any later choice, in these ways: (a) legacy client-side per-round scoring in
+35 runs, unread by any analysis; (b) round-20 scoring for an earlier
+round-lottery comparison, since replaced by a validation-based one; (c) 14
+fixed rows as SHAP explanation inputs; (d) display-only use: 514 extracted
+rows, and the dashboard simulator before 2026-10-13 (not logged, no
+aggregate); (e) centralized pilot and baseline runs (18) and XGBoost seeds (3)
+scored on test during development; (f) one preregistered re-evaluation of a
+single validation-selected configuration
+([`docs/preregistration_accuracy.md`](docs/preregistration_accuracy.md)). Full
+table: [`docs/test_set_exposure_audit.md`](docs/test_set_exposure_audit.md).
+
+</details>
+
+## 🚀 Quick start
+
+Prerequisite: the data pipeline and the one-time demo files (steps 2, 3 and 7
+below) must have been run locally; a fresh clone has no processed data.
+
+```powershell
+conda env create -f environment.yml
+conda activate xfed
+uvicorn backend.main:app --reload
+python -m backend.simulator
+cd frontend; npm ci; npm run dev
 ```
-configs/      every parameter: data, model, attack, defense, agent, backend, hotswap, showcase export
-data/         README.md (data decision record); processed/ is git-ignored
-federated/    xfed_federated/: the Flower app that produced every reported number
-src/          data/, models/, train/ (centralized + XGBoost), attacks/, monitoring/,
-              agents/ (ByzAgent), hotswap/; src/federated/ is an early prototype, unused
-tools/        SHAP pipeline, agreement metrics, parity monitor, plots, showcase export
-scripts/      partition checks, aggregation, trust-check phase gates and analyses
-results/      aggregated/, centralized/, federated/, shap/, inspection/,
-              attacks/, monitoring/, defenses/, agents/, explanations/, figures/
-backend/      FastAPI service for the dashboard (+ simulator.py traffic replay)
-frontend/     React + Recharts dashboard
-site/         static showcase site (Vite + React), deployed to Vercel
-film/         Remotion source for the explainer film
-docs/         contribution_a_results.md, contribution_b_results.md, measurement_protocol.md
-app.py, app_lib/   Streamlit dashboard (Phase 1, superseded by backend/ + frontend/)
-PROJECT_INSTRUCTIONS.md   project rules, locked decisions and headline numbers
-```
 
-The phase-by-phase trust-check write-ups behind
-`docs/contribution_b_results.md` are
-[`PHASE0_SUMMARY.md`](results/attacks/PHASE0_SUMMARY.md),
-[`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md),
-[`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md),
-[`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md),
-[`PHASE4_SUMMARY.md`](results/agents/PHASE4_SUMMARY.md) and
-[`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md).
+Run the last three in separate terminals. The API listens on
+`http://127.0.0.1:8000` and the Vite dev server proxies `/api` to it.
 
-## Reproduce it
+### Reproduce it, step by step
 
 All commands run from the repo root in PowerShell unless noted. Everything
 was developed and run on Windows 11 with an RTX 4050 (6 GB VRAM, a hard
@@ -288,7 +363,9 @@ on CPU: Flower installs its own isolated environment with torch 2.13.0+cpu
 2026-10-12/13). SHAP, the dashboard backend and hot-swap retraining also run
 on CPU.
 
-### 1. Environment
+
+<details>
+<summary><b>1. Environment</b></summary>
 
 The project used a conda env named `xfed` with Python 3.11. Use PowerShell:
 on the development machine `conda activate` is a silent no-op in `cmd.exe`.
@@ -332,7 +409,10 @@ Paths are relative to the repo root. The raw dataset is expected in a
 put it anywhere else. The Flower app finds the repo root on its own;
 `XFED_PROJECT_ROOT` overrides that if it ever guesses wrong.
 
-### 2. Dataset
+</details>
+
+<details>
+<summary><b>2. Dataset</b></summary>
 
 This project uses **Distrinet CICIDS2017 V4**, the IEEE CNS 2022 update of
 CICIDS2017, published on Kaggle as
@@ -352,7 +432,10 @@ Put the CSVs outside the repo, in a `Dataset` folder next to it (the project
 used `C:\Pilli\Capstone\Dataset\`), or point `XFED_DATASET_DIR` at the folder. Derived data
 (`*.parquet`, the demo `.npz` files) is git-ignored and not committed.
 
-### 3. Cleaning, split and partitioning
+</details>
+
+<details>
+<summary><b>3. Cleaning, split and partitioning</b></summary>
 
 ```powershell
 python src/data/clean.py           # raw CSVs -> clean.parquet
@@ -371,7 +454,10 @@ cannot be trained on. `check_partitions.py` is a pre-flight check for silos
 that would crash a federated round (empty train or test shards, missing
 classes).
 
-### 4. Training
+</details>
+
+<details>
+<summary><b>4. Training</b></summary>
 
 Centralized and XGBoost baselines, one run per seed, then aggregated:
 
@@ -410,7 +496,10 @@ runs were made with it on. To reproduce their `silo_metrics.jsonl` evaluate
 rows, pass `-LegacyClientTestEval` to either sweep script, or
 `--run-config "legacy-client-test-eval=true"` to `flwr run`.
 
-### 5. Explanation check (SHAP export and agreement)
+</details>
+
+<details>
+<summary><b>5. Explanation check (SHAP export and agreement)</b></summary>
 
 ```powershell
 python tools/extract_best_rounds.py         # -> results/inspection/best_rounds_manifest.json
@@ -426,7 +515,10 @@ SHAP runs on CPU, which was measured to be faster than the GPU for this
 small model. The FedProx variants take `--tag-prefix fedprox_mu0.0005` plus
 a matching manifest path; see each script's docstring.
 
-### 6. Trust check (ByzAgent)
+</details>
+
+<details>
+<summary><b>6. Trust check (ByzAgent)</b></summary>
 
 Attacks, defenses and the agent are switched on through
 `configs/attack.yaml`, `configs/defense.yaml` and `configs/agent.yaml`. In
@@ -470,7 +562,10 @@ their committed state all three leave plain FedAvg untouched.
    `defense.strategy: byzagent` wires the agent into live aggregation, but
    no reported number comes from a live ByzAgent run.
 
-### 7. Dashboard (FastAPI + React)
+</details>
+
+<details>
+<summary><b>7. Dashboard (FastAPI + React)</b></summary>
 
 The backend needs the processed data from step 3, the trained
 `fedavg_a0.5_s42` checkpoint and `best_rounds_manifest.json`. At startup it
@@ -572,7 +667,10 @@ pulse and fades are off and the colours change instantly.
 
 The older Streamlit dashboard still runs with `streamlit run app.py`.
 
-### 8. Showcase site and film
+</details>
+
+<details>
+<summary><b>8. Showcase site and film</b></summary>
 
 The site reads small JSON files in `site/public/data/`. Regenerate them from
 `results/` and `docs/` (read-only; the output path is set in
@@ -595,7 +693,71 @@ npm run build           # -> site/dist
 The film's source and render steps are in [`film/README.md`](film/README.md);
 the rendered film is in `site/public/film/`.
 
-## Team
+</details>
+
+## 📁 Repository layout
+
+```
+configs/      every parameter: data, model, attack, defense, agent, backend, hotswap, showcase export
+data/         README.md (data decision record); processed/ is git-ignored
+federated/    xfed_federated/: the Flower app that produced every reported number
+src/          data/, models/, train/ (centralized + XGBoost), attacks/, monitoring/,
+              agents/ (ByzAgent), hotswap/; src/federated/ is an early prototype, unused
+tools/        SHAP pipeline, agreement metrics, parity monitor, plots, showcase export
+scripts/      partition checks, aggregation, trust-check phase gates and analyses
+results/      aggregated/, centralized/, federated/, shap/, inspection/,
+              attacks/, monitoring/, defenses/, agents/, explanations/, figures/
+backend/      FastAPI service for the dashboard (+ simulator.py traffic replay)
+frontend/     React dashboard
+site/         static showcase site (Vite + React), deployed to Vercel
+film/         Remotion source for the explainer film
+docs/         contribution_a_results.md, contribution_b_results.md, measurement_protocol.md
+app.py, app_lib/   Streamlit dashboard (Phase 1, superseded by backend/ + frontend/)
+PROJECT_INSTRUCTIONS.md   project rules, locked decisions and headline numbers
+```
+
+The phase-by-phase trust-check write-ups behind
+`docs/contribution_b_results.md` are
+[`PHASE0_SUMMARY.md`](results/attacks/PHASE0_SUMMARY.md),
+[`PHASE1_SUMMARY.md`](results/monitoring/PHASE1_SUMMARY.md),
+[`PHASE2_SUMMARY.md`](results/defenses/PHASE2_SUMMARY.md),
+[`PHASE3_SUMMARY.md`](results/agents/PHASE3_SUMMARY.md),
+[`PHASE4_SUMMARY.md`](results/agents/PHASE4_SUMMARY.md) and
+[`MULTISEED_VALIDATION_SUMMARY.md`](results/agents/MULTISEED_VALIDATION_SUMMARY.md).
+
+## 🛠️ Tech stack
+
+Versions from [`requirements.txt`](requirements.txt) and
+[`frontend/package.json`](frontend/package.json).
+
+| Component | Technology |
+|---|---|
+| Language | Python 3.11 |
+| Model and training | PyTorch 2.6.0 (CUDA 12.4 build), scikit-learn 1.9.0, XGBoost 3.2.0, Optuna 4.9.0 |
+| Federated learning | Flower (flwr) 1.33.0 |
+| Explanations | SHAP 0.51.0 (GradientExplainer) |
+| Serving | FastAPI 0.138.2, Uvicorn 0.49.0, ONNX Runtime 1.31.0 |
+| LLM agent | `llama3.1:8b-instruct-q4_K_M` through Ollama |
+| Frontend | React 19, React Router 7, Vite 8 |
+| Showcase site and film | Vite + React (`site/`), Remotion (`film/`) |
+| Older dashboard | Streamlit 1.61.1 (`app.py`) |
+
+## 📅 Timeline
+
+Dates are commit dates from this repository's git history, which begins on
+2026-09-11.
+
+| Date | Milestone |
+|---|---|
+| 2026-09-11 | First commit: pipeline, backend, React dashboard |
+| 2026-09-13 | Hot-swap audit log and live hot-swap with revert |
+| 2026-10-02 | Streamed SHAP pool and LLM explanation layer |
+| 2026-10-07 | Showcase site and explainer film merged |
+| 2026-10-12 | Preregistered accuracy comparison; single test evaluation of FedAvgM β=0.9 |
+| 2026-10-13 | Efficiency experiments merged; validation SHAP pool for the demo |
+| 2026-10-14 | Dashboard v2 (Live, Investigate, Limits) |
+
+## 👥 Team
 
 VIT-AP University capstone project, 2026.
 
@@ -606,7 +768,7 @@ VIT-AP University capstone project, 2026.
 | P Sampath | 23BCE8614 |
 | D Tharun | 23BCE8818 |
 
-## Citation
+## 📚 Citation
 
 If you use this code or the measurement protocol, please cite the
 repository:
@@ -622,19 +784,48 @@ repository:
 ```
 
 Please also cite the dataset papers (Liu et al., IEEE CNS 2022; Engelen et
-al., WTMC 2021) listed under [Dataset](#2-dataset).
+al., WTMC 2021), as listed in the dataset step above:
 
-## Acknowledgements
+```bibtex
+@inproceedings{liu2022error,
+  title     = {Error Prevalence in {NIDS} datasets: A Case Study on {CIC-IDS-2017} and {CSE-CIC-IDS-2018}},
+  author    = {Liu, L. and Engelen, G. and Lynar, T. and Essam, D. and Joosen, W.},
+  booktitle = {IEEE Conference on Communications and Network Security (CNS)},
+  year      = {2022},
+  pages     = {254--262}
+}
+
+@inproceedings{engelen2021troubleshooting,
+  title     = {Troubleshooting an Intrusion Detection Dataset: the {CICIDS2017} Case Study},
+  author    = {Engelen, G. and Rimmer, V. and Joosen, W.},
+  booktitle = {IEEE Security and Privacy Workshops (SPW), Workshop on Traffic Measurements for Cybersecurity (WTMC)},
+  year      = {2021}
+}
+```
+
+Related work referred to above: Oki et al., IEEE Networking Letters, 2024;
+Gholizade et al., arXiv 2607.13045 (June 2026). Full entries for these two
+are not in this repository's docs, so none are written here.
+
+## 🤝 Acknowledgements
 
 - The authors of the corrected CICIDS2017 dataset this project is built on
   (Engelen, Rimmer and Joosen; Liu, Engelen, Lynar, Essam and Joosen).
 - The Canadian Institute for Cybersecurity, for the original CICIDS2017
   capture.
 - The open-source tools the system runs on: Flower, PyTorch, SHAP,
-  scikit-learn, XGBoost, FastAPI, React, Recharts, Vite and Remotion.
+  scikit-learn, XGBoost, FastAPI, React, Vite and Remotion.
 - Meta's Llama 3.1 8B Instruct, served locally through Ollama, which is
   covered by its own license.
 
-## License
+## 📄 License
 
 License: to be decided. This repository does not have a license file yet.
+
+---
+
+<div align="center">
+
+**Detect the attack, then check the detector.**
+
+</div>
