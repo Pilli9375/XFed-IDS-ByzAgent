@@ -708,7 +708,7 @@ scripts/      partition checks, aggregation, trust-check phase gates and analyse
 results/      aggregated/, centralized/, federated/, shap/, inspection/,
               attacks/, monitoring/, defenses/, agents/, explanations/, figures/
 backend/      FastAPI service for the dashboard (+ simulator.py traffic replay)
-frontend/     React + Recharts dashboard
+frontend/     React dashboard
 site/         static showcase site (Vite + React), deployed to Vercel
 film/         Remotion source for the explainer film
 docs/         contribution_a_results.md, contribution_b_results.md, measurement_protocol.md
@@ -814,7 +814,7 @@ are not in this repository's docs, so none are written here.
 - The Canadian Institute for Cybersecurity, for the original CICIDS2017
   capture.
 - The open-source tools the system runs on: Flower, PyTorch, SHAP,
-  scikit-learn, XGBoost, FastAPI, React, Recharts, Vite and Remotion.
+  scikit-learn, XGBoost, FastAPI, React, Vite and Remotion.
 - Meta's Llama 3.1 8B Instruct, served locally through Ollama, which is
   covered by its own license.
 
