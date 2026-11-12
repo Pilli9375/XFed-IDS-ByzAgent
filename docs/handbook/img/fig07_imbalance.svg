@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 328" width="800" height="328" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="328" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<text x="130" y="35" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Benign</text>
+<rect x="140" y="20" width="508.2" height="20" fill="#9ca3af"/>
+<text x="654.2485630094761" y="35" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">1,440,899</text>
+<text x="130" y="65" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">PortScan</text>
+<rect x="140" y="50" width="434.9" height="20" fill="#2563eb"/>
+<text x="580.9036450279812" y="65" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">186,160</text>
+<text x="130" y="95" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">DoS</text>
+<rect x="140" y="80" width="433.2" height="20" fill="#f97316"/>
+<text x="579.1945248217298" y="95" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">177,491</text>
+<text x="130" y="125" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">DDoS</text>
+<rect x="140" y="110" width="410.8" height="20" fill="#dc2626"/>
+<text x="556.846850885739" y="125" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">95,144</text>
+<text x="130" y="155" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">BruteForce</text>
+<rect x="140" y="140" width="317.2" height="20" fill="#d97706"/>
+<text x="463.1776420939156" y="155" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">6,972</text>
+<text x="130" y="185" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Bot</text>
+<rect x="140" y="170" width="303.1" height="20" fill="#7c3aed"/>
+<text x="449.0671160527828" y="185" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">4,703</text>
+<text x="130" y="215" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">WebAttack</text>
+<rect x="140" y="200" width="273.4" height="20" fill="#db2777"/>
+<text x="419.4111754036403" y="215" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">2,056</text>
+<text x="130" y="245" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Infiltration</text>
+<rect x="140" y="230" width="150.2" height="20" fill="#0d9488"/>
+<text x="296.1600289369942" y="245" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">66</text>
+<text x="130" y="275" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Heartbleed</text>
+<rect x="140" y="260" width="85.9" height="20" fill="#111827"/>
+<text x="231.94217082840805" y="275" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">11</text>
+<line x1="387.578570658052" y1="15" x2="387.578570658052" y2="290" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,3"/>
+<text x="391.578570658052" y="300" font-size="11" fill="#dc2626" text-anchor="start" font-weight="400">1,000-flow floor</text>
+<text x="400" y="318" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">Log scale. Source: data/README.md §5.</text>
+</svg>

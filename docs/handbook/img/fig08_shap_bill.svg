@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 310" width="800" height="310" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="310" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<text x="400" y="22" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="700">Sharing the bill: each feature's SHAP value moves the output up (red) or down (teal)</text>
+<text x="210" y="57" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">base value E[f]</text>
+<rect x="220" y="40" width="120.0" height="22" fill="#d1d5db"/>
+<text x="210" y="93" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Flow Packets/s</text>
+<rect x="340.0" y="76" width="192.0" height="22" fill="#dc2626"/>
+<text x="538.0" y="92" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">+share</text>
+<text x="210" y="129" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Fwd Packet Length Std</text>
+<rect x="532.0" y="112" width="107.99999999999999" height="22" fill="#dc2626"/>
+<text x="646.0" y="128" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">+share</text>
+<text x="210" y="165" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Flow Duration</text>
+<rect x="592.0" y="148" width="47.999999999999986" height="22" fill="#0d9488"/>
+<text x="646.0" y="164" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">−share</text>
+<text x="210" y="201" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">Init Win Bytes</text>
+<rect x="592.0" y="184" width="72.00000000000001" height="22" fill="#dc2626"/>
+<text x="670.0" y="200" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">+share</text>
+<text x="210" y="237" font-size="12" fill="#1f2937" text-anchor="end" font-weight="400">other features</text>
+<rect x="664.0" y="220" width="35.99999999999998" height="22" fill="#dc2626"/>
+<text x="706.0" y="236" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">+share</text>
+<rect x="220" y="256" width="480.0" height="22" fill="#1f2937"/>
+<text x="210" y="273" font-size="12" fill="#1f2937" text-anchor="end" font-weight="700">model output f(x)</text>
+<text x="400" y="300" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">base value + Σ SHAP = output (additivity). Illustrative values, not from any model.</text>
+</svg>

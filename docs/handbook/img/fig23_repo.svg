@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 262" width="800" height="262" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="262" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<rect x="20" y="20" width="180" height="62" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="110" y="46" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="700">configs/</text>
+<text x="110" y="66" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">every parameter</text>
+<rect x="215" y="20" width="180" height="62" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="305" y="46" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="700">data/</text>
+<text x="305" y="66" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">decision record</text>
+<rect x="410" y="20" width="180" height="62" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="500" y="46" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="700">federated/</text>
+<text x="500" y="66" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">Flower app (authoritative)</text>
+<rect x="605" y="20" width="180" height="62" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="695" y="46" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="700">src/</text>
+<text x="695" y="66" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">data, models, attacks, agents, hotswap</text>
+<rect x="20" y="100" width="180" height="62" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.6"/>
+<text x="110" y="126" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">tools/</text>
+<text x="110" y="146" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">SHAP, metrics, audits</text>
+<rect x="215" y="100" width="180" height="62" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.6"/>
+<text x="305" y="126" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">scripts/</text>
+<text x="305" y="146" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">checks, phase gates</text>
+<rect x="410" y="100" width="180" height="62" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.6"/>
+<text x="500" y="126" font-size="14" fill="#d97706" text-anchor="middle" font-weight="700">results/</text>
+<text x="500" y="146" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">every number's file</text>
+<rect x="605" y="100" width="180" height="62" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.6"/>
+<text x="695" y="126" font-size="14" fill="#d97706" text-anchor="middle" font-weight="700">docs/</text>
+<text x="695" y="146" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">canonical results</text>
+<rect x="20" y="180" width="180" height="62" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="110" y="206" font-size="14" fill="#7c3aed" text-anchor="middle" font-weight="700">backend/</text>
+<text x="110" y="226" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">FastAPI</text>
+<rect x="215" y="180" width="180" height="62" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="305" y="206" font-size="14" fill="#7c3aed" text-anchor="middle" font-weight="700">frontend/</text>
+<text x="305" y="226" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">React dashboard</text>
+<rect x="410" y="180" width="180" height="62" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="500" y="206" font-size="14" fill="#7c3aed" text-anchor="middle" font-weight="700">site/</text>
+<text x="500" y="226" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">showcase site</text>
+<rect x="605" y="180" width="180" height="62" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="695" y="206" font-size="14" fill="#7c3aed" text-anchor="middle" font-weight="700">film/</text>
+<text x="695" y="226" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">explainer film</text>
+</svg>

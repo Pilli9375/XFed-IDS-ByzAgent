@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="340" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<rect x="20" y="20" width="360" height="300" rx="8" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+<text x="200" y="44" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="700">inside each organization (×10, plus global)</text>
+<rect x="45" y="60" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="80" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">14 fixed eval rows (2 per family)</text>
+<rect x="45" y="102" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="122" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">own scaler → own model</text>
+<line x1="200" y1="90" x2="200" y2="102" stroke="#6b7280" stroke-width="1.2" marker-end="url(#ar)"/>
+<rect x="45" y="144" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="164" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">GradientExplainer, nsamples=4000</text>
+<line x1="200" y1="132" x2="200" y2="144" stroke="#6b7280" stroke-width="1.2" marker-end="url(#ar)"/>
+<rect x="45" y="186" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="206" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">200-row seeded background (own train data)</text>
+<line x1="200" y1="174" x2="200" y2="186" stroke="#6b7280" stroke-width="1.2" marker-end="url(#ar)"/>
+<rect x="45" y="228" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="248" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">SHAP of the true class</text>
+<line x1="200" y1="216" x2="200" y2="228" stroke="#6b7280" stroke-width="1.2" marker-end="url(#ar)"/>
+<rect x="45" y="270" width="310" height="30" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="200" y="290" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">rank → top-k list</text>
+<line x1="200" y1="258" x2="200" y2="270" stroke="#6b7280" stroke-width="1.2" marker-end="url(#ar)"/>
+<line x1="380" y1="290" x2="450" y2="170" stroke="#16a34a" stroke-width="2" marker-end="url(#ar)"/>
+<text x="415" y="260" font-size="11" fill="#16a34a" text-anchor="middle" font-weight="700">top-k only</text>
+<rect x="455" y="60" width="320" height="230" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.2"/>
+<text x="615" y="86" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="700">server</text>
+<text x="615" y="116" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">eligibility (silo ≥ 400, family ≥ 20)</text>
+<text x="615" y="144" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">Jaccard@10, weighted τ vs global</text>
+<text x="615" y="172" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">median per α</text>
+<text x="615" y="200" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">compare with chance 0.065</text>
+<text x="615" y="228" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">and seed-noise floor 0.429</text>
+<text x="615" y="256" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="400">parity monitor (N≥3 draws)</text>
+</svg>

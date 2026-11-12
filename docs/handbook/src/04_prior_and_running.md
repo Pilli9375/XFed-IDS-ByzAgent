@@ -79,6 +79,8 @@ Then open `http://localhost:5173/`. The API is at `http://127.0.0.1:8000`; Vite 
 | 4:40 | Open **Limits** | "Finally, Limits shows our claims and limitations verbatim from the project instructions. We'd rather you read them here than find them yourself." |
 | 5:00 | (optional) Switch theme | Done. |
 
+Sources for the numbers spoken in this script: FedAvgM 0.9852 (source: `results/federated_methods/test_once/result.json`); 45.7 µs (source: `results/efficiency/inference_speed_summary.json`); org 5 at seed 1337 0.00 → 0.95 (source: `docs/contribution_b_results.md` §7); Multi-Krum 0% (source: `docs/contribution_b_results.md` §4); chance 0.065, floor 0.429, agreement 0.667 / 0.333 (source: `docs/contribution_a_results.md` §2); 1,587,920 bytes (source: `results/efficiency/communication.json`); 74.9% (source: `results/efficiency/update_compression.json`). The dashboard itself links every number on screen to its file.
+
 **Optional hot-swap (adds ~2 minutes):** on Live, select an alert → **Hot-swap model…** → confirm. Say: "This retrains for two rounds from the base model in a separate process. It only replaces the served model if it's at least as good on validation; otherwise it's rejected — and that happens often, because of the round lottery." Then **revert**.
 
 ## 5.3 If something breaks {#broken}

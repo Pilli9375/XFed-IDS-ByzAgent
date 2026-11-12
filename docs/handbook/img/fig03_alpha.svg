@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="800" height="460" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="460" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<text x="20" y="42" font-size="14" fill="#1f2937" text-anchor="start" font-weight="700">α = 0.1, seed 42</text>
+<rect x="120" y="189.69" width="44" height="0.31" fill="#7c3aed"/>
+<rect x="120" y="189.69" width="44" height="0.01" fill="#d97706"/>
+<rect x="120" y="163.00" width="44" height="26.69" fill="#dc2626"/>
+<rect x="120" y="50.00" width="44" height="113.00" fill="#2563eb"/>
+<text x="142" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 0</text>
+<rect x="184" y="162.31" width="44" height="27.69" fill="#9ca3af"/>
+<rect x="184" y="151.38" width="44" height="10.93" fill="#7c3aed"/>
+<rect x="184" y="98.80" width="44" height="52.59" fill="#d97706"/>
+<rect x="184" y="81.10" width="44" height="17.69" fill="#f97316"/>
+<rect x="184" y="50.00" width="44" height="31.10" fill="#2563eb"/>
+<text x="206" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 1</text>
+<rect x="248" y="56.56" width="44" height="133.44" fill="#9ca3af"/>
+<rect x="248" y="56.09" width="44" height="0.47" fill="#dc2626"/>
+<rect x="248" y="50.04" width="44" height="6.05" fill="#f97316"/>
+<rect x="248" y="50.00" width="44" height="0.04" fill="#db2777"/>
+<text x="270" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 2</text>
+<rect x="312" y="104.76" width="44" height="85.24" fill="#7c3aed"/>
+<rect x="312" y="104.10" width="44" height="0.66" fill="#d97706"/>
+<rect x="312" y="103.23" width="44" height="0.87" fill="#f97316"/>
+<rect x="312" y="103.14" width="44" height="0.09" fill="#2563eb"/>
+<rect x="312" y="50.00" width="44" height="53.14" fill="#db2777"/>
+<text x="334" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 3</text>
+<rect x="376" y="173.48" width="44" height="16.52" fill="#9ca3af"/>
+<rect x="376" y="172.91" width="44" height="0.57" fill="#7c3aed"/>
+<rect x="376" y="157.73" width="44" height="15.19" fill="#d97706"/>
+<rect x="376" y="153.60" width="44" height="4.13" fill="#dc2626"/>
+<rect x="376" y="152.70" width="44" height="0.90" fill="#0d9488"/>
+<rect x="376" y="50.40" width="44" height="102.30" fill="#2563eb"/>
+<rect x="376" y="50.00" width="44" height="0.40" fill="#db2777"/>
+<text x="398" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 4</text>
+<rect x="440" y="125.74" width="44" height="64.26" fill="#9ca3af"/>
+<rect x="440" y="122.42" width="44" height="3.32" fill="#7c3aed"/>
+<rect x="440" y="50.42" width="44" height="72.00" fill="#f97316"/>
+<rect x="440" y="50.00" width="44" height="0.42" fill="#2563eb"/>
+<text x="462" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 5</text>
+<rect x="504" y="189.73" width="44" height="0.27" fill="#d97706"/>
+<rect x="504" y="50.00" width="44" height="139.73" fill="#dc2626"/>
+<rect x="504" y="50.00" width="44" height="0.00" fill="#2563eb"/>
+<text x="526" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 6</text>
+<rect x="568" y="105.32" width="44" height="84.68" fill="#9ca3af"/>
+<rect x="568" y="105.31" width="44" height="0.01" fill="#7c3aed"/>
+<rect x="568" y="100.38" width="44" height="4.93" fill="#d97706"/>
+<rect x="568" y="50.01" width="44" height="50.37" fill="#f97316"/>
+<rect x="568" y="50.00" width="44" height="0.01" fill="#111827"/>
+<rect x="568" y="50.00" width="44" height="0.00" fill="#0d9488"/>
+<text x="590" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 7</text>
+<rect x="632" y="65.29" width="44" height="124.71" fill="#9ca3af"/>
+<rect x="632" y="65.29" width="44" height="0.00" fill="#d97706"/>
+<rect x="632" y="65.29" width="44" height="0.00" fill="#dc2626"/>
+<rect x="632" y="50.00" width="44" height="15.29" fill="#f97316"/>
+<rect x="632" y="50.00" width="44" height="0.00" fill="#db2777"/>
+<text x="654" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 8</text>
+<rect x="696" y="189.02" width="44" height="0.98" fill="#9ca3af"/>
+<rect x="696" y="188.04" width="44" height="0.98" fill="#7c3aed"/>
+<rect x="696" y="187.06" width="44" height="0.98" fill="#d97706"/>
+<rect x="696" y="159.65" width="44" height="27.41" fill="#dc2626"/>
+<rect x="696" y="155.73" width="44" height="3.92" fill="#f97316"/>
+<rect x="696" y="154.76" width="44" height="0.98" fill="#111827"/>
+<rect x="696" y="153.78" width="44" height="0.98" fill="#0d9488"/>
+<rect x="696" y="152.80" width="44" height="0.98" fill="#2563eb"/>
+<rect x="696" y="50.00" width="44" height="102.80" fill="#db2777"/>
+<text x="718" y="206" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 9</text>
+<line x1="115" y1="190" x2="760" y2="190" stroke="#d1d5db" stroke-width="1"/>
+<text x="20" y="242" font-size="14" fill="#1f2937" text-anchor="start" font-weight="700">α = 5.0, seed 42</text>
+<rect x="120" y="290.21" width="44" height="99.79" fill="#9ca3af"/>
+<rect x="120" y="289.47" width="44" height="0.73" fill="#7c3aed"/>
+<rect x="120" y="288.27" width="44" height="1.20" fill="#d97706"/>
+<rect x="120" y="277.52" width="44" height="10.76" fill="#dc2626"/>
+<rect x="120" y="255.32" width="44" height="22.19" fill="#f97316"/>
+<rect x="120" y="255.32" width="44" height="0.00" fill="#0d9488"/>
+<rect x="120" y="250.09" width="44" height="5.22" fill="#2563eb"/>
+<rect x="120" y="250.00" width="44" height="0.09" fill="#db2777"/>
+<text x="142" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 0</text>
+<rect x="184" y="299.32" width="44" height="90.68" fill="#9ca3af"/>
+<rect x="184" y="298.69" width="44" height="0.63" fill="#7c3aed"/>
+<rect x="184" y="297.78" width="44" height="0.91" fill="#d97706"/>
+<rect x="184" y="286.97" width="44" height="10.81" fill="#dc2626"/>
+<rect x="184" y="278.69" width="44" height="8.29" fill="#f97316"/>
+<rect x="184" y="278.68" width="44" height="0.00" fill="#111827"/>
+<rect x="184" y="278.68" width="44" height="0.00" fill="#0d9488"/>
+<rect x="184" y="250.22" width="44" height="28.46" fill="#2563eb"/>
+<rect x="184" y="250.00" width="44" height="0.22" fill="#db2777"/>
+<text x="206" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 1</text>
+<rect x="248" y="299.55" width="44" height="90.45" fill="#9ca3af"/>
+<rect x="248" y="299.27" width="44" height="0.28" fill="#7c3aed"/>
+<rect x="248" y="298.89" width="44" height="0.38" fill="#d97706"/>
+<rect x="248" y="292.81" width="44" height="6.08" fill="#dc2626"/>
+<rect x="248" y="270.09" width="44" height="22.72" fill="#f97316"/>
+<rect x="248" y="270.09" width="44" height="0.00" fill="#0d9488"/>
+<rect x="248" y="250.24" width="44" height="19.84" fill="#2563eb"/>
+<rect x="248" y="250.00" width="44" height="0.24" fill="#db2777"/>
+<text x="270" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 2</text>
+<rect x="312" y="288.08" width="44" height="101.92" fill="#9ca3af"/>
+<rect x="312" y="287.75" width="44" height="0.34" fill="#7c3aed"/>
+<rect x="312" y="287.43" width="44" height="0.32" fill="#d97706"/>
+<rect x="312" y="282.68" width="44" height="4.75" fill="#dc2626"/>
+<rect x="312" y="272.73" width="44" height="9.95" fill="#f97316"/>
+<rect x="312" y="272.73" width="44" height="0.00" fill="#111827"/>
+<rect x="312" y="272.72" width="44" height="0.00" fill="#0d9488"/>
+<rect x="312" y="250.13" width="44" height="22.59" fill="#2563eb"/>
+<rect x="312" y="250.00" width="44" height="0.13" fill="#db2777"/>
+<text x="334" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 3</text>
+<rect x="376" y="264.83" width="44" height="125.17" fill="#9ca3af"/>
+<rect x="376" y="264.73" width="44" height="0.10" fill="#7c3aed"/>
+<rect x="376" y="264.39" width="44" height="0.34" fill="#d97706"/>
+<rect x="376" y="261.30" width="44" height="3.10" fill="#dc2626"/>
+<rect x="376" y="256.99" width="44" height="4.31" fill="#f97316"/>
+<rect x="376" y="256.98" width="44" height="0.00" fill="#111827"/>
+<rect x="376" y="256.98" width="44" height="0.00" fill="#0d9488"/>
+<rect x="376" y="250.07" width="44" height="6.91" fill="#2563eb"/>
+<rect x="376" y="250.00" width="44" height="0.07" fill="#db2777"/>
+<text x="398" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 4</text>
+<rect x="440" y="293.79" width="44" height="96.21" fill="#9ca3af"/>
+<rect x="440" y="293.48" width="44" height="0.31" fill="#7c3aed"/>
+<rect x="440" y="292.67" width="44" height="0.81" fill="#d97706"/>
+<rect x="440" y="282.53" width="44" height="10.14" fill="#dc2626"/>
+<rect x="440" y="258.39" width="44" height="24.13" fill="#f97316"/>
+<rect x="440" y="258.39" width="44" height="0.00" fill="#111827"/>
+<rect x="440" y="258.38" width="44" height="0.01" fill="#0d9488"/>
+<rect x="440" y="250.10" width="44" height="8.29" fill="#2563eb"/>
+<rect x="440" y="250.00" width="44" height="0.10" fill="#db2777"/>
+<text x="462" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 5</text>
+<rect x="504" y="291.38" width="44" height="98.62" fill="#9ca3af"/>
+<rect x="504" y="290.93" width="44" height="0.45" fill="#7c3aed"/>
+<rect x="504" y="290.76" width="44" height="0.17" fill="#d97706"/>
+<rect x="504" y="285.22" width="44" height="5.55" fill="#dc2626"/>
+<rect x="504" y="264.51" width="44" height="20.71" fill="#f97316"/>
+<rect x="504" y="264.50" width="44" height="0.00" fill="#111827"/>
+<rect x="504" y="264.50" width="44" height="0.01" fill="#0d9488"/>
+<rect x="504" y="250.21" width="44" height="14.29" fill="#2563eb"/>
+<rect x="504" y="250.00" width="44" height="0.21" fill="#db2777"/>
+<text x="526" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 6</text>
+<rect x="568" y="299.30" width="44" height="90.70" fill="#9ca3af"/>
+<rect x="568" y="298.80" width="44" height="0.50" fill="#7c3aed"/>
+<rect x="568" y="298.22" width="44" height="0.59" fill="#d97706"/>
+<rect x="568" y="284.78" width="44" height="13.43" fill="#dc2626"/>
+<rect x="568" y="269.61" width="44" height="15.17" fill="#f97316"/>
+<rect x="568" y="269.61" width="44" height="0.01" fill="#0d9488"/>
+<rect x="568" y="250.41" width="44" height="19.19" fill="#2563eb"/>
+<rect x="568" y="250.00" width="44" height="0.41" fill="#db2777"/>
+<text x="590" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 7</text>
+<rect x="632" y="268.69" width="44" height="121.31" fill="#9ca3af"/>
+<rect x="632" y="268.55" width="44" height="0.14" fill="#7c3aed"/>
+<rect x="632" y="268.17" width="44" height="0.38" fill="#d97706"/>
+<rect x="632" y="263.83" width="44" height="4.33" fill="#dc2626"/>
+<rect x="632" y="258.58" width="44" height="5.26" fill="#f97316"/>
+<rect x="632" y="258.57" width="44" height="0.00" fill="#111827"/>
+<rect x="632" y="258.57" width="44" height="0.00" fill="#0d9488"/>
+<rect x="632" y="250.06" width="44" height="8.51" fill="#2563eb"/>
+<rect x="632" y="250.00" width="44" height="0.06" fill="#db2777"/>
+<text x="654" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 8</text>
+<rect x="696" y="291.95" width="44" height="98.05" fill="#9ca3af"/>
+<rect x="696" y="291.37" width="44" height="0.58" fill="#7c3aed"/>
+<rect x="696" y="290.87" width="44" height="0.49" fill="#d97706"/>
+<rect x="696" y="279.18" width="44" height="11.70" fill="#dc2626"/>
+<rect x="696" y="266.24" width="44" height="12.94" fill="#f97316"/>
+<rect x="696" y="266.24" width="44" height="0.00" fill="#111827"/>
+<rect x="696" y="266.23" width="44" height="0.01" fill="#0d9488"/>
+<rect x="696" y="250.25" width="44" height="15.98" fill="#2563eb"/>
+<rect x="696" y="250.00" width="44" height="0.25" fill="#db2777"/>
+<text x="718" y="406" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">silo 9</text>
+<line x1="115" y1="390" x2="760" y2="390" stroke="#d1d5db" stroke-width="1"/>
+<rect x="120" y="420" width="10" height="10" fill="#9ca3af"/>
+<text x="134" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">Benign</text>
+<rect x="192" y="420" width="10" height="10" fill="#7c3aed"/>
+<text x="206" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">Bot</text>
+<rect x="264" y="420" width="10" height="10" fill="#d97706"/>
+<text x="278" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">BruteForce</text>
+<rect x="336" y="420" width="10" height="10" fill="#dc2626"/>
+<text x="350" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">DDoS</text>
+<rect x="408" y="420" width="10" height="10" fill="#f97316"/>
+<text x="422" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">DoS</text>
+<rect x="480" y="420" width="10" height="10" fill="#111827"/>
+<text x="494" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">Heartbleed</text>
+<rect x="552" y="420" width="10" height="10" fill="#0d9488"/>
+<text x="566" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">Infiltration</text>
+<rect x="624" y="420" width="10" height="10" fill="#2563eb"/>
+<text x="638" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">PortScan</text>
+<rect x="696" y="420" width="10" height="10" fill="#db2777"/>
+<text x="710" y="429" font-size="10" fill="#1f2937" text-anchor="start" font-weight="400">WebAttack</text>
+<text x="20" y="450" font-size="10" fill="#6b7280" text-anchor="start" font-weight="400">Each bar is one silo's flows, shown as shares of that silo. Source: data/processed/partitions/label_distribution_a{α}_s42.csv</text>
+</svg>

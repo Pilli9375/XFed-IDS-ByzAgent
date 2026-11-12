@@ -93,6 +93,8 @@ FedAvgM m=0.9 cleared the 0.5428 threshold → selected. Then trained at α=5.0 
 
 ### Questions an examiner might ask
 
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
+
 **Q: Didn't you just keep trying optimizers until the test score went up?**
 A: No. The rule and candidates were committed before any run, selection used validation only, the chosen 9 checkpoints were sealed by hash in a commit, and the test was run once by a script that refuses to run twice. We'd have reported a worse result too.
 
@@ -111,7 +113,7 @@ A: The FedAvg row is the published table; FedAvgM's is shown to 4 decimals so no
 
 ### In one line
 
-ONNX Runtime fp32 serves each flow about 4× faster than PyTorch (p50 45.7 vs 186.5 µs) with identical predictions; each training round moves 1,587,920 bytes; compressing updates saves 50–75% of upload with no detectable accuracy effect at n=3; and a train_loss pre-screen for ByzAgent failed — a negative result we report.
+ONNX Runtime fp32 serves each flow about 4× faster than PyTorch (p50 45.7 vs 186.5 µs) with identical predictions; each training round moves 1,587,920 bytes; compressing updates saves 50–75% of upload with no detectable accuracy effect at n=3; and a train_loss pre-screen for ByzAgent failed — a negative result we report (source: `docs/efficiency_results.md`).
 
 ### Why this exists
 
@@ -177,8 +179,10 @@ Agreed reading: **no detectable effect at n=3** (seed 2024 −0.0068 / −0.0066
 
 ### Questions an examiner might ask
 
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
+
 **Q: Why not quantize to int8 — it's standard?**
-A: We tried. Validation macro-F1 fell by 0.1428 because the changed predictions hit small classes: WebAttack F1 dropped from 0.9671 to 0.4401. Aggregate agreement (99.46%) hides that. We dropped it.
+A: We tried. Validation macro-F1 fell by 0.1428 because the changed predictions hit small classes: WebAttack F1 dropped from 0.9671 to 0.4401. Overall prediction agreement (0.994593) hides that (source: `docs/efficiency_results.md`). We dropped it.
 
 **Q: How do you know the ONNX model is the same model?**
 A: The backend refuses to start unless ONNX predictions equal PyTorch's on all 143,513 validation rows.
@@ -228,22 +232,27 @@ Results in CSV files don't help an analyst. The dashboard is stage 5: it puts de
 
 **Investigate (`/investigate`)** — four questions on one page, trust first:
 
-![Investigate route, Aubergine theme.](../dashboard_v2/screens/investigate_aubergine_1440.png)
+![Investigate route, Aubergine theme — the trust question, cropped from `docs/dashboard_v2/screens/investigate_aubergine_1440.png`.](img/investigate_trust_crop.png)
 
 1. **Is anyone poisoning it?** Per-org clean/attack flag rates and lift, Multi-Krum 0%, cost with no attack (−22.7 / −4.9 / −1.6 pp), decision stability 27/30, round-by-round decision strips, the five statistics as small multiples, the agent's verbatim rationale labelled "a rationale of measured fidelity," and the locked claim.
 2. **Is it accurate?** FedAvg vs FedAvgM per α, centralized and XGBoost references, per-class F1 and per-run tables.
 3. **Do the orgs agree on why?** The agreement number line with chance and the floor, weighted τ, the α=0.1 CI vs floor labelled "directional, not significant," faithfulness, round-wise agreement, and a data & eligibility heatmap.
 4. **What does it cost to run?** Latency, upload size, traffic per round, time per round, and the dropped int8 and pre-screen results.
 
+![Investigate route, accuracy and explanation-agreement questions (same screenshot, cropped).](img/investigate_accuracy_agreement_crop.png)
+
+![Investigate route, efficiency question (same screenshot, cropped). Full-page captures in all three themes: `docs/dashboard_v2/screens/investigate_*_1440.png`.](img/investigate_efficiency_crop.png)
+
 **Limits (`/limits`)** renders the claims section of `PROJECT_INSTRUCTIONS.md` as written (`/limits` endpoint parses it verbatim).
 
-![Limits route, Deep Sea theme.](../dashboard_v2/screens/limits_deep-sea_1440.png)
 
 **Every number links to its source** through `/source/{path}`, which only serves a whitelist of results files (source: `README.md`, step 7).
 
 **Themes and ambient light.** Three themes — Deep Sea, Aubergine, Porcelain — remembered in `localStorage`. Two blurred light pools behind the content take the colour of the newest flow on Live (benign, attack, or a stronger pulse for a miss) and of the selected organization on Investigate (poisoned, flagged without an attack, or clean). A shimmering skeleton stays up until the view's data has arrived (at least 600 ms). With `prefers-reduced-motion`, shimmer, pulse and fades are off (source: `README.md`, step 7; `frontend/src/components/Ambient.jsx`).
 
 ![Live route, Porcelain (light) theme.](../dashboard_v2/screens/live_porcelain_1440.png)
+
+![Live route, Aubergine theme.](../dashboard_v2/screens/live_aubergine_1440.png)
 
 **Hot-swap and its gate.** An analyst who confirms an alert can ask for a quick model update:
 
@@ -285,6 +294,8 @@ This is an engineering stage, not an experiment; it has no research findings of 
 
 ### Questions an examiner might ask
 
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
+
 **Q: Is the dashboard showing test-set performance?**
 A: No. It replays validation rows; each alert is marked against its true label, but no aggregate metric is computed and nothing is selected from it. Test rows can't be replayed unless a checkpoint is allowlisted, and the allowlist is empty.
 
@@ -300,7 +311,7 @@ A: They're one-sentence summaries for usability, labelled "not a research result
 
 ### In one line
 
-A public static website and a 70.8-second explainer film tell the project's story to a general audience, with every number built from exported JSON files that trace back to `results/` and `docs/`.
+A public static website and a 70.8-second explainer film (source: `film/README.md`) tell the project's story to a general audience, with every number built from exported JSON files that trace back to `results/` and `docs/`.
 
 ### Why this exists
 
@@ -328,6 +339,8 @@ Not an experiment. Accessibility work (WCAG AA contrast, self-hosted fonts) is r
 `site/` (sections in `site/src/sections/`, copy in `site/src/copy.js`, sources in `site/src/sources.js`), `tools/export_showcase_data.py`, `configs/showcase_export.yaml`, `film/` (`film/src/numbers.js`, `film/src/timeline.json`), rendered film in `site/public/film/`.
 
 ### Questions an examiner might ask
+
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
 
 **Q: Could the site show a number that isn't in your results?**
 A: Every number is built from exported JSON with its source list, and the build checks that every source link is a tracked file. The film reads the same JSON.

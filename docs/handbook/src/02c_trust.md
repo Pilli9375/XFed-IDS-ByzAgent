@@ -210,7 +210,7 @@ Result: silo 8 (the never-malicious canary) got a rolling-history lift of +0.60 
 - **train_loss is the only strong attack signal** (33.8×–154.3×, seed-42 effect-size ratios); geometry statistics are weak-to-null; val_accuracy inverts.
 - **Multi-Krum excluded a malicious silo 0% of the time**; its f=2 "success" is a compositional artifact. Defending with nobody attacking costs Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp.
 - **ByzAgent:** the locked claim above. Decisions are stable on the trust/flag boundary (30/30); exact decisions 27/30.
-- **Rationale fidelity is measured, not assumed:** citation error 11.7% (seed 42) → 22.5% (seeds 1337/2024); trend claims ≈35–45% wrong under rolling history.
+- **Rationale fidelity is measured, not assumed:** citation error 11.7% (seed 42) → 22.5% (seeds 1337/2024); trend claims ≈35–45% wrong under rolling history (source: `docs/contribution_b_results.md` §5, §8).
 - **Rolling history failed its pre-registered test.**
 
 ### What this does NOT mean
@@ -241,6 +241,8 @@ Result: silo 8 (the never-malicious canary) got a rolling-history lift of +0.60 
 | `docs/contribution_b_results.md` | Canonical results |
 
 ### Questions an examiner might ask
+
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
 
 **Q: Krum is standard. Why did it fail?**
 A: Krum assumes honest updates cluster and attackers sit apart. Under non-IID data, honest organizations with unusual traffic also sit apart. In our partition, Krum-family selection was dominated by silo size and composition: Multi-Krum excluded the same large, Benign-heavy silos every round, even with zero attackers, and excluded a malicious silo 0% of the time.

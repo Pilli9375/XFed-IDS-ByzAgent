@@ -57,8 +57,8 @@ Also checked and *not* exposures: hot-swap retraining, backend model loading, XG
 | Additivity residual audit | 594 stored SHAP files | 4 of 99 final FedAvg files above 3.336, clustered at α=0.1 small silos; none at α=0.5 | `results/inspection/residual_audit.md` |
 | Residual sensitivity (pre-specified) | Does excluding flagged silos move the headline? | α=0.1 Jaccard@10 0.333 → 0.333; τ 0.592 → 0.597 | `results/inspection/residual_sensitivity.json` |
 | Unbacked residual figure | Was "~3–8%" traceable? | No backing file → dropped; replaced by median 3.2%, p95 7.7%, max 21.2% | `results/shap/fedavg_a0.5_s42/val_pool_summary.json` |
-| Explainer cross-check | Kernel vs Gradient SHAP | τ 0.730, Jaccard@10 0.538 (n=14) | `results/inspection/kernel_vs_gradient_validation.csv` |
-| Background ablation | Common vs per-silo background | τ 0.807, Jaccard@10 0.603 (n=42) | `results/inspection/common_background_ablation.csv` |
+| Explainer cross-check | Kernel vs Gradient SHAP | τ 0.730, Jaccard@10 0.538 (n=14) | `results/inspection/kernel_vs_gradient_validation.csv`; `docs/contribution_a_results.md` §3 |
+| Background ablation | Common vs per-silo background | τ 0.807, Jaccard@10 0.603 (n=42) | `results/inspection/common_background_ablation.csv`; `docs/contribution_a_results.md` §3 |
 | Faithfulness spot-check | Deletion < insertion AUC? | Yes for all four probed models (one config) | `results/inspection/deletion_auc.csv`, `insertion_auc.csv` |
 | Parity monitor single-draw bug | Do flags reproduce? | Single-draw flags were artifacts (MAD crushed to 0.042); fixed with N≥3 draws | `docs/contribution_a_results.md` §4 |
 | SHAP determinism | Same inputs, same SHAP? | No: mean abs. difference 0.0188, max 0.403 — sampling is unseeded | `docs/contribution_a_results.md`, Lim. #17 |
@@ -81,7 +81,7 @@ Also checked and *not* exposures: hot-swap retraining, backend model loading, XG
 
 ## 3.3 What we do NOT claim {#not-claim}
 
-Memorise this list. Each line is a sentence you should never say, or a stronger version you should correct if someone else says it.
+Memorise this list. Each line is a sentence you should never say, or a stronger version you should correct if someone else says it. The numbers in it are sourced in chapters [2.4](#ch-expl), [2.5](#ch-trust), [2.6](#ch-prereg) and [2.7](#ch-eff).
 
 1. We do **not** claim to be the first to measure explanation agreement in federated IDS.
 2. We do **not** claim the broad "FL + IDS + XAI" combination as new; several 2025–2026 papers cover it.

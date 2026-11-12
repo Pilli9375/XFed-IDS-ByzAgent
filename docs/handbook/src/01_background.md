@@ -334,7 +334,7 @@ Krum, Multi-Krum and trimmed mean all need to be told **f**, the number of attac
 
 ### 1.9.1 Mean ± sd over seeds {#bg-meansd}
 
-We repeat every federated configuration with 3 seeds. We report the **mean** and the **standard deviation (sd)** across those 3 runs, e.g. 0.941 ± 0.057. The sd tells you how much results swing just from randomness. Our headline tables use the *population* sd (dividing by n, not n − 1) (source: `docs/preregistration_accuracy.md`, Part 2). With n = 3, treat the sd as a rough indication, not a precise number.
+We repeat every federated configuration with 3 seeds. We report the **mean** and the **standard deviation (sd)** across those 3 runs, e.g. 0.941 ± 0.057 (source: `results/aggregated/federated_headline.csv`). The sd tells you how much results swing just from randomness. Our headline tables use the *population* sd (dividing by n, not n − 1) (source: `docs/preregistration_accuracy.md`, Part 2). With n = 3, treat the sd as a rough indication, not a precise number.
 
 ### 1.9.2 Median and IQR {#bg-median}
 

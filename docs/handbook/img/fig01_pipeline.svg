@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 422" width="800" height="422" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="422" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<rect x="250" y="15" width="300" height="76" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="400.0" y="39" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="700">1. Data</text>
+<text x="400.0" y="59" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">Distrinet CICIDS2017 V4</text>
+<text x="400.0" y="76" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">8 families + Benign</text>
+<line x1="400" y1="91" x2="400" y2="110" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar)"/>
+<rect x="250" y="112" width="300" height="76" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="400.0" y="136" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="700">2. Federated training</text>
+<text x="400.0" y="156" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">10 orgs · Flower · FedAvg</text>
+<text x="400.0" y="173" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">α ∈ {0.1, 0.5, 5.0} × 3 seeds</text>
+<line x1="340" y1="188" x2="200" y2="215" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="460" y1="188" x2="600" y2="215" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar)"/>
+<rect x="40" y="217" width="320" height="96" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.2"/>
+<text x="200.0" y="241" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="700">3. Explanation check</text>
+<text x="200.0" y="261" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">client-side SHAP, top-k only</text>
+<text x="200.0" y="278" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">Jaccard@10 · weighted τ</text>
+<text x="200.0" y="295" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">vs chance and seed-noise floor</text>
+<rect x="440" y="217" width="320" height="96" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.2"/>
+<text x="600.0" y="241" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="700">4. Trust check (ByzAgent)</text>
+<text x="600.0" y="261" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">LLM: trust / downweight / quarantine</text>
+<text x="600.0" y="278" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">vs Krum, Multi-Krum, trimmed mean</text>
+<text x="600.0" y="295" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">rationale fidelity audited</text>
+<text x="400" y="262" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400" font-style="italic">separate</text>
+<text x="400" y="276" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400" font-style="italic">experiments</text>
+<line x1="200" y1="313" x2="340" y2="344" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="600" y1="313" x2="460" y2="344" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar)"/>
+<rect x="250" y="346" width="300" height="66" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="400.0" y="370" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="700">5. Dashboard</text>
+<text x="400.0" y="390" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="400">FastAPI + React · Live / Investigate / Limits</text>
+</svg>

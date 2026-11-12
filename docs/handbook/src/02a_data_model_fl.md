@@ -123,6 +123,8 @@ Every later number depends on the data being right. CICIDS2017 is one of the mos
 
 ### Questions an examiner might ask
 
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
+
 **Q: Why not use the original CICIDS2017 like most papers?**
 A: The original release has documented errors in flow construction and labelling. Engelen et al. (WTMC 2021) and Liu et al. (IEEE CNS 2022) corrected them; we use the V4 release from the second paper and cite both.
 
@@ -216,6 +218,8 @@ The largest gap between the best-by-validation round and round 20 is **0.118** (
 | `results/federated/round_lottery_val.csv` | The validation-only round lottery |
 
 ### Questions an examiner might ask
+
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
 
 **Q: Why such a small model?**
 A: The top four architectures scored within 0.0008 of each other on validation, so extra capacity bought nothing measurable. The smallest has 19,849 parameters, 3.7× and 10.6× fewer than the next two — and every parameter travels every round.
@@ -315,6 +319,8 @@ So the near-IID control does its job: the drop is caused by **non-IID data**, no
 | `src/federated/` | Early prototype, **unused**, kept as it was |
 
 ### Questions an examiner might ask
+
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
 
 **Q: Isn't your federated accuracy worse than centralized?**
 A: Only under heterogeneity. At α=5.0 FedAvg scores 0.990 ± 0.001, the same as centralized 0.9900 ± 0.0022. At α=0.5 it's 0.941 ± 0.057 and at α=0.1 0.516 ± 0.048. The near-IID control shows the drop comes from non-IID data, not federation itself.

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 352" width="800" height="352" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="352" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<line x1="70" y1="290" x2="740" y2="290" stroke="#1f2937" stroke-width="1"/>
+<line x1="70" y1="50" x2="70" y2="290" stroke="#1f2937" stroke-width="1"/>
+<line x1="66" y1="290" x2="740" y2="290" stroke="#f3f4f6" stroke-width="1"/>
+<text x="60" y="294" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400">0.00</text>
+<line x1="66" y1="232.5" x2="740" y2="232.5" stroke="#f3f4f6" stroke-width="1"/>
+<text x="60" y="236.5" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400">0.25</text>
+<line x1="66" y1="175.0" x2="740" y2="175.0" stroke="#f3f4f6" stroke-width="1"/>
+<text x="60" y="179.0" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400">0.50</text>
+<line x1="66" y1="117.5" x2="740" y2="117.5" stroke="#f3f4f6" stroke-width="1"/>
+<text x="60" y="121.5" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400">0.75</text>
+<line x1="66" y1="60.0" x2="740" y2="60.0" stroke="#f3f4f6" stroke-width="1"/>
+<text x="60" y="64.0" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400">1.00</text>
+<text x="70" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">0</text>
+<text x="136" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">2</text>
+<text x="202" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">4</text>
+<text x="268" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">6</text>
+<text x="334" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">8</text>
+<text x="400" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">10</text>
+<text x="466" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">12</text>
+<text x="532" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">14</text>
+<text x="598" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">16</text>
+<text x="664" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">18</text>
+<text x="730" y="306" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">20</text>
+<path d="M70.0,260.0 L103.0,114.1 L136.0,97.4 L169.0,94.5 L202.0,94.4 L235.0,94.4 L268.0,91.2 L301.0,91.1 L334.0,62.9 L367.0,63.7 L400.0,63.7 L433.0,62.5 L466.0,62.5 L499.0,62.5 L532.0,62.6 L565.0,89.7 L598.0,89.6 L631.0,89.6 L664.0,62.4 L697.0,89.6 L730.0,89.6" fill="none" stroke="#2563eb" stroke-width="2"/>
+<circle cx="664" cy="62.35314501253461" r="6" fill="#16a34a"/>
+<circle cx="730" cy="89.5920033801157" r="6" fill="#dc2626"/>
+<text x="654" y="82.35314501253461" font-size="11" fill="#16a34a" text-anchor="end" font-weight="700">best round 18: 0.9898</text>
+<text x="720" y="127.5920033801157" font-size="11" fill="#dc2626" text-anchor="end" font-weight="700">round 20: 0.8713</text>
+<text x="405" y="324" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">round</text>
+<text x="400" y="20" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="700">FedAvg α=5.0 seed 42 — validation macro-F1 per round (four decimals for display)</text>
+<text x="400" y="342" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">Source: results/federated/fedavg_a5.0_s42/round_history.json</text>
+</svg>

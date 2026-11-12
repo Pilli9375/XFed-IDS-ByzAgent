@@ -2,6 +2,8 @@
 
 ## 7.1 Glossary, A–Z {#glossary}
 
+Numbers in the glossary are given with their sources in the chapters and in the headline table ([7.2](#headline)).
+
 - **Accuracy** — share of all predictions that are correct; misleading here because Benign dominates, so never reported as a headline.
 - **Activation function** — the simple bend a neuron applies to its weighted sum; we use ReLU.
 - **AdamW** — the optimizer used for local training: Adam with decoupled weight decay.
@@ -103,19 +105,19 @@
 | Centralized MLP macro-F1 | 0.9900 ± 0.0022 | `results/aggregated/centralized_headline.csv` |
 | XGBoost macro-F1 | 0.9946 ± 0.0001 | `results/aggregated/xgboost_headline.csv` |
 | FedAvg α=0.1 / 0.5 / 5.0 | 0.516 ± 0.048 / 0.941 ± 0.057 / 0.990 ± 0.001 | `results/aggregated/federated_headline.csv` |
-| Jaccard@10 across α | 0.333 → 0.538 → 0.667 | `results/inspection/agreement_metrics.csv` |
-| Weighted Kendall's τ across α | 0.592 → 0.787 → 0.844 | `results/inspection/agreement_metrics.csv` |
+| Jaccard@10 across α | 0.333 → 0.538 → 0.667 | `results/inspection/agreement_metrics.csv`; `docs/contribution_a_results.md` §2 |
+| Weighted Kendall's τ across α | 0.592 → 0.787 → 0.844 | `results/inspection/agreement_metrics.csv`; `docs/contribution_a_results.md` §2 |
 | Chance-level Jaccard@10 | 0.065 (5.1×–10.3× chance) | `tools/agreement_metrics.py`; `docs/contribution_a_results.md` §2 |
-| Centralized-seed instability floor | median 0.429, range [0.429, 0.484] | `results/inspection/centralized_instability_floor.csv` |
+| Centralized-seed instability floor | median 0.429, range [0.429, 0.484] | `results/inspection/centralized_instability_floor.csv`; `docs/contribution_a_results.md` §2 |
 | α=0.1 cluster-bootstrap CI | [0.250, 0.429] | `docs/contribution_a_results.md` §2 |
 | Served demo model | fedavg_a0.5_s42, round 18, val macro-F1 0.9760 | `results/federated/fedavg_a0.5_s42/final_metrics.json` |
-| FedAvgM β=0.9 (preregistered, test once) α=0.1 / 0.5 / 5.0 | 0.5930 ± 0.0632 / 0.9852 ± 0.0005 / 0.9911 ± 0.0005 | `results/federated_methods/test_once/result.json` |
+| FedAvgM β=0.9 (preregistered, test once) α=0.1 / 0.5 / 5.0 | 0.5930 ± 0.0632 / 0.9852 ± 0.0005 / 0.9911 ± 0.0005 | `results/federated_methods/test_once/result.json`; `docs/contribution_a_results.md` (optimizer section) |
 | Per-flow latency p50, ONNX fp32 vs PyTorch | 45.7 µs vs 186.5 µs | `results/efficiency/inference_speed_summary.json` |
 | Bytes per round (10 silos, fp32, up + down) | 1,587,920 (793,960 each way) | `results/efficiency/communication.json` |
 | Round lottery (max, validation) | 0.118 (α=5.0, seed 42) | `results/federated/round_lottery_val.csv` |
 | train_loss separation (Glass's delta ratio) | 33.8× (f=3) / 154.3× (f=2) | `results/monitoring/PHASE1_SUMMARY.md` |
 | Multi-Krum malicious exclusion | 0% (f=3 and f=2) | `results/defenses/PHASE2_SUMMARY.md` |
-| Cost of defending with no attack | Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp | `results/defenses/PHASE2_SUMMARY.md` |
+| Cost of defending with no attack | Krum −22.7pp, Multi-Krum −4.9pp, trimmed mean −1.6pp | `CLAUDE.md`; underlying test macro-F1 in `docs/contribution_b_results.md` §4 |
 | ByzAgent decision stability | 27/30 exact; 30/30 trust-vs-flag | `results/agents/PHASE3_SUMMARY.md` |
 | Citation strict error | 11.7% (seed 42) → 22.5% (seeds 1337/2024) | `docs/contribution_b_results.md` §5, §8 |
 | Trend claims contradicted (rolling history) | ≈35–45% (automated 45.00%) | `results/agents/MULTISEED_VALIDATION_SUMMARY.md` |

@@ -69,6 +69,8 @@ Oki et al. (IEEE Networking Letters, 2024) showed that federated training *reduc
 
 **It is directional, not significant.** The cluster-bootstrap CI at α=0.1 is [0.250, 0.429]; the floor's range is [0.429, 0.484]. They overlap, so we **never** state the below-floor result as confirmed (source: `docs/contribution_a_results.md` §2).
 
+![The seed-noise floor compared with federated agreement across α (from the project's figures).](img/instability_floor_vs_alpha.png)
+
 ![The number line every examiner question about agreement comes back to. α=0.1 is shown with its cluster-bootstrap CI; it touches the floor's range.](img/fig10_numberline.svg)
 
 ![Accuracy and agreement do not move together across α (from the project's figures).](img/accuracy_agreement_decoupling.png)
@@ -164,6 +166,8 @@ Analogy for KL: entropy asks "how evenly mixed is this silo?"; KL asks "how far 
 | `docs/measurement_protocol.md` | The reusable protocol |
 
 ### Questions an examiner might ask
+
+_Numbers in these model answers repeat numbers already given with their source earlier in this chapter; the source notes are not repeated here._
 
 **Q: Is 0.333 vs 0.429 significant?**
 A: No, and we never say it is. The cluster-bootstrap CI at α=0.1 is [0.250, 0.429]; the floor's range is [0.429, 0.484]. They overlap, so the result is directional, not significant. What *is* solid is the trend across α and that every α sits well above chance.
