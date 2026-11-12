@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 255" width="800" height="255" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="255" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<text x="400" y="22" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="700">Seed 42: flag rate with no attack (open) vs under f=3 attack (filled)</text>
+<line x1="330" y1="40" x2="330" y2="205" stroke="#f3f4f6" stroke-width="1"/>
+<text x="330" y="222" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">0.0</text>
+<line x1="520.0" y1="40" x2="520.0" y2="205" stroke="#f3f4f6" stroke-width="1"/>
+<text x="520.0" y="222" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">0.5</text>
+<line x1="710.0" y1="40" x2="710.0" y2="205" stroke="#f3f4f6" stroke-width="1"/>
+<text x="710.0" y="222" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">1.0</text>
+<text x="40" y="65" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700">silo 0</text>
+<text x="110" y="65" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">9.2% Benign</text>
+<text x="210" y="65" font-size="11" fill="#dc2626" text-anchor="start" font-weight="400">malicious</text>
+<line x1="691.0" y1="60" x2="710.0" y2="60" stroke="#dc2626" stroke-width="2"/>
+<circle cx="691.0" cy="60" r="7" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<circle cx="710.0" cy="60" r="6" fill="#dc2626"/>
+<text x="40" y="99" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700">silo 3</text>
+<text x="110" y="99" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">0.3% Benign</text>
+<text x="210" y="99" font-size="11" fill="#dc2626" text-anchor="start" font-weight="400">malicious</text>
+<line x1="710.0" y1="94" x2="710.0" y2="94" stroke="#dc2626" stroke-width="2"/>
+<circle cx="710.0" cy="94" r="7" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<circle cx="710.0" cy="94" r="6" fill="#dc2626"/>
+<text x="40" y="133" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700">silo 5</text>
+<text x="110" y="133" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">0.1% Benign</text>
+<text x="210" y="133" font-size="11" fill="#dc2626" text-anchor="start" font-weight="400">malicious</text>
+<line x1="710.0" y1="128" x2="710.0" y2="128" stroke="#dc2626" stroke-width="2"/>
+<circle cx="710.0" cy="128" r="7" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<circle cx="710.0" cy="128" r="6" fill="#dc2626"/>
+<text x="40" y="167" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700">silo 8</text>
+<text x="110" y="167" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">12.3% Benign</text>
+<text x="210" y="167" font-size="11" fill="#d97706" text-anchor="start" font-weight="400">never malicious</text>
+<line x1="691.0" y1="162" x2="710.0" y2="162" stroke="#d97706" stroke-width="2"/>
+<circle cx="691.0" cy="162" r="7" fill="#fff" stroke="#d97706" stroke-width="2"/>
+<circle cx="710.0" cy="162" r="6" fill="#d97706"/>
+<text x="40" y="201" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700">silos 1,2,4,6,7,9</text>
+<text x="170" y="201" font-size="11" fill="#6b7280" text-anchor="start" font-weight="400">81.5–98.0% Benign · clean 0.00–0.25 · f=3 0.00–0.05</text>
+<text x="400" y="245" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="400">The four lowest-Benign silos are flagged almost always, attack or not. Source: docs/contribution_b_results.md §5</text>
+</svg>

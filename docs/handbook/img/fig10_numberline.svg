@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 232" width="800" height="232" style="font-family:Inter,'Segoe UI',Arial,sans-serif">
+<rect width="800" height="232" fill="#ffffff"/>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+<line x1="60" y1="120" x2="740" y2="120" stroke="#1f2937" stroke-width="1.5"/>
+<line x1="60" y1="115" x2="60" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="60" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">0.0</text>
+<line x1="196.0" y1="115" x2="196.0" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="196.0" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">0.2</text>
+<line x1="332.0" y1="115" x2="332.0" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="332.0" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">0.4</text>
+<line x1="468.0" y1="115" x2="468.0" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="468.0" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">0.6</text>
+<line x1="604.0" y1="115" x2="604.0" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="604.0" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">0.8</text>
+<line x1="740.0" y1="115" x2="740.0" y2="125" stroke="#1f2937" stroke-width="1"/>
+<text x="740.0" y="142" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">1.0</text>
+<rect x="351.71999999999997" y="70" width="37.400000000000034" height="50" fill="#7c3aed" fill-opacity="0.18" stroke="#7c3aed"/>
+<text x="370.08" y="62" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="700">seed-noise floor 0.429–0.484</text>
+<line x1="104.2" y1="80" x2="104.2" y2="120" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="104.2" y="72" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">chance 0.065</text>
+<line x1="230.0" y1="100" x2="351.71999999999997" y2="100" stroke="#dc2626" stroke-width="3"/>
+<circle cx="286.44000000000005" cy="100" r="7" fill="#dc2626"/>
+<text x="286.44000000000005" y="175" font-size="12" fill="#dc2626" text-anchor="middle" font-weight="700">α=0.1  0.333</text>
+<circle cx="425.84000000000003" cy="100" r="7" fill="#2563eb"/>
+<text x="425.84000000000003" y="175" font-size="12" fill="#2563eb" text-anchor="middle" font-weight="700">α=0.5  0.538</text>
+<circle cx="513.56" cy="100" r="7" fill="#16a34a"/>
+<text x="513.56" y="175" font-size="12" fill="#16a34a" text-anchor="middle" font-weight="700">α=5.0  0.667</text>
+<text x="291.20000000000005" y="195" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="400">red bar: α=0.1 cluster-bootstrap CI [0.250, 0.429] — touches the floor</text>
+<text x="400" y="222" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="400">Median Jaccard@10 (source: docs/contribution_a_results.md §2)</text>
+</svg>
