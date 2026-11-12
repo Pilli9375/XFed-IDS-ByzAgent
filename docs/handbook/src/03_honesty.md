@@ -93,7 +93,7 @@ Memorise this list. Each line is a sentence you should never say, or a stronger 
 4. We do **not** claim heterogeneity *causes* lower agreement; the KL result is observational.
 5. We do **not** claim ByzAgent beats Krum, Multi-Krum or trimmed mean.
 6. We do **not** claim ByzAgent "explains its reasoning." It produces decisions plus a rationale of measured fidelity.
-7. We do **not** claim any attack here is realistic; all are worst-case, full-knowledge.
+7. We do **not** claim our attacks describe real-world attackers: every one is a deliberately worst-case, full-knowledge adversary — NOT a realistic attacker.
 8. We do **not** credit classical Krum with the 0% figure; it belongs to Multi-Krum.
 9. We do **not** cite Multi-Krum's f=2 recovery (1.35) as attack mitigation.
 10. We do **not** claim "33.8×–154.3×" is a detection threshold; it's a seed-42 effect-size ratio.

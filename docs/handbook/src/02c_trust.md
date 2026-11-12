@@ -14,7 +14,7 @@ We secretly turned some of the ten organizations into saboteurs that relabel par
 
 In federated learning the server can't see the data, so it can't check whether a client is honest. Classical robust aggregators (Krum, trimmed mean) assume "unusual update = malicious update." Under non-IID data that assumption is shaky, because honest organizations with unusual traffic also look unusual. We wanted to know:
 
-1. Does a realistic label-flipping attack actually hurt the shared model?
+1. Does a label-flipping attack — a deliberately worst-case one — actually hurt the shared model?
 2. Which behaviour statistics reveal attackers?
 3. Do classical defenses catch them in a non-IID setting?
 4. Can an LLM agent, reading the same statistics a human operator would see, make better-informed trust decisions — and can we check the reasons it gives?
@@ -37,7 +37,7 @@ In federated learning the server can't see the data, so it can't check whether a
 
 A secondary condition uses **f=2, silos {0, 3}** (source: `docs/contribution_b_results.md` §2).
 
-**This is a worst-case attacker, never a realistic one.** The locked framing, used wherever this attack is cited:
+**This is a worst-case attacker — NOT a realistic attacker.** The locked framing, used wherever this attack is cited:
 
 > Worst-case/upper-bound adversary with full knowledge of federation composition. Selected by enumerating all C(10,3)=120 malicious-silo triples at alpha=0.5 seed=42 against the global per-silo family composition and maximizing the minimum per-family coverage across the 6 non-Benign headline families at flip_fraction=1.0 (achieved: 38.60% min, on DoS). NOT a realistic or naturalistic attacker — no real attacker has this global view.
 
@@ -220,7 +220,7 @@ Result: silo 8 (the never-malicious canary) got a rolling-history lift of +0.60 
 ### What this does NOT mean
 
 - **Not "ByzAgent beats Krum."** The trust check is explicitly not that claim; Phases 3 and 4 are negative results on the agent's own headline metric (source: `docs/contribution_b_results.md` §1).
-- **Not a realistic attack.** Every configuration is a worst-case, full-knowledge adversary.
+- **NOT a realistic attacker.** Every configuration is a deliberately worst-case, full-knowledge adversary.
 - **Not a fair fight in the baselines' disfavour** — the opposite: the baselines were given the true f as an oracle; ByzAgent was not.
 - **Not "explains its reasoning."** It produces decisions plus a rationale of measured fidelity.
 - **Not deterministic.** One logged decision is one draw at temperature 0.2; stability is reported with it.
@@ -272,7 +272,7 @@ A: It's what a human operator would see, so we kept it and told the agent, in th
 **Q: Rolling history sounds sensible. Why did it fail?**
 A: Our pre-registered rule said: if the never-malicious canary rises alongside the attackers, it fails. The canary's lift (+0.60 sudden) matched or exceeded every attacker's. The agent's reasoning also degraded on longer prompts.
 
-**Q: Is the attack realistic?**
+**Q: Would a real-world attacker look like yours?**
 A: No, and we say so everywhere: it's a worst-case adversary chosen by searching all 120 triples with full knowledge of every silo's composition.
 
 **Q: Isn't train_loss enough on its own? Why an LLM?**

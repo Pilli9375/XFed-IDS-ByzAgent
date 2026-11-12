@@ -78,7 +78,7 @@ It flags a silo whose top-10 list deviates unusually from the fleet, using only 
 **24. Zero parity flags at α=0.1 — so α=0.1 is fine?**
 No. When every silo disagrees, nobody stands out as an outlier. α=0.1's median deviation (0.694) was worse than any flagged α=0.5 silo. Read absolute agreement from Jaccard and τ, not flag counts. (source: `docs/contribution_a_results.md` §4)
 
-**25. Is your attack realistic?**
+**25. Would a real-world attacker look like yours?**
 No, and we say so everywhere. It's a worst-case, full-knowledge adversary: we searched all 120 possible attacker triples for the one covering the most attack traffic. No real attacker has that global view. (source: `docs/contribution_b_results.md` §2)
 
 **26. Which statistic actually detects attackers?**
