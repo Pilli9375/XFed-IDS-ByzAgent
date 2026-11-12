@@ -27,7 +27,7 @@ SUBTITLE = "Everything you need to understand, explain and defend the project at
 def assemble() -> str:
     parts = sorted(SRC.glob("*.md"))
     head = (f"# {TITLE}\n\n_{SUBTITLE}_\n\nVIT-AP University capstone project, 2026. "
-            "Team: [Member 1], [Member 2], [Member 3], [Member 4].\n\n"
+            "V Naga Adithya (23BCE9062) · T Shaun (23BCE9916) · P Sampath (23BCE8614) · D Tharun (23BCE8818).\n\n"
             "Generated from `docs/handbook/src/` by `docs/handbook/build/build_handbook.py`. "
             "Every number cites the file it comes from.\n\n")
     body = "\n\n".join(p.read_text(encoding="utf-8").strip() for p in parts)
@@ -115,7 +115,7 @@ def convert(md: str) -> tuple[str, list[tuple[int, str, str]]]:
             used.add(hid)
             cls = ""
             if lvl == 1:
-                cls = ' class="part"' if text.startswith("Part") else ' class="doc-title"'
+                cls = (' class="part flow"' if text.startswith("Part 1 ") else ' class="part"') if text.startswith("Part") else ' class="doc-title"'
                 part, h2_in_part = text, 0
             elif lvl == 2:
                 h2_in_part += 1
@@ -128,6 +128,8 @@ def convert(md: str) -> tuple[str, list[tuple[int, str, str]]]:
                 cls = ' class="exam-h"'
             elif lvl == 3 and text.startswith("In one line"):
                 cls = ' class="oneline"'
+            elif lvl == 3 and text.startswith("The plain version"):
+                cls = ' class="plain"'
             if lvl <= 2 and not (lvl == 1 and not text.startswith("Part")):
                 toc.append((lvl, hid, text))
             out.append(f"<h{lvl} id=\"{hid}\"{cls}>{inline(text)}</h{lvl}>")
@@ -195,7 +197,8 @@ def convert(md: str) -> tuple[str, list[tuple[int, str, str]]]:
 
 
 CSS = r"""
-@page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+@page { size: A4; margin: 18mm 18mm 18mm 18mm; }
+@page :first { margin-top: 0; margin-bottom: 0; }
 :root { --ink:#1f2937; --mute:#6b7280; --line:#e5e7eb; --blue:#1d4ed8; --tint:#f8fafc; --exam:#fff7ed; --examline:#ea580c; }
 * { box-sizing: border-box; }
 body { font-family: "Segoe UI", Inter, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: var(--ink); margin: 0; }
@@ -208,10 +211,13 @@ h1, h2, h3, h4 { line-height: 1.25; break-after: avoid; page-break-after: avoid;
 h1.part { font-size: 26pt; color: #fff; background: #1e3a8a; padding: 28mm 12mm 12mm; margin: 0 -16px 18px; break-before: page; page-break-before: always; border-radius: 0; }
 h2.chapter { font-size: 17pt; color: #1e3a8a; border-bottom: 3px solid #1e3a8a; padding-bottom: 4px; margin-top: 28px; }
 h1.part + h2.chapter { break-before: avoid; page-break-before: avoid; }
+h1.part.flow { break-before: auto; page-break-before: auto; margin-top: 22px; }
 h2.newpage { break-before: page; page-break-before: always; }
 h3 { font-size: 13pt; margin: 20px 0 6px; color: #111827; }
 h3.oneline { color: #1e3a8a; }
 h3.oneline + p { font-size: 12pt; background: #eff6ff; border-left: 4px solid #1d4ed8; padding: 8px 12px; border-radius: 4px; }
+h3.plain { color: #166534; margin-top: 14px; }
+h3.plain + p { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; padding: 9px 13px; border-radius: 4px; break-inside: avoid; }
 h4 { font-size: 11.5pt; }
 p { margin: 6px 0 9px; orphans: 3; widows: 3; }
 ul, ol { padding-left: 22px; margin: 6px 0 10px; }
@@ -236,7 +242,7 @@ section.exam h3.exam-h { color: #9a3412; }
 section.exam p { break-inside: avoid; }
 section.exam p strong:first-child { color: #9a3412; }
 hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
-.cover { height: 257mm; display: flex; flex-direction: column; justify-content: space-between; padding: 30mm 6mm 10mm; break-after: page; page-break-after: always; }
+.cover { height: 293mm; padding-top: 48mm !important; display: flex; flex-direction: column; justify-content: space-between; padding: 30mm 6mm 10mm; break-after: page; page-break-after: always; }
 .cover .band { background: #1e3a8a; color: #fff; padding: 18mm 12mm; border-radius: 6px; }
 .cover h1 { font-size: 30pt; margin: 0 0 8px; color: #fff; }
 .cover .sub { font-size: 14pt; opacity: .9; }
@@ -268,12 +274,18 @@ def build():
     for lvl, hid, text in toc:
         plain = re.sub(r"\s+", " ", re.sub(r"[`*]", "", text)).strip()
         pg = pages.get(re.sub(r"\s+", "", plain), "")
+        if pg == "":
+            num = re.match(r"^(Part \d+|\d+(?:\.\d+)+)", plain)
+            if num:
+                key = re.sub(r"\s+", "", num.group(1))
+                pg = next((v for k, v in pages.items() if k.startswith(key) and not k[len(key):len(key) + 1].isdigit()
+                           and not k[len(key):len(key) + 2].startswith(".")), "")
         toc_html.append(f'<li class="l{lvl}"><a href="#{hid}"><span class="tt">{inline(text)}</span><span class="pg">{pg}</span></a></li>')
     toc_html.append("</ol></nav>")
     cover = f"""<section class="cover">
 <div class="band"><h1>{TITLE}</h1><div class="sub">{SUBTITLE}</div></div>
 <p class="pitch">A federated IDS that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted.</p>
-<div class="meta">VIT-AP University capstone project, 2026 · Team: [Member 1], [Member 2], [Member 3], [Member 4]<br>
+<div class="meta">VIT-AP University capstone project, 2026 · V Naga Adithya (23BCE9062) · T Shaun (23BCE9916) · P Sampath (23BCE8614) · D Tharun (23BCE8818)<br>
 Teaching document, not a paper. Every number cites the file it comes from. Canonical results: <code>docs/contribution_a_results.md</code> (explanation check) and <code>docs/contribution_b_results.md</code> (trust check); where anything here disagrees with them, they win.</div>
 </section>"""
     doc = f"""<!DOCTYPE html>

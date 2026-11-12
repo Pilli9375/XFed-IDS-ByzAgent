@@ -4,6 +4,10 @@
 
 We poisoned some organizations with a label-flipping attack, gave a local LLM agent (ByzAgent) five behaviour statistics per organization per round, compared its trust / downweight / quarantine decisions with Krum, Multi-Krum and trimmed mean, and found that every method — including ByzAgent — is entangled with how *unusual* an organization's data is, not only with whether it is attacking.
 
+### The plain version
+
+We secretly turned some of the ten organizations into saboteurs that relabel part of their attack traffic as normal. Then a small AI assistant, running on our own laptop, read five simple health readings for every organization each round and decided whether to trust it. The catch: organizations with unusual traffic look suspicious even when they are honest, so the assistant flagged them nearly every round, attack or no attack. Where that wasn't already happening, it did react to real sabotage — one saboteur went from a flag rate of 0.00 with no attack to 0.95 under attack (source: `docs/contribution_b_results.md` §7). The standard textbook defence, Multi-Krum, threw out a saboteur 0% of the time (source: `docs/contribution_b_results.md` §4).
+
 **Reminder:** this is a separate experiment from the explanation check. Its findings are reported here, on their own, and never combined with Chapter 2.4's.
 
 ### Why this exists
