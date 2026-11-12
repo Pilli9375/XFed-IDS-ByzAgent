@@ -2,7 +2,7 @@
 
 _Everything you need to understand, explain and defend the project at the final review_
 
-VIT-AP University capstone project, 2026. Team: [Member 1], [Member 2], [Member 3], [Member 4].
+VIT-AP University capstone project, 2026. V Naga Adithya (23BCE9062) · T Shaun (23BCE9916) · P Sampath (23BCE8614) · D Tharun (23BCE8818).
 
 Generated from `docs/handbook/src/` by `docs/handbook/build/build_handbook.py`. Every number cites the file it comes from.
 
@@ -782,6 +782,10 @@ A: No; it's a simulation simplification that lets us pick rounds fairly and comp
 
 Each organization explains its own model with SHAP on its own machine, only the top-10 feature rankings go to the server, and we measure how well those rankings agree with the global model's — finding that agreement falls as data becomes more heterogeneous, down to a level at α=0.1 that sits below a seed-noise floor (directional, not significant).
 
+### The plain version
+
+Ten organizations each trained the same kind of detector on their own traffic. We asked every one of them the same question: which clues did you use to spot this attack? When their traffic is similar, they mostly point to the same clues — their top-10 lists overlap at 0.667. When their traffic is very different, the overlap falls to 0.333, which is even lower than two copies of one ordinary model, trained twice by chance, agree with each other (0.429) (source: `docs/contribution_a_results.md` §2). Treat that last drop as a strong hint, not a proven result: the uncertainty ranges of the two numbers touch.
+
 ### Why this exists
 
 **The claim** this chapter tests, from the canonical results document: **"Under realistic non-IID federation, accuracy parity between silos does not imply explanation parity."** (source: `docs/contribution_a_results.md` §1)
@@ -982,6 +986,10 @@ A: At μ=0.0005 only, and only clearly at α=0.5: Jaccard@10 rose in all 3 seeds
 ### In one line
 
 We poisoned some organizations with a label-flipping attack, gave a local LLM agent (ByzAgent) five behaviour statistics per organization per round, compared its trust / downweight / quarantine decisions with Krum, Multi-Krum and trimmed mean, and found that every method — including ByzAgent — is entangled with how *unusual* an organization's data is, not only with whether it is attacking.
+
+### The plain version
+
+We secretly turned some of the ten organizations into saboteurs that relabel part of their attack traffic as normal. Then a small AI assistant, running on our own laptop, read five simple health readings for every organization each round and decided whether to trust it. The catch: organizations with unusual traffic look suspicious even when they are honest, so the assistant flagged them nearly every round, attack or no attack. Where that wasn't already happening, it did react to real sabotage — one saboteur went from a flag rate of 0.00 with no attack to 0.95 under attack (source: `docs/contribution_b_results.md` §7). The standard textbook defence, Multi-Krum, threw out a saboteur 0% of the time (source: `docs/contribution_b_results.md` §4).
 
 **Reminder:** this is a separate experiment from the explanation check. Its findings are reported here, on their own, and never combined with Chapter 2.4's.
 
@@ -1258,6 +1266,10 @@ A: At seed 42 it separates attackers by 33.8×–154.3× as an effect size, but 
 ### In one line
 
 We wrote down, before running anything, how we would pick a better federated optimizer using validation data only; the rule picked FedAvgM with server momentum 0.9; we sealed its 9 checkpoints by SHA256 and scored them on the test set exactly once.
+
+### The plain version
+
+We wanted a better way to combine the organizations' models, without peeking at the final exam. So we wrote down the rules for choosing before running anything, compared four methods on practice data only, and locked in our choice with a digital seal. Then we sat the final exam exactly once. The chosen method, server momentum, scored 0.9852 when the organizations' data differs realistically (FedAvg: 0.941) and 0.5930 when it differs extremely (FedAvg: 0.516) (source: `docs/contribution_a_results.md`, optimizer section). Better, but the extreme case is still far from solved.
 
 ### Why this exists
 
@@ -1610,6 +1622,10 @@ This part collects every disclosure in one place. Present it as a strength: **we
 ## 3.1 The test-set story, start to finish {#test-story}
 
 **In one line:** all model and round selection used validation data; the test set was nevertheless read in several documented ways during development; three early choices were recorded with test numbers as their justification and were re-checked on validation; and since 2026-10-12 only one preregistered configuration may ever be scored on test.
+
+### The plain version
+
+A test set is like a final exam you may sit only once. While we were building the project, our code looked at that exam paper in several ways — mostly to log or display things, never to pick anything — and three early settings were written down with exam scores as the reason. We checked those three settings again using practice data and got the same answers. We published a full list of every look. Since 12 October 2026, only one configuration, chosen beforehand, may ever be scored on the test set (source: `CLAUDE.md`, "Test-set use").
 
 ### What the rule should be
 

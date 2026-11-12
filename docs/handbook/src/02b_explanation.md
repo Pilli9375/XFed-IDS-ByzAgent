@@ -4,6 +4,10 @@
 
 Each organization explains its own model with SHAP on its own machine, only the top-10 feature rankings go to the server, and we measure how well those rankings agree with the global model's — finding that agreement falls as data becomes more heterogeneous, down to a level at α=0.1 that sits below a seed-noise floor (directional, not significant).
 
+### The plain version
+
+Ten organizations each trained the same kind of detector on their own traffic. We asked every one of them the same question: which clues did you use to spot this attack? When their traffic is similar, they mostly point to the same clues — their top-10 lists overlap at 0.667. When their traffic is very different, the overlap falls to 0.333, which is even lower than two copies of one ordinary model, trained twice by chance, agree with each other (0.429) (source: `docs/contribution_a_results.md` §2). Treat that last drop as a strong hint, not a proven result: the uncertainty ranges of the two numbers touch.
+
 ### Why this exists
 
 **The claim** this chapter tests, from the canonical results document: **"Under realistic non-IID federation, accuracy parity between silos does not imply explanation parity."** (source: `docs/contribution_a_results.md` §1)

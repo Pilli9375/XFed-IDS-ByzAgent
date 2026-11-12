@@ -43,6 +43,9 @@ for n, o in objs.items():
     m = re.search(rb"/Title (\(.*?\)|<[0-9A-Fa-f]+>)\s*/Dest \[(\d+) 0 R", o, re.S)
     if m:
         title = re.sub(r"\s+", " ", decode(m.group(1))).strip()
+        h = len(title) // 2
+        if len(title) % 2 == 0 and title[:h] == title[h:]:
+            title = title[:h]  # Chromium sometimes repeats an outline title
         pages.setdefault(title, order.get(int(m.group(2))))
 (HB / "build" / "toc_pages.json").write_text(json.dumps(pages, ensure_ascii=False, indent=1), encoding="utf-8")
 print(len(pages), "outline entries;", len(order), "pages")

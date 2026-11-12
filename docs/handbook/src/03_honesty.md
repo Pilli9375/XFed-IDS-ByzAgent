@@ -6,6 +6,10 @@ This part collects every disclosure in one place. Present it as a strength: **we
 
 **In one line:** all model and round selection used validation data; the test set was nevertheless read in several documented ways during development; three early choices were recorded with test numbers as their justification and were re-checked on validation; and since 2026-10-12 only one preregistered configuration may ever be scored on test.
 
+### The plain version
+
+A test set is like a final exam you may sit only once. While we were building the project, our code looked at that exam paper in several ways — mostly to log or display things, never to pick anything — and three early settings were written down with exam scores as the reason. We checked those three settings again using practice data and got the same answers. We published a full list of every look. Since 12 October 2026, only one configuration, chosen beforehand, may ever be scored on the test set (source: `CLAUDE.md`, "Test-set use").
+
 ### What the rule should be
 
 From [1.3.1](#bg-splits): choose everything on validation, score the test set once at the end. The test set is `data/processed/test_global.parquet`, 478,376 rows (source: `docs/test_set_exposure_audit.md`).

@@ -4,6 +4,10 @@
 
 We wrote down, before running anything, how we would pick a better federated optimizer using validation data only; the rule picked FedAvgM with server momentum 0.9; we sealed its 9 checkpoints by SHA256 and scored them on the test set exactly once.
 
+### The plain version
+
+We wanted a better way to combine the organizations' models, without peeking at the final exam. So we wrote down the rules for choosing before running anything, compared four methods on practice data only, and locked in our choice with a digital seal. Then we sat the final exam exactly once. The chosen method, server momentum, scored 0.9852 when the organizations' data differs realistically (FedAvg: 0.941) and 0.5930 when it differs extremely (FedAvg: 0.516) (source: `docs/contribution_a_results.md`, optimizer section). Better, but the extreme case is still far from solved.
+
 ### Why this exists
 
 FedAvg collapses at α=0.1 (0.516 ± 0.048). The obvious question: does a smarter way of combining updates help? But the test set had already been read in several documented ways (Part 3), and trying optimizers until one looks good on test would be exactly the "peeking at the exam" problem. So on 2026-10-12 the team adopted a rule: **the test set is evaluated one further time, once, for a single federated configuration selected beforehand on validation data only. No other configuration is ever scored on the test set** (source: `docs/preregistration_accuracy.md`; commit `b2b9bee`).

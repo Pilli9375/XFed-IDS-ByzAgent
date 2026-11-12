@@ -26,7 +26,7 @@ await page.pdf({
   displayHeaderFooter: true,
   headerTemplate: `<div style="${small}text-align:right;">XFed-IDS-ByzAgent Team Handbook</div>`,
   footerTemplate: `<div style="${small}text-align:center;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
-  margin: { top: '18mm', bottom: '18mm', left: '18mm', right: '18mm' },
+  preferCSSPageSize: true,
   outline: true,
   tagged: true,
 });
