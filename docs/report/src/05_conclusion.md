@@ -26,4 +26,16 @@ Several next steps follow directly from the limitations in Section 4.6.
 - **A real deployment.** All results come from simulation on one machine. Running the federation across machines would expose network cost, stragglers and client failures that the simulation does not model.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-## Contribution of Each Member {#sec:contributions}
+## Contribution of Each Member {#sec:contributions newpage}
+
+**V Naga Adithya (23BCE9062):** Built the federated training pipeline on Flower and ran the FedAvg, FedProx and FedAvgM experiments across all label-skew levels and seeds. Designed and ran the preregistered accuracy study and the efficiency work (ONNX serving, update compression, communication cost). Developed the dashboard, both the FastAPI backend and the React frontend, including the hot-swap gate and the validation-only simulator. Led the testing, the audits (including the test-set exposure audit) and the reproducibility setup, and wrote the IEEE paper, this report, the team handbook and the README.
+<!-- src: paper/main.tex -->
+
+**T Shaun (23BCE9916):** Prepared the dataset. Cleaned the Distrinet CICIDS2017 (V4) data into eight attack families plus Benign, built the group-aware train, validation and test split, and created the Dirichlet partitions for the ten silos with the SHA256 manifest that checks every partition at load time.
+<!-- src: paper/main.tex -->
+
+**P Sampath (23BCE8614):** Built the trust check. Implemented the worst-case label-flipping attacks, the per-silo behaviour statistics and the Krum, Multi-Krum and trimmed-mean baselines, and developed ByzAgent, the local LLM agent that decides to trust, downweight or quarantine each silo, together with its fidelity and decision-stability audits.
+<!-- src: paper/main.tex -->
+
+**D Tharun (23BCE8818):** Built the explanation check. Implemented client-side SHAP with fixed backgrounds, the Jaccard@10 and weighted Kendall's τ agreement measures, the centralized-seed instability floor and chance level, and the SHAP additivity residual audit with its sensitivity check.
+<!-- src: paper/main.tex -->

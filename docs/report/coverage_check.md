@@ -4,8 +4,7 @@ Every finding and item from the project's canonical sources, mapped to the repor
 appears. Section numbers are those of the built report (chapters 1–7; appendix sections 6.A–6.S).
 "Covered" means the item is stated with its numbers and caveats, not only named.
 
-**Result: no uncovered item.** One item is deliberately left blank pending input from the team
-(5.3 Contribution of Each Member). Items skipped on purpose are listed at the end with the reason.
+**Result: no uncovered item.** Items skipped on purpose are listed at the end with the reason.
 
 ## 1. PROJECT_INSTRUCTIONS.md: "Findings that limit what can be claimed"
 
@@ -159,7 +158,7 @@ appears. Section numbers are those of the built report (chapters 1–7; appendix
 | List of Abbreviations, List of Symbols | Front matter |
 | Challenges faced and how we solved them | 4.7 |
 | Testing and checks with last recorded result | 2.5, 6.R |
-| Contribution of each member | 5.3 (blank: waiting for the team's split) |
+| Contribution of each member | 5.3 (text supplied by the team) |
 | Key code excerpts with captions and paths | 6.S |
 | Standards actually used | 2.3 |
 | Cost analysis: nothing bought, owned hardware, free software, measured compute | Chapter 3 |
