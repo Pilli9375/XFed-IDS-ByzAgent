@@ -126,9 +126,9 @@ it. D\"IoT~\cite{nguyen2019diot} trained device-type anomaly models across home
 gateways; Rahman et al.~\cite{rahman2020} compared centralized, on-device and federated
 training for IoT detection; Mothukuri et al.~\cite{mothukuri2022} and Popoola et
 al.~\cite{popoola2022} used recurrent and deep models for IoT attacks and zero-day
-botnets. Two surveys~\cite{campos2022,agrawal2022} list non-IID data among the main
-open problems. Non-IID splits are now often generated with a per-class Dirichlet
-prior~\cite{hsu2019,li2022noniid}, and server-side remedies include proximal local
+botnets. Two reviews~\cite{campos2022,agrawal2022} collect the challenges that still
+stand between FL-based detection and deployment. Benchmarks build non-IID splits with a
+tunable degree of skew~\cite{hsu2019,li2022noniid}, and server-side remedies include proximal local
 terms~\cite{li2020fedprox}, server momentum~\cite{hsu2019} and adaptive server
 optimizers~\cite{reddi2021}. What these studies share is a single yardstick, detection
 accuracy. None of them asks whether the silo models detect the same attack for the same
@@ -136,10 +136,10 @@ reason.
 
 \subsection{Explainable IDS and federated XAI}
 SHAP~\cite{lundberg2017} is the usual tool for attributing an IDS decision to flow
-features~\cite{wang2020xai}, and surveys of explainable IDS~\cite{neupane2022,arisdakessian2023}
-note that evaluation of the explanations themselves lags behind their use. Warnecke et
-al.~\cite{warnecke2020} proposed criteria such as stability for judging explanation
-methods in security tasks. Federated systems that add explanations to an IDS have
+features~\cite{wang2020xai}. Surveys map the open problems of explainable
+IDS~\cite{neupane2022}, and one of them argues for combining XAI with FL in IoT
+detection~\cite{arisdakessian2023}. Warnecke et al.~\cite{warnecke2020} proposed
+criteria, robustness among them, for judging explanation methods in security tasks. Federated systems that add explanations to an IDS have
 appeared: FEDFOREST uses gradient-boosted trees~\cite{dong2022fedforest},
 XFedHunter explains APT detection in SDN~\cite{thi2023xfedhunter}, and recent work
 pairs FedAvg with SHAP or LIME on IoT traffic~\cite{bilal2025,gholamrezazadeh2026}.
@@ -157,10 +157,10 @@ input~\cite{ghorbani2019,alvarezmelis2018}, and sampling-based explainers carry 
 estimation noise~\cite{slack2021}. Watson et al.~\cite{watson2022} retrained identical
 architectures with different seeds and data order and found low explanation consistency,
 which means two models can disagree about reasons even when nothing about their data
-differs. Krishna et al.~\cite{krishna2024} formalised disagreement between explanations
-with top-$k$ feature and rank agreement measures. For comparing full rankings, weighted
-Kendall's $\tau$~\cite{kendall1938,vigna2015} discounts swaps among unimportant
-features. Faithfulness is commonly checked by deleting or inserting the
+differs. Krishna et al.~\cite{krishna2024} gave a quantitative definition of disagreement between
+explanation methods and found that it is common in practice. For comparing full
+rankings, a weighted form of Kendall's $\tau$~\cite{kendall1938,vigna2015} counts
+discordant pairs near the top of the ranking more heavily than those near the bottom. Faithfulness is commonly checked by deleting or inserting the
 highest-ranked inputs and tracking the model's score~\cite{petsiuk2018}. The gap we see
 is that federated studies report agreement numbers without the seed-noise reference
 that Watson et al.'s result implies they need.
@@ -169,8 +169,9 @@ that Watson et al.'s result implies they need.
 Krum and Multi-Krum~\cite{blanchard2017} pick the updates closest to their neighbours,
 and coordinate-wise trimmed mean~\cite{yin2018} discards extreme values per parameter.
 Bulyan~\cite{mhamdi2018} combines the two ideas. Later defences use a server-held root
-dataset (FLTrust~\cite{cao2021fltrust}), similarity of client histories
-(FoolsGold~\cite{fung2020}), or momentum over past rounds~\cite{karimireddy2021}.
+dataset (FLTrust~\cite{cao2021fltrust}), the diversity of client updates over training
+(FoolsGold~\cite{fung2020}), or iterative clipping with worker momentum that carries
+information across rounds~\cite{karimireddy2021}.
 Attack papers show that distance-based rules can be bypassed by crafted
 updates~\cite{fang2020local}, and label flipping~\cite{tolpegin2020} and backdoor
 injection have been shown for FL-based IoT detectors specifically~\cite{nguyen2020poison}.
