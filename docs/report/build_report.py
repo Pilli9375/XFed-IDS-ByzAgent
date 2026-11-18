@@ -349,21 +349,28 @@ CMT_RE = re.compile(r"<!--.*?-->")
 TEXT_WIDTH_CM = 16.4  # body section: 12240 twips page, 1701 + 1080 margins
 
 
-def column_widths(rows, ncol, total):
-    """Share the text width among columns by how much text each holds (min 1.4 cm)."""
+def column_widths(rows, ncol, total, size=10.0):
+    """Column widths (cm): every column is wide enough for its longest unbreakable token at the
+    table's font size (numbers never wrap), and the space left over goes to the columns that hold
+    the most text."""
     def plain(c):
         return re.sub(r"[*`]|\[@[^\]]*\]|@\w+:[\w-]+", "xxxx", c)
-    weights = []
+    pt_per_char = 0.52 * size          # Times New Roman, average glyph width
+    pad = 0.42                         # left + right cell margins, cm
+    mins, weights = [], []
     for ci in range(ncol):
         cells = [plain(r[ci]) if ci < len(r) else "" for r in rows]
-        longest_word = max((len(wd) for c in cells for wd in c.split()), default=1)
-        avg = sum(len(c) for c in cells) / max(len(cells), 1)
-        mx = max(len(c) for c in cells)
-        weights.append(max(longest_word * 1.1, 0.6 * avg + 0.4 * min(mx, 60), 3))
-    tot = sum(weights)
-    widths = [max(total * w / tot, 1.4) for w in weights]
-    scale = total / sum(widths)
-    return [w * scale for w in widths]
+        body, head = cells[1:] or cells, cells[0]
+        longest_body = max((len(t) for c in body for t in c.split()), default=1)
+        longest_head = max((len(t) for t in head.split()), default=1) * 1.1   # header is bold
+        need = max(longest_body, longest_head) * pt_per_char / 28.35 + pad
+        mins.append(max(need, 0.9))
+        weights.append(sum(len(c) for c in body) / max(len(body), 1))
+    if sum(mins) >= total:
+        return [m * total / sum(mins) for m in mins]
+    extra = total - sum(mins)
+    wsum = sum(weights) or 1.0
+    return [m + extra * w / wsum for m, w in zip(mins, weights)]
 
 
 def split_row(row):
@@ -565,6 +572,25 @@ class Report:
                 heading = Paragraph(el, self.doc)
         if heading is not None:
             tc_entry(heading, "ACKNOWLEDGEMENT", 1)
+            # The certificate fills its page exactly, so the template's separate page-break
+            # paragraph would land on a page of its own; break before the heading instead.
+            prev = heading._p.getprevious()
+            if prev is not None and prev.xpath('.//w:br[@w:type="page"]') and not Paragraph(prev, self.doc).text.strip():
+                prev.getparent().remove(prev)
+            page_break_before(heading)
+            # Empty spacer paragraphs between acknowledgement paragraphs: keep them, but at 6 pt
+            # so the four names stay on the acknowledgement page after the added dataset sentence.
+            el = heading._p.getnext()
+            while el is not None and el is not P(T_ACK_MEMBERS[0] - 1)._p:
+                if el.tag == qn("w:p") and not Paragraph(el, self.doc).text.strip():
+                    sp = Paragraph(el, self.doc)
+                    sp_spacing = ppr(sp).find(qn("w:spacing"))
+                    if sp_spacing is None:
+                        sp_spacing = OxmlElement("w:spacing")
+                        ppr(sp).append(sp_spacing)
+                    sp_spacing.set(qn("w:line"), "120")
+                    sp_spacing.set(qn("w:lineRule"), "exact")
+                el = el.getnext()
         p = P(T_ACK_VC)
         set_text(p, p.text.replace("Dr. Dr. P. Arulmozhivarman", "Dr. P. Arulmozhivarman"))
         p = P(T_ACK_HOD)
@@ -580,19 +606,16 @@ class Report:
         p = P(T_ACK_GUIDE)
         rpr = copy.deepcopy(p.runs[0]._r.rPr)
         set_text(p, p.text.replace("<Name of the Guide>", GUIDE))
-        # one sentence for the dataset providers, as its own paragraph before the family paragraph
-        fam = body[T_ACK_FAMILY]
-        new = copy.deepcopy(fam)
-        fam.addprevious(new)
-        sp = copy.deepcopy(body[T_ACK_FAMILY - 1])  # the blank spacer paragraph
-        fam.addprevious(sp)
+        # one sentence for the dataset providers, added to the faculty-and-staff paragraph so the
+        # acknowledgement keeps the template's paragraph structure and stays on one page
+        faculty = P(T_ACK_FAMILY - 2)
         # keep "Project Team Members:" and the four names together on one page
         for idx in (T_ACK_MEMBERS[0] - 1,) + T_ACK_MEMBERS[:-1]:
             keep_next(P(idx))
-        set_text(Paragraph(new, self.doc),
-                 "We thank the Canadian Institute for Cybersecurity (CIC) at the University of New Brunswick for "
-                 "releasing the CICIDS2017 dataset, and the DistriNet research group at KU Leuven for the corrected "
-                 "version of it on which every experiment in this report was run.")
+        set_text(faculty, faculty.text.rstrip() +
+                 " We also thank the Canadian Institute for Cybersecurity (CIC) at the University of New Brunswick "
+                 "for releasing the CICIDS2017 dataset, and the DistriNet research group at KU Leuven for the "
+                 "corrected version of it on which every experiment in this report was run.")
         for idx, (name, reg) in zip(T_ACK_MEMBERS, MEMBERS):
             set_text(P(idx), f"{name} \u2013 {reg}")
 
@@ -696,7 +719,7 @@ class Report:
             borders.append(e)
         tbl_pr.append(borders)
         # column widths in proportion to the text each column holds
-        widths = column_widths(rows, ncol, TEXT_WIDTH_CM)
+        widths = column_widths(rows, ncol, TEXT_WIDTH_CM, b["size"])
         w = tbl_pr.find(qn("w:tblW"))
         if w is None:
             w = OxmlElement("w:tblW")
@@ -1035,7 +1058,11 @@ def word_export(docx_path, pdf_path):
                 toc.Update()
             doc.Repaginate()
         doc.Save()
-        doc.SaveAs2(str(pdf_path), FileFormat=17)
+        doc.Close(False)
+        # export from a fresh open of the saved file, so the PDF uses the same layout Word shows
+        doc = word.Documents.Open(str(docx_path), ReadOnly=True, AddToRecentFiles=False)
+        doc.Repaginate()
+        doc.ExportAsFixedFormat(str(pdf_path), 17, False, 0)  # wdExportFormatPDF, no open, optimize for print
         pages = doc.ComputeStatistics(2)  # wdStatisticPages
         doc.Close(False)
         return pages
