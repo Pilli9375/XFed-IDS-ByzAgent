@@ -24,6 +24,7 @@ Markdown dialect used in src/*.md (deliberately small):
   # Title                         chapter (one per file, numbered by file order)
   ## Title {#sec:id}              section  N.M
   ### Title {#sec:id}             subsection N.M.K
+  ## Title {#sec:id newpage}      section that starts on a new page
   - item / 1. item                bullet / numbered list
   > text                          indented quotation
   Table: Caption {#tab:id}        caption line, followed by a pipe table
@@ -408,7 +409,8 @@ def parse_markdown(text):
             lab = LABEL_RE.search(title)
             label = lab.group(1) if lab else None
             title = LABEL_RE.sub("", title).strip()
-            blocks.append({"type": "heading", "level": lvl, "text": title, "label": label})
+            blocks.append({"type": "heading", "level": lvl, "text": title, "label": label,
+                           "newpage": bool(lab and "newpage" in lab.group(2))})
             i += 1
             continue
         if s.startswith("Table:"):
@@ -903,6 +905,8 @@ class Report:
                 elif t == "heading":
                     st = "Section Heading" if b["level"] == 2 else "Subsection Heading"
                     p = self.doc.add_paragraph(style=st)
+                    if b.get("newpage"):
+                        page_break_before(p)
                     p.add_run(f"{b['num']}\t")
                     self.add_inline(p, b["text"])
                     tabs = OxmlElement("w:tabs")
