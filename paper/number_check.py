@@ -103,7 +103,7 @@ for fname in FILES:
     in_doc = not fname.endswith("main.tex")
     for ln, line in enumerate(text.split("\n"), 1):
         if not in_doc:
-            in_doc = "\\begin{document}" in line
+            in_doc = "\\maketitle" in line
             continue
         if any(f"\\begin{{{e}}}" in line for e in SKIP_ENVS):
             in_env = True
