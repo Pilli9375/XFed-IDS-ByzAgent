@@ -90,3 +90,6 @@ paper/*.aux
 paper/*.bbl
 paper/*.blg
 paper/*.xdv
+
+# Capstone report: private inputs and submission build (biodata has phone numbers and addresses)
+docs/report/private/
