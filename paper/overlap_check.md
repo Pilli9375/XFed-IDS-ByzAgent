@@ -1,0 +1,59 @@
+# Overlap check (8-word runs)
+
+Sources compared: 54 saved abstracts of cited papers (`paper/_sources/`, git-ignored), `README.md`, and every Markdown file under `docs/handbook/`.
+
+**Sentences sharing an 8-word run: 16 total; 16 exempt (locked wording the project requires verbatim, or runs made of result numbers); 0 counted.**
+
+- EXEMPT (locked wording or numbers only): "FedAvg reaches test macro-F1 of 0.516\, \,0.048, 0.941\, \,0.057 and 0.990\, \,0.001."
+  - `0 516 0 048 0 941 0 057` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/07_reference.md
+- EXEMPT (locked wording or numbers only): "It produces decisions plus a rationale of measured fidelity, and part of what it flags is silo composition rather than attack."
+  - `it produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
+  - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "Multi-Krum excluded a malicious silo 0\% of the time."
+  - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "Multi-Krum excluded a malicious silo 0\% of the time, against a chance rate of 0.30 at ; it removed the same large, Benign-heavy silos in every round, attack or not."
+  - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated."
+  - `a real compositional confound saturates some silos flag` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `real compositional confound saturates some silos flag rates` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `compositional confound saturates some silos flag rates independent` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `confound saturates some silos flag rates independent of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition.'' quote"
+  - `seed 42s apparent null was partly a ceiling` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `42s apparent null was partly a ceiling artifact` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `apparent null was partly a ceiling artifact of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+  - `null was partly a ceiling artifact of that` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "We describe the agent as one that produces decisions plus a rationale of measured fidelity, and the measurement shows it is partial: its strict citation error rose from 11.7\% (seed 42) to 22.5\% (seeds 1337 and 2024)."
+  - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "Instead it removed the same large, Benign-heavy silos (30.3\% and 23.0\% of the fleet, over 90\% Benign) in every round of every condition, including the clean control, where it excluded exactly in 20 of 20 rounds."
+  - `30 3 and 23 0 of the fleet` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md
+- EXEMPT (locked wording or numbers only): "Their flag rates are already 0.95--1.00 with no attack, so lift at seed 42 is at most +0.05."
+  - `0 95 1 00 with no attack so` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md
+- EXEMPT (locked wording or numbers only): "The project's wording follows from these numbers: ByzAgent produces decisions plus a rationale of measured fidelity."
+  - `byzagent produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md
+  - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "0.516 0.048 0.5930 0.0632 ."
+  - `0 516 0 048 0 5930 0 0632` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+- EXEMPT (locked wording or numbers only): "0.5426 0.6558 / 0.4481 0.5065 / 0.5572 0.6167 ."
+  - `0 5426 0 6558 0 4481 0 5065` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `5426 0 6558 0 4481 0 5065 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `0 6558 0 4481 0 5065 0 5572` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `6558 0 4481 0 5065 0 5572 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+- EXEMPT (locked wording or numbers only): "0.941 0.057 0.9852 0.0005 ."
+  - `0 941 0 057 0 9852 0 0005` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+- EXEMPT (locked wording or numbers only): "0.9753 0.9846 / 0.9866 0.9856 / 0.8605 0.9856 ."
+  - `0 9753 0 9846 0 9866 0 9856` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `9753 0 9846 0 9866 0 9856 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `0 9846 0 9866 0 9856 0 8605` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `9846 0 9866 0 9856 0 8605 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+- EXEMPT (locked wording or numbers only): "0.990 0.001 0.9911 0.0005 ."
+  - `0 990 0 001 0 9911 0 0005` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+- EXEMPT (locked wording or numbers only): "0.9900 0.9918 / 0.9905 0.9906 / 0.9889 0.9910 ."
+  - `0 9900 0 9918 0 9905 0 9906` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `9900 0 9918 0 9905 0 9906 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `0 9918 0 9905 0 9906 0 9889` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md
+  - `9918 0 9905 0 9906 0 9889 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02d_prereg_eff_dash.md

@@ -81,3 +81,12 @@ docs/dashboard_inventory/*.png
 docs/dashboard_v2/screens/*
 !docs/dashboard_v2/screens/live_*_1440.png
 !docs/dashboard_v2/screens/investigate_*_1440.png
+
+# Paper build (paper/)
+paper/_sources/
+paper/*.log
+paper/build*.out
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.xdv

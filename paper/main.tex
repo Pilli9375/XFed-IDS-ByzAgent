@@ -1,0 +1,621 @@
+% XFed-IDS-ByzAgent -- IEEE conference paper (body) + complete-record appendices.
+% Build: tectonic main.tex                 -> main.pdf (body + appendices)
+%        tectonic main_conference.tex      -> main_conference.pdf (body + references only)
+% Every number carries a trailing src comment naming the repo file it was copied from.
+% paper/number_check.py re-checks each one against that file and writes number_check.md.
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{newtxtext,newtxmath}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-\do_\do.}
+
+% ---- full version (body + appendices) unless main_conference.tex defines \conferenceonly
+\newif\iffullversion
+\ifdefined\conferenceonly \fullversionfalse \else \fullversiontrue \fi
+\newcommand{\fullref}[1]{\iffullversion Appendix~\ref{#1}\else the extended version\fi}
+% (no data numbers above this line)
+\newcommand{\cmark}{\checkmark}
+\newcommand{\pp}{\,pp}
+
+\begin{document}
+
+\title{Do Federated Intrusion Detectors Agree on Why?\\
+Explanation Agreement and Client Trust under Non-IID Data}
+
+\author{\IEEEauthorblockN{V Naga Adithya, T Shaun, P Sampath, D Tharun}
+\IEEEauthorblockA{School of Computer Science and Engineering, VIT-AP University, Amaravati, India\\
+{[email]}}}
+
+\maketitle
+
+% =====================================================================================
+\begin{abstract}
+Federated learning lets organisations train one network intrusion detector without
+pooling their traffic. Two questions are usually left open: do the participants'
+models flag attacks for the same reasons, and is any participant poisoning the shared
+model? We examine both in one system built on the corrected CICIDS2017 data (Distrinet
+V4), spread over ten silos with Dirichlet label skew $\alpha\in\{0.1,0.5,5.0\}$ and three % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+seeds. FedAvg reaches test macro-F1 of 0.516\,$\pm$\,0.048, 0.941\,$\pm$\,0.057 and % src: PROJECT_INSTRUCTIONS.md
+0.990\,$\pm$\,0.001. Client-side SHAP rankings match the global model at median % src: PROJECT_INSTRUCTIONS.md
+Jaccard@10 of 0.333, 0.538 and 0.667, against a chance level of 0.065 and a % src: PROJECT_INSTRUCTIONS.md
+seed-noise floor of 0.429 measured between centralized models that differ only by % src: PROJECT_INSTRUCTIONS.md
+seed. The $\alpha=0.1$ value lies under that floor, but the result is directional, not % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+significant: its cluster-bootstrap interval [0.250, 0.429] touches the floor range. % src: PROJECT_INSTRUCTIONS.md
+In a separate experiment, a language-model trust agent (ByzAgent) reads per-silo
+training statistics under a worst-case label-flipping attack. It produces decisions
+plus a rationale of measured fidelity, and part of what it flags is silo composition
+rather than attack. Multi-Krum excluded a malicious silo 0\% of the time. % src: PROJECT_INSTRUCTIONS.md
+\end{abstract}
+
+\begin{IEEEkeywords}
+Federated learning, intrusion detection, explainable artificial intelligence,
+Byzantine robustness, large language models
+\end{IEEEkeywords}
+
+% =====================================================================================
+\section{Introduction}
+
+A network intrusion detection system (IDS) learns what attacks look like from labelled
+traffic, and no single organisation sees every kind of attack. Pooling flow records
+across organisations would help the detector, but those records describe internal
+hosts, users and services, so legal and contractual limits often rule it out.
+Federated learning (FL) offers a way around this: each organisation trains on its own
+traffic and only model weights travel to an aggregating server~\cite{mcmahan2017}.
+Several groups have built FL-based detectors for IoT and enterprise
+traffic~\cite{nguyen2019diot,rahman2020,mothukuri2022,campos2022,agrawal2022} and report
+accuracy close to a centrally trained model.
+
+Accuracy is usually where such evaluations stop. We think two further questions matter
+to anyone who would run a federated IDS. The first is about explanations. An analyst who
+receives an alert also wants to know which flow features drove it, and in a federation
+each silo holds its own copy of the model, trained on its own skewed slice of traffic.
+If those copies rely on different features, the explanation an analyst sees depends on
+whose model was asked. Oki et al.~\cite{oki2024} showed that FL pulls per-site
+explanations closer to those of a centrally trained detector. We ask how far that holds
+as label skew grows, and how much disagreement one should expect from random seeds
+alone. The second question is about the participants. The server only sees weight
+updates, so a silo that relabels its own data can bend the shared
+model~\cite{tolpegin2020,nguyen2020poison}. Byzantine-robust aggregation rules exist for
+this case~\cite{blanchard2017,yin2018}, but they were designed around geometric
+outliers, and a silo whose traffic is simply unusual can look like an outlier too.
+
+We built one system with five stages (data, federated training, an explanation check, a
+trust check and a dashboard) and report the two checks as separate experiments with
+separate evidence. Our contributions are:
+\begin{enumerate}
+\item A measurement of silo-versus-global explanation agreement (Jaccard@10 and weighted
+Kendall's $\tau$) across three levels of label skew for a FedAvg detector on corrected
+CICIDS2017, read against two reference lines: the chance level and a
+\emph{centralized-seed instability floor}, i.e., the agreement between centralized models
+trained identically apart from their random seed.
+\item An observational analysis that separates label skew from silo size, which the
+Dirichlet partitioner ties together: KL divergence from the global label mix still
+predicts agreement after conditioning on log size. We report that entropy was tried
+first and failed this test.
+\item A trust check that sets a language-model agent (ByzAgent) against three classical
+aggregators, namely trimmed mean, Krum and Multi-Krum, under a worst-case label-flipping
+attack.
+All four mechanisms respond to silo composition, not only to the attack, and we audit
+how often the agent's stated reasons match the numbers it was shown.
+\item An evaluation protocol that selects every model and round on validation data, a
+written audit of every way the test set was read, one preregistered optimizer
+comparison, and serving and communication measurements for the deployed model.
+\end{enumerate}
+We do not claim the combination of FL, intrusion detection and explainability as new;
+recent work already combines
+them~\cite{dong2022fedforest,thi2023xfedhunter,bilal2025,gholamrezazadeh2026}.
+
+% =====================================================================================
+\section{Related Work}
+
+\subsection{Federated learning for intrusion detection}
+FedAvg~\cite{mcmahan2017} remains the default aggregator, and most FL-IDS studies keep
+it. D\"IoT~\cite{nguyen2019diot} trained device-type anomaly models across home
+gateways; Rahman et al.~\cite{rahman2020} compared centralized, on-device and federated
+training for IoT detection; Mothukuri et al.~\cite{mothukuri2022} and Popoola et
+al.~\cite{popoola2022} used recurrent and deep models for IoT attacks and zero-day
+botnets. Two reviews~\cite{campos2022,agrawal2022} collect the challenges that still
+stand between FL-based detection and deployment. Benchmarks build non-IID splits with a
+tunable degree of skew~\cite{hsu2019,li2022noniid}, and server-side remedies include proximal local
+terms~\cite{li2020fedprox}, server momentum~\cite{hsu2019} and adaptive server
+optimizers~\cite{reddi2021}. What these studies share is a single yardstick, detection
+accuracy. None of them asks whether the silo models detect the same attack for the same
+reason.
+
+\subsection{Explainable IDS and federated XAI}
+SHAP~\cite{lundberg2017} is the usual tool for attributing an IDS decision to flow
+features~\cite{wang2020xai}. Surveys map the open problems of explainable
+IDS~\cite{neupane2022}, and one of them argues for combining XAI with FL in IoT
+detection~\cite{arisdakessian2023}. Warnecke et al.~\cite{warnecke2020} proposed
+criteria, robustness among them, for judging explanation methods in security tasks. Federated systems that add explanations to an IDS have
+appeared: FEDFOREST uses gradient-boosted trees~\cite{dong2022fedforest},
+XFedHunter explains APT detection in SDN~\cite{thi2023xfedhunter}, and recent work
+pairs FedAvg with SHAP or LIME on IoT traffic~\cite{bilal2025,gholamrezazadeh2026}.
+These systems produce explanations, but they do not compare explanations across
+participants. Oki et al.~\cite{oki2024} come closest: they measured the distance between
+per-class feature sets of a distributed and a non-distributed IDS and found that FL
+shrinks it. The FedXAI survey of Gholizade et al.~\cite{gholizade2026} lists the
+behaviour of explanations on non-IID clients among the field's unsolved problems and
+observes that there is still no agreed way to score how stable federated explanations
+are.
+
+\subsection{Stability and consistency of explanations}
+Outside FL, attributions are known to move under small perturbations of the
+input~\cite{ghorbani2019,alvarezmelis2018}, and sampling-based explainers carry their own
+estimation noise~\cite{slack2021}. Watson et al.~\cite{watson2022} retrained identical
+architectures with different seeds and data order and found low explanation consistency,
+which means two models can disagree about reasons even when nothing about their data
+differs. Krishna et al.~\cite{krishna2024} gave a quantitative definition of disagreement between
+explanation methods and found that it is common in practice. For comparing full
+rankings, a weighted form of Kendall's $\tau$~\cite{kendall1938,vigna2015} counts
+discordant pairs near the top of the ranking more heavily than those near the bottom. Faithfulness is commonly checked by deleting or inserting the
+highest-ranked inputs and tracking the model's score~\cite{petsiuk2018}. The gap we see
+is that federated studies report agreement numbers without the seed-noise reference
+that Watson et al.'s result implies they need.
+
+\subsection{Byzantine-robust aggregation}
+Krum and Multi-Krum~\cite{blanchard2017} pick the updates closest to their neighbours,
+and coordinate-wise trimmed mean~\cite{yin2018} discards extreme values per parameter.
+Bulyan~\cite{mhamdi2018} combines the two ideas. Later defences use a server-held root
+dataset (FLTrust~\cite{cao2021fltrust}), the diversity of client updates over training
+(FoolsGold~\cite{fung2020}), or iterative clipping with worker momentum that carries
+information across rounds~\cite{karimireddy2021}.
+Attack papers show that distance-based rules can be bypassed by crafted
+updates~\cite{fang2020local}, and label flipping~\cite{tolpegin2020} and backdoor
+injection have been shown for FL-based IoT detectors specifically~\cite{nguyen2020poison}.
+Most evaluations assume that honest clients look alike. Under strong label skew they do
+not, and the effect of this on what these rules exclude is rarely measured.
+
+\subsection{Language-model agents for security decisions}
+Agents that interleave reasoning with actions~\cite{yao2023react} have been applied to
+penetration testing~\cite{deng2024pentestgpt} and to exploiting known
+vulnerabilities~\cite{fang2024oneday}, and a recent review~\cite{xu2026llmsec} maps many
+other security uses. A known weakness is that the reasons a model writes down need not
+reflect what drove its answer~\cite{turpin2023}. If an agent is placed in an aggregation
+loop, its written rationale therefore has to be checked against the data it was given,
+not taken at face value.
+
+\subsection{CICIDS2017 and its corrections}
+CICIDS2017~\cite{sharafaldin2018} is widely used, but Engelen et al.~\cite{engelen2021}
+documented errors in its flow construction, feature extraction and labelling, and Liu et
+al.~\cite{liu2022} traced further errors through the dataset lifecycle and released the
+refined version we use. Lanvin et al.~\cite{lanvin2023} corrected a separate set of
+issues; we did not use that branch. Arp et al.~\cite{arp2022} list data snooping among
+common pitfalls in security ML, which is why we audit our own test-set use.
+
+\subsection{Positioning}
+Our explanation check builds directly on Oki et al.~\cite{oki2024}. Where they found that
+FL brings per-site explanations closer together, we vary label skew and look for the
+point at which that effect gives out. We also measure something the FL-IDS papers above
+leave out: the spread in feature rankings among centralized models whose only difference
+is the seed. That spread is the yardstick a federated gap has to beat before it can be
+blamed on federation, and it is one concrete answer to the missing consistency metrics
+that Gholizade et al.~\cite{gholizade2026} point to. For the trust check, we run the
+Krum family on a 10-silo federation with the true attacker count handed to it, and we % src: PROJECT_INSTRUCTIONS.md
+score the agent's written reasons against the statistics it saw. The text summaries the
+dashboard generates for analysts are a convenience, and we make no research claim about
+them. Table~\ref{tab:related} sets out the comparison.
+
+\begin{table}[t]
+\centering
+\caption{Closest works. A mark means the paper's abstract or text, as we read it, shows
+the property: FL, IDS, explanations (XAI), an explanation-consistency metric (Cons.), a
+seed-noise control (Seed), a Byzantine defence evaluated (Byz.), an LLM agent (LLM).}
+\label{tab:related}
+\footnotesize
+\setlength{\tabcolsep}{2.6pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+Work & FL & IDS & XAI & Cons. & Seed & Byz. & LLM\\
+\midrule
+D\"IoT~\cite{nguyen2019diot} & \cmark & \cmark & & & & & \\
+Nguyen et al.~\cite{nguyen2020poison} & \cmark & \cmark & & & & \cmark & \\
+FLTrust~\cite{cao2021fltrust} & \cmark & & & & & \cmark & \\
+FEDFOREST~\cite{dong2022fedforest} & \cmark & \cmark & \cmark & & & & \\
+XFedHunter~\cite{thi2023xfedhunter} & \cmark & \cmark & \cmark & & & & \\
+Oki et al.~\cite{oki2024} & \cmark & \cmark & \cmark & \cmark & & & \\
+Bilal et al.~\cite{bilal2025} & \cmark & \cmark & \cmark & & & & \\
+XAI FL-IDS~\cite{gholamrezazadeh2026} & \cmark & \cmark & \cmark & & & & \\
+Watson et al.~\cite{watson2022} & & & \cmark & \cmark & \cmark & & \\
+PentestGPT~\cite{deng2024pentestgpt} & & & & & & & \cmark\\
+\midrule
+This work & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================================
+\section{System Overview}
+
+Fig.~\ref{fig:pipeline} shows the five stages. \emph{Data}: the corrected CICIDS2017
+flows are cleaned into eight attack families plus Benign and split once into training,
+validation and test sets. \emph{Federated training}: ten silos train a shared multilayer
+perceptron with Flower~\cite{beutel2020flower}; every silo trains in every round, and
+the round kept is the one with the best validation score. \emph{Explanation check}:
+each silo computes SHAP attributions locally and sends only top-$k$ feature indices to
+the server, which compares them with the global model's ranking. \emph{Trust check}: the
+server logs five statistics per silo and round; ByzAgent or a classical robust rule
+decides how much each update counts. \emph{Dashboard}: a FastAPI backend serves the
+selected model, explanations and trust decisions to a React front end.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={draw, rounded corners=1.5pt, align=center, inner sep=2.5pt, minimum height=9mm},
+  arr/.style={-{Latex[length=1.6mm]}, semithick}]
+\node[box, text width=21mm] (data) {1. Data\\CICIDS2017 (V4)\\8 families + Benign};
+\node[box, text width=27mm, right=9mm of data] (fl) {2. Federated training\\10 silos, Dirichlet $\alpha$\\round chosen on validation};
+\node[box, fill=black!6, text width=27mm, below=6mm of data.south west, anchor=north west] (exp) {3. Explanation check\\client SHAP, top-$k$ only\\Jaccard@10, weighted $\tau$};
+\node[box, fill=black!6, text width=27mm, anchor=north east] (trust) at (fl.south east |- exp.north) {4. Trust check\\5 statistics per silo\\ByzAgent vs.\ Krum family};
+\node[box, minimum height=6mm, anchor=north west, text width=60.5mm] (dash) at ($(exp.south west)+(0,-5mm)$) {5. Dashboard: live alerts, explanations, trust decisions};
+\draw[arr] (data) -- (fl);
+\draw[arr] (fl.south) ++(-6mm,0) -- ++(0,-2.5mm) -| (exp.north);
+\draw[arr] (fl.south) ++(4mm,0) -- ($(trust.north)+(4mm,0)$);
+\draw[arr] (exp.south) -- (exp.south |- dash.north);
+\draw[arr] (trust.south) -- (trust.south |- dash.north);
+\end{tikzpicture}
+\caption{The five-stage pipeline. Stages 3 and 4 are separate experiments on the same % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+federated runs and are reported separately.}
+\label{fig:pipeline}
+\end{figure}
+
+% =====================================================================================
+\section{Methodology}
+
+\subsection{Data and partitioning}
+We use the Distrinet CICIDS2017 release (version 4) of Liu et al.~\cite{liu2022}, % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+which builds on the corrections of Engelen et al.~\cite{engelen2021}. The raw files hold
+2,099,976 flows with 82 numeric features once seven identifier columns (flow ID, IPs, % src: data/README.md
+ports, timestamp) are dropped. Flows marked ``Attempted'' join their parent family,
+because for Bot and both web-attack subtypes they make up most of the class. The 14 raw % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+labels map to eight attack families plus Benign; the internal port-scan phase of the
+infiltration scenario goes to PortScan because its features look like a port scan.
+Cleaning removed 5 non-finite rows, 44,005 rows whose identical feature vectors carry % src: data/README.md
+different families, and 142,464 duplicates that span capture days, leaving 1,913,502 % src: data/README.md
+flows. Families under 1,000 flows (Infiltration, 66; Heartbleed, 11) stay in the data % src: data/README.md
+but are left out of the headline macro-F1, which averages the remaining seven classes,
+and are reported per class.
+
+The split is global and group-aware: every distinct feature vector is a group, so copies
+never straddle the boundary, which gives 1,435,126 training and 478,376 test flows. Ten % src: data/README.md
+percent of the training pool (143,513 rows) is held out as a centralized validation set. % src: docs/efficiency_results.md
+For each family $k$, silo shares are drawn as $p_k\sim\mathrm{Dir}(\alpha\mathbf{1}_{10})$
+with $\alpha\in\{0.1,0.5,5.0\}$ and seeds 42, 1337 and 2024, giving nine partitions. % src: PROJECT_INSTRUCTIONS.md
+$\alpha=5.0$ is a near-IID control. The row-to-silo assignment arrays are written to disk % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+with a SHA256 manifest, and the loader refuses to return a silo whose hash does not
+match. Full counts are in \fullref{app:data}.
+
+\subsection{Model and federated setup}
+Table~\ref{tab:locked} lists the locked settings and the reason for each. Local
+training uses AdamW~\cite{loshchilov2019} (learning rate $10^{-3}$, weight decay % src: configs/model.yaml
+$10^{-4}$, batch 1024). Each run has 20 rounds of FedAvg in Flower; the scaler is fit % src: configs/model.yaml
+per silo on that silo's training rows. Two centralized references use the same features
+and split: the same MLP and XGBoost~\cite{chen2016xgb}, both early-stopped on
+validation. Pilot results behind each choice are in \fullref{app:model}.
+
+\begin{table}[t]
+\centering
+\caption{Locked model and training settings}
+\label{tab:locked}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright}p{2.5cm}X@{}}
+\toprule
+Setting & Reason\\
+\midrule
+StandardScaler & RobustScaler degenerates on 28 of 82 zero-IQR features\\ % src: PROJECT_INSTRUCTIONS.md
+Effective-number class weights, $\beta=0.999$~\cite{cui2019} & best validation score in the weighting pilot\\ % src: PROJECT_INSTRUCTIONS.md
+MLP [128, 64], dropout 0.1 & top pilot arms tie on validation; smallest of them\\ % src: PROJECT_INSTRUCTIONS.md
+LayerNorm~\cite{ba2016} & BatchNorm statistics do not aggregate across silos\\
+3 local epochs & validation prefers 3 over 1 at $\alpha=0.5$ in all three seeds\\ % src: PROJECT_INSTRUCTIONS.md
+9-wide frozen label vocabulary & every silo shares one output layer even when it lacks a class\\ % src: PROJECT_INSTRUCTIONS.md
+All 10 silos train each round & size floor applies only to explanation eligibility\\ % src: PROJECT_INSTRUCTIONS.md
+Best-by-validation round & rounds differ by up to 0.118 in validation macro-F1\\ % src: PROJECT_INSTRUCTIONS.md
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Explanation check}
+Because DeepExplainer breaks on our LayerNorm layers (an additivity error of 2.43), % src: PROJECT_INSTRUCTIONS.md
+every silo uses SHAP's GradientExplainer~\cite{lundberg2017,erion2021} on its own copy of
+the model at the selected round. The background is 200 rows drawn once from the silo's % src: docs/measurement_protocol.md
+own training partition, stratified by class under a fixed seed; each explanation uses
+4000 samples. % src: docs/measurement_protocol.md
+All models explain the same 14 rows, two per % src: docs/measurement_protocol.md
+headline family, and every comparison uses the attribution vector of the row's true
+class, so prediction disagreement does not leak into the agreement score. Only the
+top-$k$ feature indices leave the client.
+
+For a silo ranking $A$ and the global ranking $B$, Jaccard@$k$ is
+$|A_k\cap B_k|/|A_k\cup B_k|$ over the $k$ features with largest $|$attribution$|$, and
+weighted Kendall's $\tau$~\cite{vigna2015} compares the full order of 82 features with % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+more weight on high-ranked pairs. Silos below a size floor, and families with too few
+rows in a silo, are excluded from agreement analysis only. Two reference lines make the
+numbers interpretable. The chance level for two random 10-subsets of 82 features is % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+$(k^2/n)/(2k-k^2/n)=0.065$. The \emph{centralized-seed instability floor} is the % src: PROJECT_INSTRUCTIONS.md
+pairwise agreement among three centralized models (seeds 42, 1337, 2024) explained on the % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+same rows with the same background construction; its median over the three seed pairs is
+the floor. Uncertainty at $\alpha=0.1$ uses a cluster bootstrap~\cite{fieldwelsh2007} % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+that resamples (seed, silo) clusters 10,000 times. Correlations are reported as $r$ and % src: site/public/data/ci.json
+$n$ only, with no $p$-values, because silos from the same run follow one common sequence
+of global models and so are not independent samples.
+
+\subsection{Trust check}
+\emph{Attack.} At $\alpha=0.5$, seed 42, $f$ silos relabel 40\% of their non-Benign rows % src: docs/contribution_b_results.md
+as Benign from round 1. The attacker set was found by enumerating all 120 triples % src: docs/contribution_b_results.md
+of silos and keeping the one with the highest minimum per-family coverage, giving
+$\{0,3,5\}$ for $f=3$ and $\{0,3\}$ for $f=2$. The adversary is therefore worst-case: it % src: docs/contribution_b_results.md
+knows the label mix of every silo. No attacker in a deployment would have that view, so
+the attack bounds what detection must handle rather than modelling what an attacker
+would do.
+
+\emph{Statistics.} Each round the server records, per silo: update norm (L2 distance
+from the previous global model), cosine similarity to the aggregate, cosine similarity
+to the unweighted mean of all updates, last-epoch training loss, and accuracy on the
+centralized validation set.
+
+\emph{ByzAgent.} A locally served Llama~3.1 8B instruct model~\cite{grattafiori2024llama3}
+(4-bit, temperature 0.2) receives one prompt per round with the five statistics of all % src: configs/agent.yaml
+ten silos and their definitions, plus a warning that this attack pushes validation
+accuracy up for malicious silos. It must answer in a fixed JSON schema with one decision
+per silo (trust, downweight to 0.3 of its weight, or quarantine) and an explanation % src: configs/agent.yaml
+citing the numbers used. It is never told $f$, the attacker identities, or which
+statistic is strongest. Its decisions were replayed on statistics logged from undefended
+FedAvg runs, so they never fed back into training.
+
+\emph{Baselines.} Multi-Krum keeps $n-f$ updates; classical Krum keeps one and is a
+secondary check only; trimmed mean trims a fraction $\beta=f/n$ at each end. All three
+receive the true $f$ as an oracle, an advantage ByzAgent does not have.
+
+\emph{Measures.} Attack strength is summarised by four statistics of validation
+macro-F1 over 20 rounds: mean, median, mean of the final five rounds and maximum. The % src: PROJECT_INSTRUCTIONS.md
+maximum selects the deployed checkpoint; the final-five mean is the attack-effect
+statistic. For defences we report recovery fraction and how often a malicious silo is
+excluded, against the matching chance rate. For ByzAgent we report each silo's flag rate
+(downweight or quarantine) and its lift over the same silo's rate in a clean run.
+
+% =====================================================================================
+\section{Experimental Setup}
+Experiments ran on one laptop with an RTX 4050 (6\,GB), 24\,GB RAM and Windows~11. The % src: PROJECT_INSTRUCTIONS.md
+centralized MLP, XGBoost and the locally hosted agent (Ollama) used the GPU. Federated
+training did not: Flower builds an isolated runtime with the CPU build of PyTorch. SHAP,
+model serving and hot-swap retraining are CPU jobs as well.
+
+Every model and every round was chosen on validation data. Headline test numbers come
+from a single evaluation of each run's validation-selected checkpoint, and trust-check
+attack effects are reported as the final-five-round mean of validation macro-F1.
+
+\emph{Test-set disclosure.} Our early notes justified three choices (3 local epochs, % src: PROJECT_INSTRUCTIONS.md
+FedProx $\mu=0.0005$ and the StandardScaler) with test-set scores. Repeating each % src: PROJECT_INSTRUCTIONS.md
+comparison on validation picks the same value (for local epochs, mean best-validation
+macro-F1 0.9425 against 0.8602 at $\alpha=0.5$). Other test-set reads did not feed any % src: PROJECT_INSTRUCTIONS.md
+later decision: legacy per-round client scoring, 14 rows used as SHAP inputs, % src: PROJECT_INSTRUCTIONS.md
+display-only rows, and development scoring of pilots and baselines. Since 2026-10-12 the % src: PROJECT_INSTRUCTIONS.md
+test set has been scored for one preregistered configuration only. The
+full table is in the repository document \texttt{docs/test\_set\_exposure\_audit.md}
+and in \fullref{app:testaudit}.
+
+% =====================================================================================
+\section{Results}
+
+\subsection{Detection accuracy}
+Table~\ref{tab:acc} gives test macro-F1 over the seven headline classes. At
+$\alpha=5.0$ FedAvg matches the centralized MLP. At $\alpha=0.5$ the mean hides one weak % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+seed (seed 2024, 0.8605), and at $\alpha=0.1$ whole families collapse: mean per-class % src: docs/contribution_a_results.md
+F1 is 0.1253 for Bot and 0.0490 for WebAttack. The preregistered comparison picked % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+FedAvgM with server momentum 0.9~\cite{hsu2019} on validation alone, then scored its nine % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+sealed checkpoints on the test set once. It removes the weak $\alpha=0.5$ seed and gains % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+in each $\alpha=0.1$ seed, though $\alpha=0.1$ stays far below centralized training. % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+The explanation and trust results below use the published FedAvg runs, not FedAvgM. The
+deployed model is \texttt{fedavg\_a0.5\_s42}, round 18, validation macro-F1 0.9760. % src: PROJECT_INSTRUCTIONS.md
+Per-run and per-class results are in \fullref{app:fedacc}; the preregistration is in
+\fullref{app:prereg}.
+
+\begin{table}[t]
+\centering
+\caption{Test macro-F1, 7 headline classes, mean $\pm$ std over 3 seeds} % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+\label{tab:acc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+\midrule
+Centralized MLP & \multicolumn{3}{c}{0.9900 $\pm$ 0.0022}\\ % src: PROJECT_INSTRUCTIONS.md
+XGBoost & \multicolumn{3}{c}{0.9946 $\pm$ 0.0001}\\ % src: PROJECT_INSTRUCTIONS.md
+FedAvg & 0.516 $\pm$ 0.048 & 0.941 $\pm$ 0.057 & 0.990 $\pm$ 0.001\\ % src: PROJECT_INSTRUCTIONS.md
+FedAvgM$^\dagger$ & 0.5930 $\pm$ 0.0632 & 0.9852 $\pm$ 0.0005 & 0.9911 $\pm$ 0.0005\\ % src: PROJECT_INSTRUCTIONS.md
+\bottomrule
+\multicolumn{4}{@{}l}{\scriptsize $^\dagger$server momentum 0.9; preregistered, scored on test once.}\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+\end{tabular}
+\end{table}
+
+\subsection{Explanation check}
+Fig.~\ref{fig:agree} shows agreement between each eligible silo and the global model.
+Median Jaccard@10 rises from 0.333 at $\alpha=0.1$ to 0.538 and 0.667, and weighted $\tau$ % src: PROJECT_INSTRUCTIONS.md
+from 0.592 to 0.787 and 0.844. Every level is 5.1--10.3 times the chance Jaccard of % src: PROJECT_INSTRUCTIONS.md
+0.065, so the rankings carry real signal. The more useful comparison is with the % src: PROJECT_INSTRUCTIONS.md
+seed-noise floor. For centralized models that share everything except the seed, the
+median pairwise Jaccard@10 is 0.429 (pair medians span 0.429 to 0.484). At $\alpha=5.0$ and $\alpha=0.5$ % src: PROJECT_INSTRUCTIONS.md
+silos agree with the global model more than seed noise alone would allow. At
+$\alpha=0.1$ the median falls under the floor while accuracy is still 0.516. We read % src: PROJECT_INSTRUCTIONS.md
+this as directional, not significant, because the $\alpha=0.1$ cluster-bootstrap % src: PROJECT_INSTRUCTIONS.md
+interval of [0.250, 0.429] overlaps the floor range. % src: PROJECT_INSTRUCTIONS.md
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_agreement_alpha.pdf}
+\caption{Silo-versus-global explanation agreement by $\alpha$ (eligible rows; box = IQR,
+line = median). Hatched band: centralized-seed instability floor. Dotted line: chance
+Jaccard@10.}
+\label{fig:agree}
+\end{figure}
+
+Silo size and label skew are not independent here: a silo's size is the sum of its
+Dirichlet shares, so small silos are also skewed ones. We first used label entropy as
+the skew covariate, as planned. Its link with agreement did not survive conditioning on
+log size: at $\alpha=0.5$ the partial correlation changed sign ($r=+0.23$ and $+0.13$ % src: docs/contribution_a_results.md
+for Jaccard@10 and $\tau$, $n=30$). We then substituted KL divergence from the global % src: docs/contribution_a_results.md
+label distribution. After conditioning on log size it still predicts agreement: partial
+$r=-0.57$ at $\alpha=0.1$ ($n=29$) and $r=-0.82$ and $-0.87$ at $\alpha=0.5$ ($n=30$). % src: docs/contribution_a_results.md
+This narrows the size explanation but stays observational; size-controlled partitions
+cannot be built with this partitioner.
+
+SHAP's additivity residual also deserves a check, since a poor reconstruction at small
+silos could produce low agreement by itself. Of the 90 final-round silo files, 3 store a % src: PROJECT_INSTRUCTIONS.md
+residual larger than the worst one in the validation pool (3.336), and these belong % src: PROJECT_INSTRUCTIONS.md
+mostly to $\alpha=0.1$. There, the Spearman correlation between a silo's residual and its % src: PROJECT_INSTRUCTIONS.md
+Jaccard@10 is $r=-0.237$ ($n=29$). Dropping the flagged silos under a rule written down % src: PROJECT_INSTRUCTIONS.md
+in advance keeps Jaccard@10 at 0.333 and shifts $\tau$ from 0.592 to 0.597. Between % src: PROJECT_INSTRUCTIONS.md
+rounds 5 and 20, agreement drifts down at $\alpha=0.1$ and $\alpha=0.5$ even as % src: docs/contribution_a_results.md
+validation macro-F1 climbs; we treat this trend as directional, since it used a cheaper
+SHAP setting and no test. Per-family results, the parity monitor, FedProx and the
+faithfulness checks are in \fullref{app:expl} and \fullref{app:resid}.
+
+\subsection{Trust check}
+Of the five statistics, only training loss separates the malicious silos: its Glass's
+$\delta$ under attack is 33.8 times its value for the same silos in a clean run at $f=3$, % src: PROJECT_INSTRUCTIONS.md
+and 154.3 times at $f=2$. These ratios are seed-42 effect sizes, not cut-offs: a % src: PROJECT_INSTRUCTIONS.md
+per-round loss cut-off tuned on seed 42 broke down at seed 1337, where it flagged 0.017 % src: PROJECT_INSTRUCTIONS.md
+of poisoned silo-rounds against the 0.483 the agent had logged. The three geometric % src: PROJECT_INSTRUCTIONS.md
+statistics show little or no separation, and validation accuracy points the wrong way:
+relabelling attack flows as Benign makes a malicious silo look more accurate on a
+validation set dominated by Benign traffic.
+
+The classical rules did not find the attackers. Multi-Krum excluded a malicious silo
+0\% of the time, against a chance rate of 0.30 at $f=3$; it removed the same large, % src: docs/contribution_b_results.md
+Benign-heavy silos in every round, attack or not. Its apparent recovery at $f=2$ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+(recovery fraction 1.3490) is a compositional artifact: dropping those silos raised the % src: docs/contribution_b_results.md
+malicious silos' share of the aggregate while lifting macro-F1 through label balance.
+Classical Krum keeps one update of ten each round, so its exclusions are at chance.
+Defending when nobody attacks has a price in test macro-F1: Krum $-22.7$\,pp, % src: PROJECT_INSTRUCTIONS.md
+Multi-Krum $-4.9$\,pp and trimmed mean $-1.6$\,pp. % src: PROJECT_INSTRUCTIONS.md
+
+ByzAgent flagged the malicious silos in 60 of 60 silo-rounds at seed 42, but the same % src: docs/contribution_b_results.md
+silos were flagged at 0.95--1.00 in the clean run, as was a silo that was never % src: docs/contribution_b_results.md
+malicious. All four are the lowest-Benign silos at that seed. At seeds 1337 and 2024, % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+where composition is graded rather than bimodal, lift appears where the clean baseline
+is low (Fig.~\ref{fig:lift}). Our conclusion for this part of the trust check is:
+\begin{quote}\small
+``Both effects are present. A real compositional confound saturates some silos' flag
+rates independent of any attack; real attack-responsive detection is also present and
+becomes visible where silos are not already saturated. Seed 42's apparent null was % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+partly a ceiling artifact of that seed's unusually bimodal composition.''
+\end{quote}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_byzagent_lift.pdf}
+\caption{ByzAgent flag rate for each malicious silo in a clean run (open) and under the
+$f=3$ sudden attack (filled). Marker shape: silo 0 (circle), 3 (square), 5 (triangle). % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+Lift is the horizontal distance.}
+\label{fig:lift}
+\end{figure}
+
+We describe the agent as one that produces decisions plus a rationale of measured
+fidelity, and the measurement shows it is partial: its strict citation error rose from 11.7\% (seed 42) to % src: docs/contribution_b_results.md
+22.5\% (seeds 1337 and 2024). At those seeds the agent kept citing update norm (in about % src: docs/contribution_b_results.md
+59\% of explanations) even though its % src: docs/contribution_b_results.md
+correlation with the agent's decisions fell from $+0.419$ to $-0.076$; training loss, % src: docs/contribution_b_results.md
+the real signal, stayed under-cited. When given five-round histories, about 35--45\% of % src: PROJECT_INSTRUCTIONS.md
+the agent's trend claims contradicted the sequence it was shown. Decisions are
+nondeterministic: three repeated calls at round 10 matched exactly in 27 of 30 cases, % src: docs/contribution_b_results.md
+and all 30 agreed on trust versus flagged. The rolling-history variant failed its % src: docs/contribution_b_results.md
+preregistered test, because a never-malicious silo rose as much as the attackers.
+Baselines, the history matrix and the gradual attack are single runs by design. Full
+tables are in \fullref{app:trust}.
+
+\subsection{Efficiency}
+Table~\ref{tab:eff} summarises the serving and communication measurements. ONNX
+Runtime fp32 gives the same predictions as PyTorch on all 143,513 validation rows and is % src: docs/efficiency_results.md
+the default serving engine; int8 quantization was dropped after validation macro-F1
+fell by 0.1428. Update compression saves bytes exactly, but its effect on accuracy is % src: docs/efficiency_results.md
+not detectable at $n=3$. Details are in \fullref{app:eff}. % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+
+\begin{table}[t]
+\centering
+\caption{Serving and communication (CPU; one laptop)}
+\label{tab:eff}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright\arraybackslash}Xr@{}}
+\toprule
+Quantity & Value\\
+\midrule
+Latency p50 per flow, ONNX fp32 / PyTorch (median, 3 sessions) & 45.7 / 186.5\,$\mu$s\\ % src: PROJECT_INSTRUCTIONS.md
+Throughput, batch 1024, ONNX fp32 / PyTorch (rows/s) & 1,071,700 / 1,482,368\\ % src: docs/efficiency_results.md
+Traffic per round (fp32, 10 silos, both directions), bytes & 1,587,920\\ % src: PROJECT_INSTRUCTIONS.md
+\quad each direction & 793,960\\ % src: PROJECT_INSTRUCTIONS.md
+Uplink saving, fp16 / int8 updates & 50.0\% / 74.9\%\\ % src: docs/efficiency_results.md
+Best-validation change, fp16 / int8 (mean, 3 seeds) & $-0.0007$ / $-0.0011$\\ % src: docs/efficiency_results.md
+Wall time per round, median of 500 rounds & 51.4\,s\\ % src: docs/efficiency_results.md
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% =====================================================================================
+\section{Discussion and Limitations}
+
+\emph{What the explanation check supports.} Agreement falls with label skew and sits
+well above chance at every $\alpha$. The claim that at $\alpha=0.1$ it is no better than % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+seed noise is directional; the interval touches the floor, and the floor itself rests on
+three seed pairs. We used three seeds throughout, so effective sample sizes are closer to
+the number of runs than to the number of silo rows. The SHAP sampling in the headline
+pipeline was not seeded, the chance level assumes uniform random rankings, and the
+faithfulness check (deletion and insertion curves) covers one configuration only. PortScan
+generalises genuinely: its test rows sit 23 times further from their nearest training % src: PROJECT_INSTRUCTIONS.md
+row than other families do. A suspected near-duplication of Bot and WebAttack rows was
+tested and not confirmed. FedProx with $\mu=0.0005$ improved agreement at $\alpha=0.5$ in % src: PROJECT_INSTRUCTIONS.md
+all three seeds with flat accuracy, was inconclusive at $\alpha=0.1$ and did nothing at % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+$\alpha=5.0$; we tested no other $\mu$. A drift monitor built on these rankings only % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
+works with explanations averaged over at least three draws; single-draw flags were
+artifacts.
+
+\emph{What the trust check supports.} The attack is worst-case by construction, and the
+attacker-selection rule picks silos on the same composition axis that every detector
+here reacts to. Under this partition, a strong attacker drawn from ordinary silos could
+not be built, so we cannot say whether the failures are general to these rules or tied
+to our selection. The agent's rationale is partly unfaithful, its decisions vary
+between calls, and the rolling-history design failed its preregistered test. The
+language-model summaries in the dashboard are a convenience for analysts and carry no
+research claim.
+
+% =====================================================================================
+\section{Conclusion and Future Work}
+On corrected CICIDS2017 split across ten silos, FedAvg holds centralized accuracy at
+mild label skew and loses it at strong skew. Explanation agreement between silos and the
+global model follows the same direction, and at strong skew it falls to the level that
+random seeds produce on their own, a result we report as directional. In a separate
+experiment, both the classical robust rules and an LLM trust agent reacted to silo
+composition as well as to a worst-case attack, and the agent's written reasons were only
+partly accurate. Next steps include a partitioning design that varies size and skew
+independently, seeded multi-draw SHAP for the headline numbers, more seeds for the floor,
+attacker selection that does not ride the composition axis, and a check of whether
+server momentum changes explanation agreement.
+
+\section*{Acknowledgment}
+We thank [Guide name], School of Computer Science and Engineering, VIT-AP University,
+for guidance throughout this project.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+% =====================================================================================
+\iffullversion
+\clearpage
+\appendices
+\input{appendix}
+\fi
+
+\end{document}
