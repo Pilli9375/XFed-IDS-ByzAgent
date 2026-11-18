@@ -332,8 +332,8 @@ federated runs and are reported separately.}
 \iffullversion
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figs/dash_live.png}
-\caption{Dashboard, Live route: alert stream, one alert's SHAP contributions, and the trust panel.}
+\includegraphics[width=\columnwidth]{figs/dash_live_alert.png}
+\caption{Dashboard, Live route (cropped): one selected alert with its SHAP contributions and LLM summary.}
 \label{fig:dashlive}
 \end{figure}
 \fi
@@ -553,7 +553,8 @@ interval of [0.250, 0.429] overlaps the floor range. % src: PROJECT_INSTRUCTIONS
 \centering
 \includegraphics[width=\columnwidth]{figs/fig_agreement_alpha.pdf}
 \caption{Silo-versus-global explanation agreement by $\alpha$ (eligible rows; box = IQR,
-line = median). Hatched band: centralized-seed instability floor. Dotted line: chance
+line = median). Hatched band: centralized-seed instability floor, for Jaccard@10 in
+panel (a) and for weighted $\tau$ in panel (b) (range 0.660--0.690). Dashed line: chance % src: site/public/data/headline.json
 Jaccard@10. IQRs computed for this paper from agreement\_metrics.csv
 (paper/figs/derived\_values.json).}
 \label{fig:agree}

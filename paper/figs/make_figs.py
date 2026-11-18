@@ -129,7 +129,12 @@ for ax, col, key, title in [
     else:
         lo, hi = floor["tau_range"]
     floor_band(ax, lo, hi)
-    ax.text(3.45, lo - 0.015, "seed-noise floor", ha="right", va="top", fontsize=6, color="#1f5f80", bbox=LABEL_BOX, zorder=6)
+    # Label sits in the empty lower-right area (right of the alpha=0.5 whisker, below the
+    # alpha=5.0 whisker) and points at the band, so it touches no box or whisker.
+    label_y = 0.27 if key == "jaccard_at_10" else 0.47
+    ax.annotate("seed-noise floor", xy=(2.55, lo), xytext=(3.45, label_y), ha="right", va="center",
+                fontsize=6, color="#1f5f80", bbox=LABEL_BOX, zorder=6,
+                arrowprops=dict(arrowstyle="-", color="#1f5f80", lw=0.6, shrinkA=1, shrinkB=0))
     bp = ax.boxplot(data, widths=0.5, patch_artist=True, showfliers=False,
                     medianprops=dict(color="black", lw=1.4), whiskerprops=dict(lw=0.6),
                     capprops=dict(lw=0.6), boxprops=dict(lw=0.6), zorder=3)
