@@ -15,6 +15,12 @@
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{xcolor}
+% Okabe-Ito palette (colour-blind safe); used only for figure fills, never for text or links.
+\definecolor{oiblue}{HTML}{0072B2}
+\definecolor{oiorange}{HTML}{E69F00}
+\definecolor{oigreen}{HTML}{009E73}
+\definecolor{oivermillion}{HTML}{D55E00}
+\definecolor{oisky}{HTML}{56B4E9}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,calc}
 \usepackage[hidelinks]{hyperref}
@@ -307,11 +313,11 @@ selected model, explanations and trust decisions to a React front end
   font=\scriptsize,
   box/.style={draw, rounded corners=1.5pt, align=center, inner sep=2.5pt, minimum height=9mm},
   arr/.style={-{Latex[length=1.6mm]}, semithick}]
-\node[box, text width=21mm] (data) {1. Data\\CICIDS2017 (V4)\\8 families + Benign};
-\node[box, text width=27mm, right=9mm of data] (fl) {2. Federated training\\10 silos, Dirichlet $\alpha$\\round chosen on validation};
-\node[box, fill=black!6, text width=27mm, below=6mm of data.south west, anchor=north west] (exp) {3. Explanation check\\client SHAP, top-$k$ only\\Jaccard@10, weighted $\tau$};
-\node[box, fill=black!6, text width=27mm, anchor=north east] (trust) at (fl.south east |- exp.north) {4. Trust check\\5 statistics per silo\\ByzAgent vs.\ Krum family};
-\node[box, minimum height=6mm, anchor=north west, text width=60.5mm] (dash) at ($(exp.south west)+(0,-5mm)$) {5. Dashboard: live alerts, explanations, trust decisions};
+\node[box, fill=oisky!22, draw=oisky!60!black, text width=21mm] (data) {1. Data\\CICIDS2017 (V4)\\8 families + Benign};
+\node[box, fill=oiblue!14, draw=oiblue!70!black, text width=27mm, right=9mm of data] (fl) {2. Federated training\\10 silos, Dirichlet $\alpha$\\round chosen on validation};
+\node[box, fill=oiorange!22, draw=oiorange!60!black, text width=27mm, below=6mm of data.south west, anchor=north west] (exp) {3. Explanation check\\client SHAP, top-$k$ only\\Jaccard@10, weighted $\tau$};
+\node[box, fill=oivermillion!16, draw=oivermillion!70!black, text width=27mm, anchor=north east] (trust) at (fl.south east |- exp.north) {4. Trust check\\5 statistics per silo\\ByzAgent vs.\ Krum family};
+\node[box, fill=oigreen!16, draw=oigreen!65!black, minimum height=6mm, anchor=north west, text width=60.5mm] (dash) at ($(exp.south west)+(0,-5mm)$) {5. Dashboard: live alerts, explanations, trust decisions};
 \draw[arr] (data) -- (fl);
 \draw[arr] (fl.south) ++(-6mm,0) -- ++(0,-2.5mm) -| (exp.north);
 \draw[arr] (fl.south) ++(4mm,0) -- ($(trust.north)+(4mm,0)$);

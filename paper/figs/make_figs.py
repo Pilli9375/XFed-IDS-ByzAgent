@@ -6,9 +6,12 @@ Run from the repository root:
 Writes PDF figures into paper/figs/ and paper/figs/derived_values.json, which
 holds every value the figures plot plus the few aggregations the appendix
 tables use that are not already stated in a results document (each entry names
-its source file and how it was computed). Nothing is smoothed or invented;
-figures use greyscale-safe styling (markers, hatching, line styles) so they
-survive black-and-white printing.
+its source file and how it was computed). Nothing is smoothed or invented.
+
+Styling: colours come from the Okabe-Ito palette, one fixed colour per meaning
+across all figures (see COLOURS below). Every series also differs by marker,
+fill or line style, so the figures stay readable in greyscale print and for
+colour-blind readers.
 """
 import csv
 import json
@@ -35,12 +38,26 @@ plt.rcParams.update({
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "axes.linewidth": 0.6,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
     "lines.linewidth": 1.0,
     "pdf.fonttype": 42,
     "savefig.bbox": "tight",
     "savefig.pad_inches": 0.02,
 })
-GREYS = ["0.0", "0.35", "0.6", "0.8"]
+
+# Okabe-Ito palette, one meaning per colour across every figure.
+OI = {"blue": "#0072B2", "orange": "#E69F00", "green": "#009E73",
+      "vermillion": "#D55E00", "sky": "#56B4E9", "purple": "#CC79A7"}
+ALPHA_COLOUR = {"0.1": OI["purple"], "0.5": OI["orange"], "5.0": OI["blue"]}  # label skew
+ALPHA_STYLE = {"0.1": ("-", "o"), "0.5": ("--", "s"), "5.0": (":", "^")}      # greyscale backup
+CLEAN = OI["green"]         # clean / no-attack runs
+ATTACK = OI["vermillion"]   # poisoned runs
+FLOOR = OI["sky"]           # centralized-seed instability floor
+CHANCE = "0.45"             # chance level, dashed grey
+SEED_STYLE = {42: ("-", "o", True), 1337: ("--", "s", False), 2024: (":", "^", False)}  # line, marker, filled
+GRID = dict(lw=0.3, color="0.88")
+
 ALPHAS = ["0.1", "0.5", "5.0"]
 SEEDS = [42, 1337, 2024]
 derived = {}
@@ -55,6 +72,16 @@ def quartiles(xs):
     q = st.quantiles(xs, n=4, method="inclusive")
     return q[0], st.median(xs), q[2]
 
+
+def floor_band(ax, lo, hi):
+    """Light band for the seed-noise floor with its edges drawn on top."""
+    ax.axhspan(lo, hi, facecolor=FLOOR, alpha=0.30, edgecolor="none", zorder=0)
+    ax.axhspan(lo, hi, facecolor="none", edgecolor=FLOOR, hatch="////", lw=0.0, zorder=0)
+    for yv in (lo, hi):
+        ax.axhline(yv, color=FLOOR, lw=0.8, zorder=1)
+
+
+LABEL_BOX = dict(boxstyle="round,pad=0.12", fc="white", ec="none", alpha=0.85)
 
 # ---------------------------------------------------------------- agreement
 agree = [r for r in read_csv(R("results", "inspection", "agreement_metrics.csv")) if r["family_eligible"] == "True"]
@@ -97,28 +124,31 @@ for ax, col, key, title in [
     data = [[float(r[col]) for r in by_alpha[a]] for a in ALPHAS]
     if key == "jaccard_at_10":
         lo, hi = floor["jaccard_at_10_range"]
-        ax.axhline(chance, color="0.2", ls=":", lw=0.9)
+        ax.axhline(chance, color=CHANCE, ls="--", lw=0.9, zorder=1)
+        ax.text(3.45, chance + 0.015, "chance", ha="right", va="bottom", fontsize=6, color="0.25", bbox=LABEL_BOX, zorder=6)
     else:
         lo, hi = floor["tau_range"]
-    ax.axhspan(lo, hi, facecolor="0.85", edgecolor="0.4", hatch="////", lw=0.4, zorder=0)
+    floor_band(ax, lo, hi)
+    ax.text(3.45, lo - 0.015, "seed-noise floor", ha="right", va="top", fontsize=6, color="#1f5f80", bbox=LABEL_BOX, zorder=6)
     bp = ax.boxplot(data, widths=0.5, patch_artist=True, showfliers=False,
                     medianprops=dict(color="black", lw=1.4), whiskerprops=dict(lw=0.6),
-                    capprops=dict(lw=0.6), boxprops=dict(lw=0.6))
-    for b in bp["boxes"]:
-        b.set_facecolor("white")
+                    capprops=dict(lw=0.6), boxprops=dict(lw=0.6), zorder=3)
+    for b, a in zip(bp["boxes"], ALPHAS):
+        b.set_facecolor(ALPHA_COLOUR[a] + "40")   # 25% tint of the alpha colour
+        b.set_edgecolor(ALPHA_COLOUR[a])
+    for part in ("whiskers", "caps"):
+        for k, ln in enumerate(bp[part]):
+            ln.set_color(ALPHA_COLOUR[ALPHAS[k // 2]])
     meds = [st.median(x) for x in data]
-    ax.plot([1, 2, 3], meds, "ko-", ms=3, lw=0.8, zorder=5)
+    ax.plot([1, 2, 3], meds, color="black", lw=0.8, zorder=5)
+    for xi, (a, m) in enumerate(zip(ALPHAS, meds), start=1):
+        ax.plot([xi], [m], marker=ALPHA_STYLE[a][1], ms=3.6, mfc=ALPHA_COLOUR[a], mec="black", mew=0.6, ls="", zorder=6)
     ax.set_xticks([1, 2, 3], [r"$\alpha$=0.1", "0.5", "5.0"])
     ax.set_ylim(0, 1.0)
     ax.set_title(title, pad=2)
-    ax.grid(axis="y", lw=0.3, color="0.85")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
 axes[0].set_ylabel("silo vs. global agreement")
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
-handles = [Patch(facecolor="0.85", edgecolor="0.4", hatch="////", lw=0.4, label="seed-noise floor (range)"),
-           Line2D([], [], color="0.2", ls=":", lw=0.9, label="chance (Jaccard@10)"),
-           Line2D([], [], color="black", marker="o", ms=3, lw=0.8, label="median")]
-fig.legend(handles=handles, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.07), handlelength=1.6)
 fig.tight_layout(w_pad=0.8)
 fig.savefig(os.path.join(OUT, "fig_agreement_alpha.pdf"))
 plt.close(fig)
@@ -167,9 +197,9 @@ markers = {0: "o", 3: "s", 5: "^"}
 for s in SEEDS:
     for silo in (0, 3, 5):
         v = d_lift[f"{s}|{silo}"]
-        ax.plot([v["clean"], v["attack"]], [y, y], color="0.45", lw=1.0, zorder=1)
-        ax.scatter([v["clean"]], [y], marker=markers[silo], facecolor="white", edgecolor="black", s=36, lw=0.7, zorder=2)
-        ax.scatter([v["attack"]], [y], marker=markers[silo], facecolor="black", edgecolor="black", s=12, lw=0.7, zorder=3)
+        ax.plot([v["clean"], v["attack"]], [y, y], color="0.55", lw=1.0, zorder=1)
+        ax.scatter([v["clean"]], [y], marker=markers[silo], facecolor="white", edgecolor=CLEAN, s=36, lw=1.1, zorder=2)
+        ax.scatter([v["attack"]], [y], marker=markers[silo], facecolor=ATTACK, edgecolor="black", s=14, lw=0.5, zorder=3)
         ypos.append(y)
         labels.append(f"seed {s}, silo {silo}")
         y += 1
@@ -178,30 +208,33 @@ ax.set_yticks(ypos, labels, fontsize=6)
 ax.invert_yaxis()
 ax.set_xlim(-0.05, 1.05)
 ax.set_xlabel("share of 20 rounds flagged (downweight or quarantine)")
-ax.grid(axis="x", lw=0.3, color="0.85")
-ax.scatter([], [], marker="o", facecolor="white", edgecolor="black", s=14, label="clean run (no attack)")
-ax.scatter([], [], marker="o", facecolor="black", edgecolor="black", s=14, label="sudden attack, f=3")
+ax.grid(axis="x", **GRID)
+ax.set_axisbelow(True)
+ax.scatter([], [], marker="o", facecolor="white", edgecolor=CLEAN, lw=1.1, s=18, label="clean run (no attack), open")
+ax.scatter([], [], marker="o", facecolor=ATTACK, edgecolor="black", lw=0.5, s=14, label="sudden attack, f=3, filled")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, handletextpad=0.2)
 fig.savefig(os.path.join(OUT, "fig_byzagent_lift.pdf"))
 plt.close(fig)
 
 # ---------------------------------------------------------------- FedAvg validation curves (round lottery)
 fig, axes = plt.subplots(1, 3, figsize=(7.1, 1.6), sharey=True)
-styles = {42: ("-", "o"), 1337: ("--", "s"), 2024: (":", "^")}
 lot = {(r["alpha"], int(r["seed"])): r for r in read_csv(R("results", "federated", "round_lottery_val.csv"))}
 for ax, a in zip(axes, ALPHAS):
+    col = ALPHA_COLOUR[a]
     for s in SEEDS:
         h = json.load(open(R("results", "federated", f"fedavg_a{a}_s{s}", "round_history.json"), encoding="utf-8"))
         xs = [p["round"] for p in h if p["round"] >= 1]
         ys = [p["val_macro_f1_headline"] for p in h if p["round"] >= 1]
-        ls, mk = styles[s]
-        ax.plot(xs, ys, color="black", ls=ls, lw=0.8, label=f"seed {s}")
+        ls, mk, filled = SEED_STYLE[s]
+        ax.plot(xs, ys, color=col, ls=ls, lw=1.2, label=f"seed {s}")
         b = lot[(a, s)]
-        ax.plot([int(b["best_round"])], [float(b["best_val"])], marker=mk, color="black", ms=3.5, mfc="white")
-    ax.set_title(rf"FedAvg, $\alpha$={a}", pad=2)
+        ax.plot([int(b["best_round"])], [float(b["best_val"])], marker=mk, color="black", ms=3.8,
+                mfc=col if filled else "white", mew=0.7, ls="")
+    ax.set_title(rf"FedAvg, $\alpha$={a}", pad=2, color="black")
     ax.set_xlabel("round")
     ax.set_xticks([1, 5, 10, 15, 20])
-    ax.grid(lw=0.3, color="0.85")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
 axes[0].set_ylabel("val macro-F1 (7 headline)")
 axes[0].legend(frameon=False, loc="lower right")
 fig.tight_layout(w_pad=0.5)
@@ -213,7 +246,9 @@ rw = read_csv(R("results", "inspection", "round_wise_agreement.csv"))
 rounds = [5, 10, 15, 20]
 fig, axes = plt.subplots(1, 2, figsize=(COL_W, 1.6))
 d_rw = {}
-for a, (ls, mk) in zip(ALPHAS, [("-", "o"), ("--", "s"), (":", "^")]):
+for a in ALPHAS:
+    ls, mk = ALPHA_STYLE[a]
+    col = ALPHA_COLOUR[a]
     mj = []
     mf = []
     for rd in rounds:
@@ -225,14 +260,15 @@ for a, (ls, mk) in zip(ALPHAS, [("-", "o"), ("--", "s"), (":", "^")]):
             f1s.append([p for p in h if p["round"] == rd][0]["val_macro_f1_headline"])
         mf.append(st.mean(f1s))
     d_rw[a] = {"mean_jaccard": mj, "mean_val_f1": mf}
-    axes[0].plot(rounds, mj, color="black", ls=ls, marker=mk, ms=3, mfc="white", label=rf"$\alpha$={a}")
-    axes[1].plot(rounds, mf, color="black", ls=ls, marker=mk, ms=3, mfc="white")
+    axes[0].plot(rounds, mj, color=col, ls=ls, lw=1.2, marker=mk, ms=3.6, mfc="white", mew=1.0, label=rf"$\alpha$={a}")
+    axes[1].plot(rounds, mf, color=col, ls=ls, lw=1.2, marker=mk, ms=3.6, mfc="white", mew=1.0)
 axes[0].set_title("(a) mean Jaccard@10", pad=2)
 axes[1].set_title("(b) mean val macro-F1", pad=2)
 for ax in axes:
     ax.set_xticks(rounds)
     ax.set_xlabel("round")
-    ax.grid(lw=0.3, color="0.85")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
 axes[0].legend(frameon=False, fontsize=6)
 fig.tight_layout(w_pad=0.8)
 fig.savefig(os.path.join(OUT, "fig_round_wise.pdf"))
@@ -243,14 +279,18 @@ derived["round_wise"] = {"source": "results/inspection/round_wise_agreement.csv 
 smh = read_csv(R("results", "inspection", "size_matched_heterogeneity.csv"))
 fig, axes = plt.subplots(1, 2, figsize=(COL_W, 1.6), sharey=True)
 for ax, a in zip(axes, ["0.1", "0.5"]):
+    col = ALPHA_COLOUR[a]
     rows = [r for r in smh if r["alpha"] == a and r["jaccard_at_10"] not in ("", "nan")]
-    for s, mk in zip(SEEDS, ["o", "s", "^"]):
+    for s in SEEDS:
+        _, mk, filled = SEED_STYLE[s]
         xs = [float(r["kl_from_global"]) for r in rows if int(r["seed"]) == s]
         ys = [float(r["jaccard_at_10"]) for r in rows if int(r["seed"]) == s]
-        ax.scatter(xs, ys, marker=mk, facecolor="white" if s != 42 else "black", edgecolor="black", s=10, lw=0.6, label=f"seed {s}")
+        ax.scatter(xs, ys, marker=mk, facecolor=col if filled else "white", edgecolor=col if not filled else "black",
+                   s=14, lw=0.95, label=f"seed {s}")
     ax.set_title(rf"$\alpha$={a} (n={len(rows)})", pad=2)
     ax.set_xlabel("KL(silo labels || global)")
-    ax.grid(lw=0.3, color="0.85")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
 axes[0].set_ylabel("Jaccard@10 vs. global")
 axes[1].legend(frameon=False, fontsize=5.5, loc="upper right")
 fig.tight_layout(w_pad=0.6)
@@ -259,23 +299,24 @@ plt.close(fig)
 
 # ---------------------------------------------------------------- Phase 0: clean vs poisoned validation curves
 runs = [
-    ("fedavg_a0.5_s42", "clean", "-"),
-    ("fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5", "sudden f=3 {0,3,5}", "--"),
-    ("fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3", "sudden f=2 {0,3}", ":"),
-    ("fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5", "gradual f=3 {0,3,5}", "-."),
+    ("fedavg_a0.5_s42", "clean", CLEAN, "-", "o"),
+    ("fedavg_a0.5_s42_poisoned_f3_sudden_silos0-3-5", "sudden f=3 {0,3,5}", ATTACK, "--", "s"),
+    ("fedavg_a0.5_s42_poisoned_f2_sudden_silos0-3", "sudden f=2 {0,3}", ATTACK, ":", "^"),
+    ("fedavg_a0.5_s42_poisoned_f3_gradual_silos0-3-5", "gradual f=3 {0,3,5}", ATTACK, "-.", "D"),
 ]
 fig, ax = plt.subplots(figsize=(COL_W, 1.7))
-for tag, lab, ls in runs:
+for tag, lab, col, ls, mk in runs:
     h = json.load(open(R("results", "federated", tag, "round_history.json"), encoding="utf-8"))
     xs = [p["round"] for p in h if p["round"] >= 1]
     ys = [p["val_macro_f1_headline"] for p in h if p["round"] >= 1]
-    ax.plot(xs, ys, color="black" if ls != ":" else "0.35", ls=ls, lw=0.9, label=lab)
-ax.axvspan(15.5, 20.5, color="0.9", zorder=0)
+    ax.plot(xs, ys, color=col, ls=ls, lw=1.15, marker=mk, ms=3.0, markevery=4, mfc="white", mew=0.9, label=lab)
+ax.axvspan(15.5, 20.5, color="0.92", zorder=0)
 ax.text(18, 0.42, "final-5\nwindow", ha="center", fontsize=6)
 ax.set_xlabel("round")
 ax.set_ylabel("val macro-F1")
 ax.set_xticks([1, 5, 10, 15, 20])
-ax.grid(lw=0.3, color="0.85")
+ax.grid(**GRID)
+ax.set_axisbelow(True)
 ax.legend(frameon=False, fontsize=6, loc="lower center", ncol=2)
 fig.savefig(os.path.join(OUT, "fig_phase0_curves.pdf"))
 plt.close(fig)
