@@ -1563,7 +1563,7 @@ Endpoint & Purpose\\
 \end{table}
 
 \emph{Dashboard.} A React front end has three routes: \emph{Live} (alert stream, selected
-alert with SHAP bars and summary, trust panel; Fig.~\ref{fig:dash1}), \emph{Investigate}
+alert with SHAP bars and summary, trust panel; Fig.~\ref{fig:dashlive}), \emph{Investigate}
 (accuracy, agreement and trust evidence) and \emph{Limits} (known limitations). Each
 displayed number links to its source file. Alerts come from a simulator that feeds validation
 rows to the deployed model and shows, per alert, whether the prediction matched the
@@ -1577,13 +1577,6 @@ only when its validation macro-F1 is equal to or higher than that of the model a
 in service; there is no tolerance band. Every swap is written to an append-only audit log with its seed and checkpoint
 hash.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.85\textwidth]{figs/dash_live.png}
-\caption{Dashboard, Live route: alert stream, selected alert with SHAP contributions
-and LLM summary (labelled as not a research result), and the trust panel.}
-\label{fig:dash1}
-\end{figure*}
 
 \begin{figure*}[t]
 \centering

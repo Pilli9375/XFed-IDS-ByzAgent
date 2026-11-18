@@ -50,6 +50,9 @@ def strip_latex(tex):
             # appendix.tex has no \begin{document}; treat it as in-document
             if "appendix" not in globals().get("_current", ""):
                 continue
+        if "numcheck: ignore" in line:
+            # front-matter facts (capstone note, names and registration numbers), not prose
+            continue
         line = re.sub(r"(?<!\\)%.*$", "", line)
         out.append(line)
     t = "\n".join(out)
