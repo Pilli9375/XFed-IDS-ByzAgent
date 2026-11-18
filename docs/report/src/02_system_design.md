@@ -9,10 +9,10 @@ XFed-IDS-ByzAgent is one system built in five stages, shown in @fig:pipeline. Ea
 ![The five stages of XFed-IDS-ByzAgent. Stages 3 and 4 are separate experiments run on the same federated training and are reported separately.](docs/report/figs/fig_pipeline.png){#fig:pipeline width=12}
 
 1. **Data.** The corrected Distrinet CICIDS2017 flows are cleaned and mapped to eight attack families plus Benign, then split once into a training pool and a test set, with a fixed validation set held out of the training pool.
-2. **Federated training.** Ten simulated organizations (silos) receive Dirichlet-skewed shares of the training pool and jointly train a multilayer perceptron with FedAvg. Every silo trains in every round, and the round kept from each run is the one with the best validation score.
-3. **Explanation check.** Each silo computes SHAP attributions on its own copy of the model and sends only its top-k feature indices to the server, which compares them with the global model's ranking.
-4. **Trust check.** The server logs five behaviour statistics per silo and round. Either ByzAgent, a language-model agent, or a classical robust rule decides how much each silo's update counts.
-5. **Dashboard.** A FastAPI backend serves the selected model, its explanations and the trust decisions to a React front end used by an analyst.
+2. **Federated training.** Ten simulated organizations (silos) receive Dirichlet-skewed shares of the training pool and jointly train a multilayer perceptron with FedAvg. No silo sits out a round, and each run keeps whichever round scored highest on validation.
+3. **Explanation check.** Each silo explains its local copy of the model with SHAP and passes just the indices of its k highest-ranked features to the server; the server sets these against the ranking of the global model.
+4. **Trust check.** The server logs five behaviour statistics per silo and round. A decision on how much weight each update gets is then made, either by ByzAgent, a language-model agent, or by one of the classical robust rules.
+5. **Dashboard.** An analyst works in a React front end, fed by a FastAPI backend that serves the chosen model, its explanations and the trust decisions.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 The design keeps one rule throughout: data stays with its silo. The only things that cross from a silo to the server are model weights, a training-loss value and, in the explanation check, a list of top-ranked feature indices.
@@ -21,34 +21,34 @@ The design keeps one rule throughout: data stays with its silo. The only things 
 
 ### Data and cleaning {#sec:m-data}
 
-We use the Distrinet release (version 4) of CICIDS2017 published with Liu et al. [@liu2022], which builds on the corrections of Engelen et al. [@engelen2021] to the original dataset [@sharafaldin2018]. The raw files hold 2,099,976 flows in five day files with 91 columns. Seven of those columns identify the flow (flow ID, addresses, ports and timestamp) and are dropped, which leaves 82 numeric candidate features, one label and one attempted-category code.
+We use the Distrinet release (version 4) of CICIDS2017 published with Liu et al. [@liu2022], a refinement of the fixes that Engelen et al. [@engelen2021] made to the original dataset [@sharafaldin2018]. Before cleaning there are 2,099,976 flows, spread over five files (one per capture day), each with 91 columns. Seven of those columns identify the flow (flow ID, addresses, ports and timestamp) and are dropped, which leaves 82 numeric candidate features, one label and one attempted-category code.
 <!-- src: data/README.md -->
 
-Two early decisions shaped the classes. First, flows labelled "Attempted" join their parent family. We had planned to fold them into Benign, as the dataset authors' benchmark does, but the counts ruled it out: attempts are most of the Bot class and of both web-attack subtypes, so folding them away would have emptied those classes. Second, 14 raw labels were mapped to nine classes. The internal port-scan phase of the infiltration scenario was sent to PortScan, because its features are those of a port scan; sending it to Infiltration would have built a class that was almost entirely scan traffic.
+Two early decisions shaped the classes. First, flows labelled "Attempted" join their parent family. We had planned to fold them into Benign, as the dataset authors' benchmark does, but the counts ruled it out: attempts are most of the Bot class and of both web-attack subtypes, so folding them away would have emptied those classes. Second, 14 raw labels were mapped to nine classes. The scanning step inside the infiltration scenario went to PortScan, since its flows look exactly like a port scan; had it gone to Infiltration, that class would have been nearly all scan traffic.
 <!-- src: data/README.md -->
 
-Cleaning ran in a fixed order: load, map families, drop non-finite values, drop conflicts, drop duplicates. It removed 5 rows with non-finite values, 44,005 rows whose identical feature vectors carried different families, and 142,464 duplicates that spanned capture days, leaving 1,913,502 flows. Families with fewer than 1,000 flows, Infiltration (66) and Heartbleed (11), stay in the data but are left out of the headline macro-F1, which averages the remaining seven classes; they are reported per class.
+Cleaning ran in a fixed order: load, map families, drop non-finite values, drop conflicts, drop duplicates. It removed 5 rows with non-finite values, 44,005 rows whose identical feature vectors carried different families, and 142,464 duplicates that spanned capture days, leaving 1,913,502 flows. Two families have fewer than 1,000 flows, Infiltration (66) and Heartbleed (11). They are kept, but the headline macro-F1 averages only the other seven classes, and these two appear in per-class tables.
 <!-- src: data/README.md -->
 
-The split is global and group-aware. Every distinct feature vector forms a group, so copies of one vector never end up on both sides of the split. This gives 1,435,126 training-pool flows and 478,376 test flows, and every headline family has exactly a 25.0% test share. Ten percent of the training pool, 143,513 rows, is held out as a centralized validation set that no silo trains on.
+The split is global and group-aware. Every distinct feature vector forms a group, so copies of one vector never end up on both sides of the split. This gives 1,435,126 training-pool flows and 478,376 test flows, and every headline family has exactly a 25.0% test share. A centralized validation set of 143,513 rows, a tenth of the training pool, is set aside, and no silo ever trains on it.
 <!-- src: data/README.md; docs/efficiency_results.md; configs/model.yaml -->
 
 The complete cleaning record, with every count, is in Section 6.A.
 
 ### Partitioning across silos {#sec:m-partition}
 
-For each family k, the shares that the 10 silos receive are drawn from a symmetric Dirichlet distribution, p_k ~ Dir(α·1). A small α concentrates each family in one or two silos; a large α spreads it evenly. We use α ∈ {0.1, 0.5, 5.0} with seeds 42, 1337 and 2024, which gives nine partitions. α=5.0 serves as a near-IID control. Shares are applied by cutting each family's shuffled index list at cumulative boundaries, so they are exact rather than sampled.
+For each family k, the shares that the 10 silos receive are drawn from a symmetric Dirichlet distribution, p_k ~ Dir(α·1). A small α concentrates each family in one or two silos; a large α spreads it evenly. We use α ∈ {0.1, 0.5, 5.0} with seeds 42, 1337 and 2024, which gives nine partitions. α=5.0 serves as a near-IID control. The shares are applied exactly: each family's rows are shuffled and then cut at the running totals of the shares, so no sampling noise is added.
 <!-- src: PROJECT_INSTRUCTIONS.md; data/README.md -->
 
-The heterogeneity is real and measured. Averaged over families, the silo that receives most of a family gets 0.694 of it at α=0.1, 0.372 at α=0.5 and 0.177 at α=5.0, against 0.100 for a uniform split. At α=0.1 silo sizes are very uneven; the largest silo holds 636,676 rows (α=0.1, seed 42, silo 2).
+The heterogeneity is real and measured. Take, for each family, the largest share any single silo receives, and average over families: the result is 0.694 at α=0.1, 0.372 at α=0.5 and 0.177 at α=5.0, while an even split would give 0.100. At α=0.1 silo sizes are very uneven; the largest silo holds 636,676 rows (α=0.1, seed 42, silo 2).
 <!-- src: data/README.md; results/inspection/silo_size_vs_agreement.csv -->
 
-The row-to-silo assignment arrays are written to disk with a SHA256 manifest. The manifest stores a hash of each assignment array, and the loader refuses to return a silo whose hash does not match. A test showed that the check catches a single flipped entry among 1.4 million. Per-silo label counts for all nine partitions are in Section 6.B.
+For each partition, the array that assigns rows to silos is saved together with a SHA256 manifest of those arrays. Loading a silo fails with an error if its array no longer matches the stored hash; in a test, changing one entry out of 1.4 million was enough to trigger it. Per-silo label counts for all nine partitions are in Section 6.B.
 <!-- src: data/README.md -->
 
 ### Model and federated training {#sec:m-model}
 
-The detector is a multilayer perceptron with 82 inputs, two hidden layers of 128 and 64 units with ReLU activation, LayerNorm and dropout of 0.1, and a 9-way output. It has 19,849 parameters. Local training uses AdamW [@loshchilov2019] with learning rate 0.001, weight decay 0.0001 and batch size 1024. Each federated run has 20 rounds of FedAvg in Flower [@beutel2020flower], with 3 local epochs per round. The scaler is fit separately in each silo, on that silo's training rows only.
+The detector is a multilayer perceptron with 82 inputs, two hidden layers of 128 and 64 units with ReLU activation, LayerNorm and dropout of 0.1, and a 9-way output. It has 19,849 parameters. Local training uses AdamW [@loshchilov2019] with learning rate 0.001, weight decay 0.0001 and batch size 1024. A federated run lasts 20 FedAvg rounds in Flower [@beutel2020flower], and every silo trains for 3 epochs in each round. The scaler is fit separately in each silo, on that silo's training rows only.
 <!-- src: configs/model.yaml; docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md; federated/pyproject.toml -->
 
 Every setting was fixed before the main experiments and is listed in @tab:locked with the reason it was chosen. The pilot runs behind these choices are in Section 6.C.
@@ -66,15 +66,15 @@ Table: Locked model and training settings, with the reason for each {#tab:locked
 | Best-by-validation round | A run's rounds can differ by up to 0.118 in validation macro-F1 |
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-Two centralized references use the same features and split: the same MLP trained on the whole training pool, and an XGBoost model [@chen2016xgb]. Both are early-stopped on validation. XGBoost was tuned on validation with 40 trials of a hyperparameter search on a subsample.
+For comparison there are two centralized models, trained on the same features and the same split: the same MLP trained on the whole training pool, and an XGBoost model [@chen2016xgb]. Both are early-stopped on validation. XGBoost was tuned on validation with 40 trials of a hyperparameter search on a subsample.
 <!-- src: configs/xgboost_tuned.json -->
 
 ### The explanation check {#sec:m-expl}
 
-DeepExplainer, SHAP's usual explainer for neural networks, fails on our LayerNorm layers with an additivity error of 2.43. Every silo therefore uses SHAP's GradientExplainer [@lundberg2017; @erion2021] on its own copy of the model at the selected round. The background is 200 rows drawn once from the silo's own training partition, stratified by class under a fixed seed, and each explanation uses 4000 samples.
+DeepExplainer, SHAP's usual explainer for neural networks, fails on our LayerNorm layers with an additivity error of 2.43. For that reason the project uses SHAP's GradientExplainer [@lundberg2017; @erion2021], which each silo runs on its local model at the chosen round. Its background sample holds 200 rows, taken a single time from that silo's training data, balanced across classes and drawn with a fixed seed; every explanation uses 4000 samples.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/measurement_protocol.md -->
 
-All models explain the same fixed set of 14 rows, two for each headline family. Each comparison uses the attribution vector of the row's true class, so a disagreement about the prediction itself cannot leak into the agreement score. Only the top-k feature indices leave the silo; SHAP magnitudes and raw rows never do.
+All models explain the same fixed set of 14 rows, two for each headline family. Rankings are always compared for the row's true class. That way, two models that predict different classes do not count as disagreeing about reasons. Only the top-k feature indices leave the silo; SHAP magnitudes and raw rows never do.
 <!-- src: docs/measurement_protocol.md -->
 
 Agreement between a silo ranking A and the global ranking B is measured two ways. Jaccard@k is the size of the intersection of the two top-k sets divided by the size of their union. Weighted Kendall's τ [@vigna2015] compares the full order of all 82 features and gives more weight to disagreements near the top. Silos with fewer than 400 training rows, and families with fewer than 20 rows in a silo, are left out of agreement analysis; they still train.
@@ -83,15 +83,15 @@ Agreement between a silo ranking A and the global ranking B is measured two ways
 Two reference lines make the agreement values interpretable:
 
 - **Chance level.** For two random 10-feature subsets of 82 features, the expected Jaccard is (k²/n)/(2k − k²/n) = 0.065.
-- **Centralized-seed instability floor.** Three centralized models (seeds 42, 1337, 2024) are explained on the same rows with the same background construction, and their pairwise agreement is computed. The median over the three seed pairs is the floor: the agreement that random seeds alone produce.
+- **Centralized-seed instability floor.** Three centralized models, trained with seeds 42, 1337 and 2024, are explained on the identical rows and with backgrounds built the identical way, and their agreement is measured pair by pair. The floor is the median of those three pairs: the agreement that random seeds alone produce.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md -->
 
-Uncertainty at α=0.1 is estimated with a cluster bootstrap [@fieldwelsh2007] that resamples (seed, silo) clusters 10,000 times. Correlations are reported as r and n only, with no p-values, because silos in one run follow the same sequence of global models and are not independent samples. The formulas for every metric are in Section 6.P.
+To estimate uncertainty at α=0.1 we use a cluster bootstrap [@fieldwelsh2007]: (seed, silo) clusters are drawn with replacement, 10,000 times. For correlations we give r and n and leave out p-values. Silos in one run all receive the same series of global models, so they are not independent observations. The formulas for every metric are in Section 6.P.
 <!-- src: site/public/data/ci.json -->
 
 ### The trust check {#sec:m-trust}
 
-**Attack.** The attack runs at α=0.5 and seed 42. f malicious silos relabel 40% of their non-Benign training rows as Benign from round 1 onward (sudden mode); a gradual mode ramps the flipped fraction up over the rounds instead. The attacker set was found by enumerating all 120 three-silo subsets and keeping the one with the highest minimum per-family coverage, which gives silos {0,3,5} for f=3; the same search gives {0,3} for f=2. The adversary is therefore worst-case: it knows the label mix of every silo. No real attacker has that view, so the attack bounds what detection must handle rather than modelling what an attacker would do.
+**Attack.** The attack runs at α=0.5 and seed 42. f malicious silos relabel 40% of their non-Benign training rows as Benign from round 1 onward (sudden mode); a gradual mode ramps the flipped fraction up over the rounds instead. To pick the attackers, every one of the 120 possible groups of three silos was scored by how well it covers its weakest attack family, and the best group won: silos {0,3,5} for f=3. Repeating the search for pairs gives {0,3} for f=2. This makes the adversary worst-case, because choosing that group requires knowing every silo's label mix. A real attacker would not know this, so the attack sets an upper bound on what a detector has to cope with; it is not a model of real attacker behaviour.
 <!-- src: docs/contribution_b_results.md -->
 
 **Statistics.** Each round the server records five numbers per silo, listed in @tab:five-stats.
@@ -105,12 +105,12 @@ Table: The five per-silo statistics recorded each round {#tab:five-stats}
 | train_loss | The silo's last-epoch local training loss |
 | val_accuracy | Accuracy of the silo's trained model on the centralized validation set |
 
-**ByzAgent.** A locally served Llama 3.1 8B instruct model [@grattafiori2024llama3], 4-bit quantized and run at temperature 0.2, receives one prompt per round. The prompt holds the five statistics of all ten silos with their definitions, and a warning that this attack pushes validation accuracy up for malicious silos. The agent must answer in a fixed JSON schema with one decision per silo: trust, downweight (to 0.3 of the silo's normal weight) or quarantine, each with an explanation that cites the numbers used. It is never told f, the attackers' identities, or which statistic is strongest. Its decisions were replayed on statistics logged from undefended FedAvg runs, so they never fed back into training.
+**ByzAgent.** ByzAgent is a Llama 3.1 8B instruct model [@grattafiori2024llama3], quantized to 4 bits and served on the laptop at temperature 0.2. It is sent a single prompt each round. That prompt defines the five statistics, gives their values for all ten silos, and cautions that under this attack a malicious silo's validation accuracy tends to rise. Its reply has to follow a fixed JSON schema and give every silo one of three decisions, trust, downweight (keeping 0.3 of the silo's usual weight) or quarantine, together with a short reason that quotes the values it relied on. It is never told f, the attackers' identities, or which statistic is strongest. The agent was run on statistics recorded during plain FedAvg runs, so none of its decisions changed the training itself.
 <!-- src: configs/agent.yaml; docs/contribution_b_results.md -->
 
-**Baselines.** Multi-Krum keeps n − f updates; classical Krum keeps one and serves only as a secondary check; trimmed mean drops a fraction β = f/n at each end of every coordinate [@blanchard2017; @yin2018]. All three are given the true f as an oracle, an advantage ByzAgent does not have.
+**Baselines.** Multi-Krum keeps n − f updates; classical Krum keeps one and serves only as a secondary check; trimmed mean drops a fraction β = f/n at each end of every coordinate [@blanchard2017; @yin2018]. Each of these three baselines is told the true value of f, an oracle advantage that ByzAgent never gets.
 
-**Measures.** The strength of an attack is summarised by four statistics of validation macro-F1 over the 20 rounds: the mean, the median, the mean of the final five rounds and the maximum. The maximum selects the deployed checkpoint; the final-five mean is the attack-effect statistic. All four are always reported together. For the defences we report the recovery fraction and how often a malicious silo is excluded, compared with the matching chance rate. For ByzAgent we report each silo's flag rate (downweight or quarantine) and its lift over the same silo's rate in a clean run.
+**Measures.** Four summaries of the 20-round validation macro-F1 curve describe an attack's strength: its mean, its median, its average over the last five rounds, and its maximum. The checkpoint to deploy is chosen by the maximum, while the last-five average measures the attack's effect. The four are always shown side by side. Each defence is described by its recovery fraction and by the rate at which it drops malicious silos, set beside the chance rate that fits that defence. ByzAgent is described per silo: the share of rounds in which it downweights or quarantines the silo (its flag rate), and how far that share rises above the silo's own rate in a run with no attack (its lift).
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_b_results.md -->
 
 ### The preregistered accuracy study {#sec:m-prereg}
@@ -120,10 +120,10 @@ After the main results were in, the team decided to test once whether a differen
 
 ### Test-set use {#sec:m-testuse}
 
-Every model and every round was selected on validation data, and headline test numbers come from one evaluation of each run's validation-selected checkpoint. We nevertheless disclose that three early design choices (3 local epochs, FedProx μ=0.0005 and the StandardScaler) were first recorded with test-set numbers as their justification. Repeating each comparison on validation picks the same value. For local epochs, validation prefers 3 epochs over 1 at α=0.5 in all three seeds, with mean best-by-validation macro-F1 of 0.9425 against 0.8602.
+Validation data chose every model and every round. Each headline test value comes from scoring, once, the checkpoint that validation had already picked for that run. We nevertheless disclose that three early design choices (3 local epochs, FedProx μ=0.0005 and the StandardScaler) had test-set scores written down as their first justification. When each comparison is rerun on validation, it chooses the same value. In the local-epoch case, 3 epochs beat 1 on validation for every seed at α=0.5, with a mean best-by-validation macro-F1 of 0.9425 for 3 epochs and 0.8602 for 1.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-The test set was also read in ways that informed no later choice: legacy client-side per-round scoring in 35 runs that no analysis reads; a round-20 score used by an earlier round-lottery comparison, since replaced by a validation version; 14 fixed rows used as SHAP inputs; 514 rows extracted for display, together with the dashboard simulator before 2026-10-13, which kept no log and computed no aggregate; development scoring of 18 centralized pilot and baseline runs and 3 XGBoost seeds; and one preregistered evaluation of a single validation-selected configuration. Since 2026-10-12, by a team decision, no configuration other than the preregistered one is ever scored on the test set. The full audit is in Section 6.J.
+The test set was also read in ways that informed no later choice: per-round scoring by the clients themselves in 35 older runs, which no analysis uses; a round-20 score behind a first version of the round-lottery comparison, now redone on validation; 14 fixed rows used as SHAP inputs; 514 rows extracted for display, together with the dashboard simulator before 2026-10-13, which kept no log and computed no aggregate; development scoring of 18 centralized pilot and baseline runs and 3 XGBoost seeds; and one preregistered evaluation of a single validation-selected configuration. The team agreed on 2026-10-12 that, apart from the single preregistered configuration, nothing will be scored on the test set again. The full audit is in Section 6.J.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 ## Standards {#sec:standards}
@@ -147,22 +147,22 @@ This section describes the software and hardware details of the system.
 
 ### Software details {#sec:software}
 
-**Federated harness.** All federated results come from the Flower app in `federated/xfed_federated/`, run with the command `flwr run federated local-simulation`. The client app trains locally and returns weights and its training loss. The server app aggregates, scores the global model on the validation set every round, keeps the best round, and logs the five client statistics, Krum selections or trim rates, and the bytes moved. The repository also holds an early prototype in `src/federated/` that lacks validation-based round selection. We removed the root project's pointer to it, so a bare `flwr run` now stops with an error instead of silently using the prototype.
+**Federated harness.** All federated results come from the Flower app in `federated/xfed_federated/`, run with the command `flwr run federated local-simulation`. The client app trains locally and returns weights and its training loss. On the server side, the app combines the updates, tests the global model on validation after each round and keeps the best round. It also records the five client statistics, which silos Krum kept or how much trimmed mean cut, and the number of bytes exchanged. The repository also holds an early prototype in `src/federated/` that lacks validation-based round selection. The link from the top-level project file to that prototype was deleted. As a result, typing just `flwr run` now fails with an error rather than quietly training with the wrong code.
 
 **Training and explanation tools.** Centralized training, the data pipeline and the attack code live under `src/`. Analysis scripts under `tools/` compute SHAP attributions, agreement metrics, the seed-noise floor, the parity monitor and the efficiency measurements; scripts under `scripts/` run the pilots, the trust-check phases and their analyses. Every parameter is read from YAML files under `configs/`.
 
-**ByzAgent.** The agent lives in `src/agents/byz_agent.py`. It sends one batched request per round to a local Ollama server, which enforces the JSON schema. A malformed reply is retried once and then raises an error, so a round is never silently given a default decision.
+**ByzAgent.** The agent lives in `src/agents/byz_agent.py`. It sends one batched request per round to a local Ollama server, which enforces the JSON schema. If the reply does not fit the schema, the call is repeated once; a second failure stops the run with an error instead of filling in a default decision.
 
-**Backend.** A FastAPI service in `backend/` loads the deployed checkpoint (`fedavg_a0.5_s42`, round 18, validation macro-F1 0.9760) and refuses to start unless its validation macro-F1 equals the value logged during training. By default it serves predictions through ONNX Runtime in fp32, and it refuses to start unless every validation prediction matches PyTorch's. It has no code path that opens the test file. The full list of endpoints is in Section 6.K.
+**Backend.** A FastAPI service in `backend/` loads the deployed checkpoint (`fedavg_a0.5_s42`, round 18, validation macro-F1 0.9760) and will not start if that model's validation macro-F1 differs from the score recorded when it was trained. By default it serves predictions through ONNX Runtime in fp32, and it refuses to start unless every validation prediction matches PyTorch's. Nothing in the backend's code reads the test file. The full list of endpoints is in Section 6.K.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/efficiency_results.md -->
 
-**Dashboard.** The React front end has three routes. *Live* (@fig:dash-live) shows the alert stream, the selected alert with its SHAP contributions and a one-sentence LLM summary, and the trust panel. *Investigate* (@fig:dash-investigate) answers four questions in turn: is anyone poisoning the model, is it accurate, do the organizations agree on why, and what does it cost to run. *Limits* lists the known limitations, read directly from the project instructions. Every displayed number links to the file it came from. Alerts come from a simulator that replays validation rows through the served model and marks each alert as matching its true label or not; it never adds these marks up into a score.
+**Dashboard.** The React front end has three routes. *Live* (@fig:dash-live) shows the alert stream, the selected alert with its SHAP contributions and a one-sentence LLM summary, and the trust panel. *Investigate* (@fig:dash-investigate) answers four questions in turn: is anyone poisoning the model, is it accurate, do the organizations agree on why, and what does it cost to run. *Limits* lists the known limitations, read directly from the project instructions. Each number on screen carries a link to its source file. Alerts come from a simulator that replays validation rows through the served model and marks each alert as matching its true label or not; it never adds these marks up into a score.
 
 ![Dashboard, Live route (Deep Sea theme): flow stream, selected alert with SHAP contributions and LLM summary, and the trust panel](docs/dashboard_v2/screens/live_deep-sea_1440.png){#fig:dash-live width=15.5}
 
 ![Dashboard, Investigate route (Deep Sea theme), shown in full: trust check, detection accuracy, explanation check and efficiency](docs/dashboard_v2/screens/investigate_deep-sea_1440.png){#fig:dash-investigate width=9}
 
-**Hot swap.** From the Live route an analyst can confirm or correct an alert's family (@fig:dash-hotswap). Only the family label is sent, never the flow's features. Retraining runs in a separate process and always starts from the original base checkpoint, so swaps never stack. It routes up to 200 extra training rows of that family to the silo that already holds most of it and runs 2 FedAvg rounds of 3 local epochs on the CPU. The new model goes live only if its validation macro-F1 is equal to or higher than that of the model in service; there is no tolerance band. Every accepted swap is written to an append-only audit log with its seed and checkpoint hash.
+**Hot swap.** On the Live route, an analyst who reviews an alert can either confirm its family or change it (@fig:dash-hotswap). Only the family label is sent, never the flow's features. The retraining happens in its own process and starts every time from the base checkpoint, never from an earlier swap. At most 200 more rows of the chosen family are given to the silo that already holds the largest share of that family, and 2 FedAvg rounds with 3 local epochs each are run on the CPU. The retrained model replaces the served one only when its validation macro-F1 is at least as high, with no margin allowed. Each accepted swap is appended to an audit log, together with its seed and the hash of the new checkpoint.
 <!-- src: configs/hotswap.yaml -->
 
 ![Hot-swap dialog after a rejected candidate: the gate kept the served model because no candidate round reached the incumbent's validation score](docs/dashboard_v2/screens/hotswap_rejected_detail_deep-sea.png){#fig:dash-hotswap width=13}
@@ -187,7 +187,7 @@ Table: Main implementation tools and versions {#tab:tools}
 All work ran on one laptop: an NVIDIA RTX 4050 GPU with 6 GB of memory, 24 GB of RAM, an AMD Ryzen 7 7435HS CPU, and Windows 11. The 6 GB of GPU memory was a hard ceiling for every model we tried.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/efficiency_results.md -->
 
-The GPU ran the centralized MLP (baselines and pilots), XGBoost, and Ollama for ByzAgent. Federated training did not use the GPU: Flower builds an isolated runtime environment, and that environment installed the CPU build of PyTorch. This was verified for the August environments and for every run from 2026-10-12 on. SHAP, model serving and hot-swap retraining are CPU jobs as well. For SHAP this was a measured choice: on this small model, the GPU ran about 3 times slower than the CPU, because kernel-launch overhead dominates.
+The GPU ran the centralized MLP (baselines and pilots), XGBoost, and Ollama for ByzAgent. Federated training did not use the GPU: Flower builds an isolated runtime environment, and that environment installed the CPU build of PyTorch. We confirmed this for the environments built in August and for all runs from 2026-10-12 onward. The CPU also handles SHAP, serving and hot-swap retraining. For SHAP this was a measured choice: on this small model, the GPU ran about 3 times slower than the CPU, because kernel-launch overhead dominates.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md -->
 
 ## Testing and Verification {#sec:testing}

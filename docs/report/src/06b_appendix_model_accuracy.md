@@ -39,7 +39,7 @@ Table: Training settings for centralized and federated runs {#tab:train-settings
 
 ### Pilot runs
 
-Each locked choice came from a centralized pilot, ranked on validation macro-F1 over the seven headline classes (@tab:pilots). The pilots were also scored on the test set during development; that exposure is disclosed in Section 6.J, and the test values are not used here.
+The locked choices were made with centralized pilot runs, compared by their validation macro-F1 on the seven headline classes (@tab:pilots). The pilots were also scored on the test set during development; that exposure is disclosed in Section 6.J, and the test values are not used here.
 
 Table: Centralized pilots: validation macro-F1 (7 headline classes) and best epoch {#tab:pilots}
 | Pilot | Arm | Validation macro-F1 | Best epoch |
@@ -60,7 +60,7 @@ Table: Centralized pilots: validation macro-F1 (7 headline classes) and best epo
 | Architecture | [512, 256, 128], dropout 0.3 | 0.9938 | 18 |
 <!-- src: results/pilots/scaler_comparison.csv; results/pilots/weights_comparison.csv; results/pilots/architecture_comparison.csv; docs/preregistration_accuracy.md; docs/handbook/XFed_Team_Handbook.md; configs/model.yaml -->
 
-The robust scalers fail because 28 of the 82 features have zero interquartile range, which leaves them unscaled or degenerate. Among the architectures, the top four arms lie within 0.0008 of each other on validation, so the smallest, [128, 64] with dropout 0.1, was kept.
+Both robust scalers break down because, for 28 features out of 82, the interquartile range is zero, so those features end up unscaled or degenerate. The four best architectures are separated by no more than 0.0008 on validation, and the smallest of them, [128, 64] with dropout 0.1, was chosen.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/test_set_exposure_audit.md -->
 
 ### Alternatives tried and rejected
@@ -125,7 +125,7 @@ This section lists every FedAvg run, the centralized references per seed, the pe
 @tab:fedruns gives, for each run, the round with the best validation score, that score, the single test score of that checkpoint, and the round-20 validation score. The gap column is the round lottery: the amount that reporting round 20 instead of the best validated round would change the result. It reaches 0.1184 (α=5.0, seed 42) and 0.1172 (α=0.5, seed 1337).
 <!-- src: results/federated/round_lottery_val.csv -->
 
-Table: FedAvg runs: best round by validation, its validation and test macro-F1, the round-20 validation score and the gap {#tab:fedruns}
+Table: Every FedAvg run: the round chosen on validation, that round's validation and test macro-F1, the validation score at round 20, and the difference {#tab:fedruns}
 | α | Seed | Best round | Validation | Test | Validation, round 20 | Gap |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | 0.1 | 42 | 20 | 0.5440 | 0.5426 | 0.5440 | 0.0000 |
@@ -139,12 +139,12 @@ Table: FedAvg runs: best round by validation, its validation and test macro-F1, 
 | 5.0 | 2024 | 20 | 0.9913 | 0.9889 | 0.9913 | 0.0000 |
 <!-- src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json -->
 
-An earlier version of this comparison used test scores of the unselected round-20 checkpoints; its maximum was 0.1199, at α=0.5, seed 1337. It is superseded by the validation version above and is kept only as a record.
+Before this table existed, the same comparison had been made with test scores of the round-20 checkpoints, which no rule had selected; the largest gap there was 0.1199, at α=0.5, seed 1337. The validation version above replaces it, and the old one is mentioned only for the record.
 <!-- src: docs/contribution_a_results.md -->
 
 ### Centralized references per seed
 
-@tab:central-seed gives the two centralized references per seed. With every class counted, including the two below-floor classes, centralized macro-F1 is 0.9695 and XGBoost 0.9752 (means over seeds).
+@tab:central-seed gives the two centralized references per seed. If the two classes below the floor are added to the average, the mean macro-F1 over seeds becomes 0.9695 for the centralized MLP and 0.9752 for XGBoost.
 <!-- src: results/aggregated/centralized_headline.csv; results/aggregated/xgboost_headline.csv -->
 
 Table: Centralized references per seed: test macro-F1 over 7 classes, with validation in brackets {#tab:central-seed}
@@ -158,7 +158,7 @@ Table: Centralized references per seed: test macro-F1 over 7 classes, with valid
 
 ### Per-class results
 
-@tab:perclass gives per-class test F1 for every model, including Infiltration and Heartbleed, which are reported per class only. Under FedAvg at α=0.1, Bot and WebAttack are almost never detected, and BruteForce, DoS and PortScan swing widely between seeds.
+@tab:perclass gives per-class test F1 for every model, including Infiltration and Heartbleed, which are reported per class only. With FedAvg at α=0.1, the model hardly ever detects Bot or WebAttack, and its results for BruteForce, DoS and PortScan change sharply between seeds.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 Table: Per-class test F1: mean over 3 seeds (FedAvg also shows the standard deviation) {#tab:perclass size=9.5}

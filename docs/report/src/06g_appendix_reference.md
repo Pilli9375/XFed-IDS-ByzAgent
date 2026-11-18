@@ -101,7 +101,7 @@ This section explains, in plain terms and with its formula, every algorithm, met
 **FedAdam and FedYogi** [@reddi2021]. The server keeps Adam-style moment estimates of the averaged change Δ = w_avg − w_t: m ← β1·m + (1 − β1)·Δ, and v ← β2·v + (1 − β2)·Δ² for FedAdam, or v ← v − (1 − β2)·Δ²·sign(v − Δ²) for FedYogi. It then updates w_(t+1) = w_t + η·m / (√v + τ).
 <!-- numcheck: ignore -->
 
-**Krum and Multi-Krum** [@blanchard2017]. For each update w_i, Krum sums its squared distances to its n − f − 2 nearest other updates: s(i) = Σ_(j ∈ nearest) ‖w_i − w_j‖². Krum keeps the single update with the smallest score; Multi-Krum keeps the n − f updates with the smallest scores and averages them. Both assume that honest updates cluster together.
+**Krum and Multi-Krum** [@blanchard2017]. Krum gives each update w_i a score: the sum of squared distances from w_i to the n − f − 2 updates closest to it, s(i) = Σ_(j ∈ nearest) ‖w_i − w_j‖². Krum keeps the single update with the smallest score; Multi-Krum keeps the n − f updates with the smallest scores and averages them. Both assume that honest updates cluster together.
 <!-- numcheck: ignore -->
 
 **Coordinate-wise trimmed mean** [@yin2018]. For every parameter separately, the server sorts the n silo values, discards the largest and the smallest fraction β of them, and averages the rest. Here β = f/n.
@@ -147,7 +147,7 @@ Table: Metrics and statistics: definitions and where they are used {#tab:metrics
 
 ### The attack setup
 
-The attack is label flipping, and it is always a worst-case construction, never a realistic one. @tab:attack-runs lists every attack configuration that was run. In each one, f malicious silos relabel a fraction of their own non-Benign training rows as Benign before local training. Their validation and test labels are never touched, and every flip is logged. In sudden mode the fraction is a constant 0.40 from round 1; in gradual mode it ramps as min(0.05 + 0.05(r − 1), 1) over rounds r=1 to 20. The attacker sets were chosen by a full search over all silo subsets, with knowledge of every silo's label mix, to maximise the weakest family's coverage; no deployed attacker would have that knowledge.
+The attack is label flipping, and it is always a worst-case construction and never a model of how a real attacker behaves. @tab:attack-runs lists every attack configuration that was run. In each one, f malicious silos relabel a fraction of their own non-Benign training rows as Benign before local training. Their validation and test labels are never touched, and every flip is logged. In sudden mode the fraction is a constant 0.40 from round 1; in gradual mode it ramps as min(0.05 + 0.05(r − 1), 1) over rounds r=1 to 20. The attacker sets were chosen by a full search over all silo subsets, with knowledge of every silo's label mix, to maximise the weakest family's coverage; no deployed attacker would have that knowledge.
 <!-- src: docs/contribution_b_results.md -->
 
 Table: Attack configurations that were run (all at α=0.5, 10 silos, 20 rounds) {#tab:attack-runs size=9.5}
@@ -350,7 +350,7 @@ tau_w, _ = weightedtau(g_vec, s_vec)          # scipy.stats.weightedtau
 
 ### ByzAgent: prompt summary and JSON schema
 
-@fig:code-schema shows the JSON schema that Ollama enforces on every reply, and @fig:code-prompt the closing lines of the prompt. The opening part of the prompt, not repeated here, defines the five statistics, warns that this attack biases validation accuracy upward for malicious clients on a Benign-heavy validation set, and notes that natural non-IID differences can also move the statistics.
+@fig:code-schema shows the JSON schema that Ollama enforces on every reply, and @fig:code-prompt the closing lines of the prompt. The opening part of the prompt, not repeated here, defines the five statistics, cautions that under this attack a malicious client tends to score higher on the mostly Benign validation set, and points out that ordinary differences between clients' data can also shift the statistics.
 
 Code: ByzAgent's response schema {#fig:code-schema} [src/agents/byz_agent.py]
 ```python

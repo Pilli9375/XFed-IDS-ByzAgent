@@ -13,7 +13,7 @@ We report macro-F1 rather than accuracy. Benign traffic is about three quarters 
 
 @tab:acc-headline gives the test macro-F1 of every model. Each value is a single test evaluation of a checkpoint that was chosen on validation.
 
-Table: Test macro-F1 over the seven headline classes, mean ± standard deviation over 3 seeds {#tab:acc-headline}
+Table: Headline test macro-F1 (seven classes): mean ± standard deviation across 3 seeds {#tab:acc-headline}
 | Model | α=0.1 | α=0.5 | α=5.0 |
 |---|:-:|:-:|:-:|
 | Centralized MLP | 0.9900 ± 0.0022 | 0.9900 ± 0.0022 | 0.9900 ± 0.0022 |
@@ -30,25 +30,25 @@ At α=5.0, the near-IID control, FedAvg matches the centralized MLP. Federation 
 At α=0.5, the mean of 0.941 hides one weak seed. Seeds 42 and 1337 reach 0.9753 and 0.9866, while seed 2024 reaches only 0.8605. The large standard deviation comes from that one run, not from general instability.
 <!-- src: results/inspection/best_rounds_manifest.json; docs/contribution_a_results.md -->
 
-At α=0.1, whole families collapse. Mean per-class test F1 is 0.1253 for Bot and 0.0490 for WebAttack, and BruteForce, DoS and PortScan swing widely between seeds. The global model at this skew is a different, weaker detector.
+At α=0.1, entire families are lost. Averaged over seeds, Bot reaches a test F1 of only 0.1253 and WebAttack 0.0490, while BruteForce, DoS and PortScan vary a great deal from one seed to the next. The global model at this skew is a different, weaker detector.
 <!-- src: results/aggregated/federated_per_family.csv -->
 
-@fig:val-curves shows the validation curves of all nine FedAvg runs. At α=0.1 and α=0.5 the curves jump between rounds, which is why the round kept from each run must be chosen on validation. The gap between the best-by-validation round and round 20 reaches 0.118 (α=5.0, seed 42). We call this the round lottery: reporting the last round instead of the best validated one would change results by more than many of the effects we study.
+@fig:val-curves shows the validation curves of all nine FedAvg runs. At α=0.1 and α=0.5 the curves jump between rounds, which is why the round kept from each run must be chosen on validation. In one run (α=5.0, seed 42), round 20 scores 0.118 below the run's best validated round. We call this the round lottery: reporting the last round instead of the best validated one would change results by more than many of the effects we study.
 <!-- src: PROJECT_INSTRUCTIONS.md; results/federated/round_lottery_val.csv -->
 
-![Validation macro-F1 per round for the nine FedAvg runs; open markers show the best-by-validation round of each run](docs/report/figs/fig_val_curves.png){#fig:val-curves width=15.5}
+![Round-by-round validation macro-F1 of all nine FedAvg runs, with an open marker at each run's best validated round](docs/report/figs/fig_val_curves.png){#fig:val-curves width=15.5}
 
-The preregistered comparison (Section 6.H) chose FedAvg with server momentum 0.9 (FedAvgM) [@hsu2019] on validation alone and then scored its nine sealed checkpoints on the test set once. At α=0.5 it mainly removes the weak seed: seed 2024 rises from 0.8605 to 0.9856, while seed 1337 moves by −0.001. At α=0.1 it gains in each of the three seeds (+0.113, +0.058, +0.060), though α=0.1 stays far below centralized training. At α=5.0 the change is within the centralized model's own seed spread. This result is reported as an accuracy finding only. The explanation check and the trust check use the published FedAvg runs, and whether momentum changes explanation agreement was not tested.
+The preregistered comparison (Section 6.H) used validation alone to choose FedAvg with server momentum 0.9 (FedAvgM) [@hsu2019]; its nine checkpoints were sealed first and then tested a single time. At α=0.5 it mainly removes the weak seed: seed 2024 rises from 0.8605 to 0.9856, while seed 1337 moves by −0.001. At α=0.1 it gains in each of the three seeds (+0.113, +0.058, +0.060), though α=0.1 stays far below centralized training. At α=5.0 the change is within the centralized model's own seed spread. This result is reported as an accuracy finding only. The explanation check and the trust check use the published FedAvg runs, and whether momentum changes explanation agreement was not tested.
 <!-- src: docs/contribution_a_results.md -->
 
-The model deployed in the dashboard is `fedavg_a0.5_s42` at round 18, with validation macro-F1 0.9760. All per-run and per-class results, including the two below-floor classes, are in Section 6.D.
+The dashboard serves `fedavg_a0.5_s42`, taken at round 18, whose validation macro-F1 is 0.9760. All per-run and per-class results, including the two below-floor classes, are in Section 6.D.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 ## Explanation Check {#sec:r-expl}
 
 ### Agreement across skew levels
 
-@tab:expl-headline and @fig:agree-alpha give the agreement between each eligible silo and the global model. Agreement falls steadily as label skew grows.
+@tab:expl-headline and @fig:agree-alpha show how closely each eligible silo's ranking matches the global model's. Agreement falls steadily as label skew grows.
 
 Table: Silo-versus-global explanation agreement: median [first quartile, third quartile] over eligible rows {#tab:expl-headline}
 | Measure | α=0.1 | α=0.5 | α=5.0 |
@@ -67,10 +67,10 @@ Every value is well above chance. The chance Jaccard@10 for two random sets of 1
 
 ### Reading agreement against seed noise
 
-Chance is a low bar. The more useful question is whether a federated value differs from what random seeds produce on their own. For three centralized models that share everything except their seed, the median pairwise Jaccard@10 is 0.429, and the three seed-pair medians span 0.429 to 0.484 (@tab:floor-pairs).
+Chance is a low bar. The more useful question is whether a federated value differs from what random seeds produce on their own. Train three centralized models that share everything but the seed, and their median Jaccard@10 is 0.429; the medians of the individual pairs lie between 0.429 and 0.484 (@tab:floor-pairs).
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-Table: Centralized-seed instability floor per seed pair (median over the 14 explained rows) {#tab:floor-pairs}
+Table: Seed-noise floor for each pair of centralized seeds, as the median over the 14 explained rows {#tab:floor-pairs}
 | Seed pair | Jaccard@10 | Weighted τ |
 |---|:-:|:-:|
 | 42 and 1337 | 0.484 | 0.660 |
@@ -87,13 +87,13 @@ We read this result as **directional, not significant**. The cluster bootstrap a
 
 ### Separating skew from silo size
 
-A Dirichlet partition ties size to skew. A silo's size is the sum of its shares of every family, so small silos are also the most skewed. A raw correlation between agreement and size therefore restates the skew effect: silo size and Jaccard@10 correlate at r=+0.46 at α=0.1 but only r=+0.07 at α=5.0.
+A Dirichlet partition ties size to skew. Because a silo's size is just the total of its family shares, the smallest silos also tend to be the most lopsided. A raw correlation between agreement and size therefore restates the skew effect: silo size and Jaccard@10 correlate at r=+0.46 at α=0.1 but only r=+0.07 at α=5.0.
 <!-- src: docs/contribution_a_results.md -->
 
-We first used label entropy as the skew covariate, as planned. Its weak link with agreement did not survive conditioning on log size; at α=0.5 the partial correlation changed sign. Only then did we substitute the KL divergence of each silo's label mix from the global label mix. After the same conditioning, KL still predicts agreement (@tab:kl-partial). This narrows the size explanation but stays observational: the same draw sets both size and skew, and size-controlled partitions turned out to be impossible to build with this partitioner.
+Label entropy was the covariate we had planned to use for skew, and we tried it first. Once log size was held fixed, its already weak relation to agreement disappeared, and at α=0.5 the partial correlation even turned positive. Only then did we substitute the KL divergence of each silo's label mix from the global label mix. After the same conditioning, KL still predicts agreement (@tab:kl-partial). That makes size a less likely explanation, but the evidence is still observational: the same draw sets both size and skew, and size-controlled partitions turned out to be impossible to build with this partitioner.
 <!-- src: docs/contribution_a_results.md -->
 
-Table: Correlation of a skew covariate with agreement after conditioning on log silo size (r and n only; entropy was tried first) {#tab:kl-partial}
+Table: Partial correlation between a skew measure and agreement, holding log silo size fixed (r and n only; entropy came first) {#tab:kl-partial}
 | Order | Covariate | α | Partial r, Jaccard@10 | Partial r, weighted τ | n |
 |---|---|:-:|:-:|:-:|:-:|
 | First | Label entropy | 0.5 | +0.23 | +0.13 | 30 |
@@ -105,10 +105,10 @@ Table: Correlation of a skew covariate with agreement after conditioning on log 
 
 Three further analyses test whether the agreement numbers reflect the models rather than the measurement.
 
-First, the SHAP additivity residual. If explanations at small silos reconstructed the model's output poorly, that alone could lower agreement. Of the 90 final-round FedAvg silo files, 3 store a residual above the worst case in the validation pool (3.336), and they belong mostly to α=0.1. Within α=0.1, a silo's residual and its Jaccard@10 correlate at Spearman r=−0.237 (n=29). Dropping the flagged silos under a rule fixed in advance leaves the α=0.1 Jaccard@10 median at 0.333 and moves τ from 0.592 to 0.597. The full residual audit is in Section 6.F.
+First, the SHAP additivity residual. If explanations at small silos reconstructed the model's output poorly, that alone could lower agreement. Of the 90 final-round FedAvg silo files, 3 store a residual above the worst case in the validation pool (3.336), and they belong mostly to α=0.1. Across the α=0.1 silos, the Spearman correlation between residual and Jaccard@10 is r=−0.237 (n=29). Dropping the flagged silos under a rule fixed in advance leaves the α=0.1 Jaccard@10 median at 0.333 and moves τ from 0.592 to 0.597. The full residual audit is in Section 6.F.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-Second, round-wise agreement. Recomputing agreement at rounds 5, 10, 15 and 20, at reduced SHAP fidelity, shows it drifting down from round 5 to round 20 at α=0.1 (Jaccard@10 −0.023) and α=0.5 (−0.029), while validation macro-F1 rises over the same rounds (+0.046 and +0.026). At α=5.0 it stays flat, within a spread of 0.004. No test was run on this trend; it is directional.
+Second, round-wise agreement. Recomputing agreement at rounds 5, 10, 15 and 20, at reduced SHAP fidelity, shows a small decline between the fifth and the twentieth round at α=0.1 (Jaccard@10 −0.023) and α=0.5 (−0.029), while validation macro-F1 rises over the same rounds (+0.046 and +0.026). At α=5.0 it stays flat, within a spread of 0.004. This trend was not tested statistically and is reported as directional only.
 <!-- src: docs/contribution_a_results.md -->
 
 Third, checks on the explainer itself. KernelExplainer and GradientExplainer agree on the same models at median τ=0.730 (n=14); swapping per-silo backgrounds for a common one gives median τ=0.807 (n=42); and deletion and insertion curves on one configuration show every deletion AUC below the matching insertion AUC. These rule out the explainer choice and the background as the source of disagreement, and they are consistent with attributions that track model behaviour.
@@ -116,25 +116,25 @@ Third, checks on the explainer itself. KernelExplainer and GradientExplainer agr
 
 ### FedProx and the parity monitor
 
-FedProx at μ=0.0005, the only μ tested, raised Jaccard@10 at α=0.5 in all three seeds while test macro-F1 stayed flat. At α=0.1 agreement and accuracy moved together in each seed, so three seeds cannot separate an explanation effect from an accuracy effect, and we call that result inconclusive. At α=5.0 there was no consistent change.
+FedProx at μ=0.0005, the only μ tested, increased Jaccard@10 for every seed at α=0.5, with test macro-F1 essentially unchanged. At α=0.1 the two measures rose or fell together in every seed. With three seeds, a change in explanations cannot be told apart from a change in accuracy there, so the α=0.1 result is inconclusive. At α=5.0 there was no consistent change.
 <!-- src: docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md -->
 
-We also built a parity monitor that turns each silo's top-10 list into a deviation from the fleet consensus and flags outliers with a modified z-score [@iglewicz1993]. Over the full sweep it raised 3 flags out of 356 rows, all at α=0.5. Its flags are meaningful only when explanations are averaged over at least three draws: an earlier single-draw version raised two flags that disappeared when the same checkpoints were explained again. All per-family results, the FedProx tables, the parity-monitor details and the faithfulness numbers are in Section 6.E.
+We also built a parity monitor that turns each silo's top-10 list into a deviation from the fleet consensus and flags outliers with a modified z-score [@iglewicz1993]. Across the whole sweep of 356 rows it flagged 3, and all of them were at α=0.5. Its flags are meaningful only when explanations are averaged over at least three draws: an earlier single-draw version raised two flags that disappeared when the same checkpoints were explained again. All per-family results, the FedProx tables, the parity-monitor details and the faithfulness numbers are in Section 6.E.
 <!-- src: docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md -->
 
 ### What the explanation check supports
 
-Explanation agreement falls with label skew and stays well above chance at every skew level. The claim that it reaches the seed-noise level at α=0.1 is directional: the interval touches the floor, and the floor itself rests on three seed pairs. KL divergence from the global label mix predicts agreement beyond silo size, observationally. This result extends Oki et al.'s finding [@oki2024] by showing where the convergence of federated explanations weakens, rather than contradicting it.
+Explanation agreement falls with label skew and stays well above chance at every skew level. The claim that it reaches the seed-noise level at α=0.1 is directional: the interval reaches the floor, and only three seed pairs define that floor. KL divergence from the global label mix predicts agreement beyond silo size, observationally. This result extends Oki et al.'s finding [@oki2024] by showing where the convergence of federated explanations weakens, rather than contradicting it.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 ## Trust Check {#sec:r-trust}
 
-The trust check is a separate experiment from the explanation check. It runs at α=0.5, seed 42, with 10 silos and 20 rounds, against the worst-case attacker sets described in @sec:m-trust. Phase 2 baselines, the Phase 4 matrix and the gradual-mode attack are single runs by design. The full record of all phases is in Section 6.G.
+The trust check stands apart from the explanation check as its own experiment. It runs at α=0.5, seed 42, with 10 silos and 20 rounds, against the worst-case attacker sets described in @sec:m-trust. By design, each of these was run only once: the Phase 2 baselines, the six-cell history matrix of Phase 4, and the gradual attack. The full record of all phases is in Section 6.G.
 <!-- src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md -->
 
 ### Is the attack worth detecting?
 
-@tab:attack-gate reports all four statistics of validation macro-F1 for the clean run and the poisoned runs. The final-five mean drops by 3.7 to 7.7 points, always in the same direction, and the drop orders correctly with how much of each family the attacker set covers. The maximum barely moves. A constant-fraction attack shifts the whole curve, and the maximum of a curve is almost blind to such a shift (@fig:phase0). This is why every attack comparison reports both statistics, and why the deployed checkpoint is still chosen by the maximum.
+@tab:attack-gate reports all four statistics of validation macro-F1 for the clean run and the poisoned runs. Under every attack the last-five average falls, by between 3.7 and 7.7 points, and the attacker sets that cover more of each family cause the bigger falls. The maximum barely moves. A constant-fraction attack shifts the whole curve, and the maximum of a curve is almost blind to such a shift (@fig:phase0). This is why every attack comparison reports both statistics, and why the deployed checkpoint is still chosen by the maximum.
 <!-- src: docs/contribution_b_results.md -->
 
 Table: Phase 0: validation macro-F1 over 20 rounds, clean against poisoned (change against clean in brackets) {#tab:attack-gate size=9.5}
@@ -146,11 +146,11 @@ Table: Phase 0: validation macro-F1 over 20 rounds, clean against poisoned (chan
 | Max | 0.9760 | 0.9710 (−0.0049) | 0.9763 (+0.0004) | 0.9867 (+0.0107) |
 <!-- src: docs/contribution_b_results.md -->
 
-![Validation macro-F1 of the clean run and the poisoned runs at seed 42; the shaded band is the final-five window](docs/report/figs/fig_phase0_curves.png){#fig:phase0 width=11}
+![Seed-42 validation macro-F1 curves for the clean run and each poisoned run, with the last five rounds shaded](docs/report/figs/fig_phase0_curves.png){#fig:phase0 width=11}
 
 ### Which statistics carry the attack?
 
-Only one of the five statistics separates the malicious silos clearly (@tab:glass-summary). Training loss under attack has a Glass's δ 33.8 times its value for the same silos in a clean run at f=3, and 154.3 times at f=2. These ratios are seed-42 effect sizes, not cut-offs. A per-round loss threshold tuned on seed 42 failed at seed 1337, where it flagged a poisoned silo-round at a rate of 0.017 against the 0.483 the agent had logged. The three geometric statistics show weak separation or none. Validation accuracy points the wrong way: relabelling attack flows as Benign makes a malicious silo look more accurate on a validation set dominated by Benign traffic.
+Only one of the five statistics separates the malicious silos clearly (@tab:glass-summary). For training loss, Glass's δ under attack is 33.8 times as large as for the same silos with no attack when f=3, and 154.3 times as large when f=2. Both ratios describe effect size at seed 42; neither is a threshold. A per-round loss threshold tuned on seed 42 failed at seed 1337, flagging only 0.017 of the poisoned silo-rounds, compared with 0.483 in the agent's own log. The three geometric statistics show weak separation or none. Validation accuracy points the wrong way: once attack flows are relabelled as Benign, a malicious silo scores better on a validation set that is mostly Benign.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_b_results.md -->
 
 Table: Phase 1: ratio of Glass's δ in the poisoned run to the same silos in a clean control run {#tab:glass-summary}
@@ -165,7 +165,7 @@ Table: Phase 1: ratio of Glass's δ in the poisoned run to the same silos in a c
 
 ### The classical rules
 
-The classical rules did not find the attackers. Multi-Krum excluded a malicious silo 0% of the time, against a chance rate of 0.30 at f=3 and 0.20 at f=2. Instead it removed the same large, Benign-heavy silos in every round, with or without an attack; in the clean control run it excluded exactly silos {2,7,9} in 20 of 20 rounds. Its apparent recovery at f=2 (recovery fraction 1.3490) is a compositional artifact. Dropping those silos raised the malicious silos' share of the surviving aggregate from 9.8% to 21.0% while they stayed fully included, and the gain in macro-F1 came from rebalancing labels, not from mitigation. Classical Krum keeps one update of ten each round, so its exclusions of malicious silos are at chance.
+None of the classical rules identified the attackers. Multi-Krum excluded a malicious silo 0% of the time. Chance alone would have given 0.30 at f=3 and 0.20 at f=2. What it dropped, round after round and whether or not anyone attacked, were the big silos that hold mostly Benign traffic; in the run with no attacker it dropped exactly silos {2,7,9} in all 20 rounds. At f=2 its recovery fraction of 1.3490 looks like success, but it comes from composition. With those big silos gone, the attackers, still fully counted, made up 21.0% of what remained instead of 9.8%, and macro-F1 rose because the label mix became more balanced, not because anything was mitigated. Classical Krum's exclusions are chance-level: it keeps 1 of 10 every round.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_b_results.md -->
 
 Trimmed mean also reacted mainly to composition. Splitting the clean silos into ordinary ones and large Benign-heavy ones shows the composition excess in trim rate (+0.1714 at f=3) to be larger than the malicious excess (+0.1522). Defending when nobody attacks has a price, too. Measured in test macro-F1 against undefended FedAvg, the cost is −22.7 points for Krum, −4.9 for Multi-Krum and −1.6 for trimmed mean.
@@ -173,7 +173,7 @@ Trimmed mean also reacted mainly to composition. Splitting the clean silos into 
 
 ### ByzAgent
 
-ByzAgent flagged the malicious silos in 60 of 60 silo-rounds at seed 42 under the f=3 attack. That number cannot be taken at face value. The same silos were already flagged at rates of 0.95 to 1.00 in the clean run, as was silo 8, which was never malicious. All four are the four lowest-Benign silos at that seed, with 9.2%, 0.3%, 0.1% and 12.3% Benign traffic against 81.5% to 98.0% for every other silo. At seed 42, the lift of a malicious silo over its own clean-run rate is at most +0.05.
+Under the f=3 attack at seed 42, ByzAgent flagged a malicious silo in every one of its 60 silo-rounds. Read alone, that figure misleads. With no attack at all, those silos were flagged at rates between 0.95 and 1.00, and so was silo 8, which never attacked. All four are the four lowest-Benign silos at that seed, with 9.2%, 0.3%, 0.1% and 12.3% Benign traffic against 81.5% to 98.0% for every other silo. At seed 42, the lift of a malicious silo over its own clean-run rate is at most +0.05.
 <!-- src: docs/contribution_b_results.md -->
 
 Seeds 1337 and 2024 changed the picture. At those seeds composition is graded rather than split into two groups, and lift appears wherever the clean-run rate is low (@tab:lift and @fig:lift). Silo 5 shows a lift of +0.95 at seed 1337 and +0.75 at seed 2024, and silo 3 shows +0.40 at seed 1337. Where a silo's clean rate is already at the ceiling, as for silo 3 at seed 2024 (clean rate 1.00), lift stays flat.
@@ -187,27 +187,27 @@ Table: ByzAgent lift over each malicious silo's own clean-run flag rate, f=3 sud
 | 2024 | +0.35 | −0.05 | +0.75 |
 <!-- src: docs/contribution_b_results.md -->
 
-![ByzAgent flag rate for each malicious silo in a clean run (open marker) and under the f=3 sudden attack (filled marker), at the three seeds; lift is the horizontal distance](docs/report/figs/fig_byzagent_lift.png){#fig:lift width=12}
+![Share of rounds in which ByzAgent flagged each attacking silo: open markers for the run without attack, filled markers for the f=3 sudden attack, at all three seeds; the horizontal gap is the lift](docs/report/figs/fig_byzagent_lift.png){#fig:lift width=12}
 
-Our conclusion for this part of the trust check is stated in the project's locked wording:
+We state the conclusion of this part in the wording the project fixed for it:
 
 > "Both effects are present. A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated. Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition."
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-A matched control, an equally strong attacker drawn from ordinary silos, could not be built. In this partition, holding enough attack traffic to poison well and having a low Benign share are the same property: the six high-Benign silos together hold only 211 of the federation's 3,174 Bot rows. We therefore cannot say whether the failures of the classical rules are general to those rules or tied to our worst-case selection.
+We could not build the obvious control, an attacker of the same strength made from ordinary silos. Here, a silo holds enough attack traffic to be a strong attacker only if its Benign share is low, so the two properties coincide; the six silos with the most Benign traffic hold just 211 Bot rows between them, out of 3,174 in the whole federation. We therefore cannot say whether the failures of the classical rules are general to those rules or tied to our worst-case selection.
 <!-- src: docs/contribution_b_results.md -->
 
 ### How faithful is the agent's rationale?
 
-ByzAgent produces decisions plus a rationale of measured fidelity, and the measurement shows that the fidelity is partial. Its strict citation error, the share of cited values that misstate the data, rose from 11.7% at seed 42 to 22.5% at seeds 1337 and 2024. At those seeds the agent kept citing update norm in about 59% of its explanations, even though update norm's correlation with the agent's own decisions fell from +0.419 to −0.076. Training loss, the statistic that actually carries the attack, stayed under-cited.
+ByzAgent produces decisions plus a rationale of measured fidelity. Measured, that fidelity turns out to be partial. The strict citation error, meaning the share of quoted values that do not match the data, was 11.7% at seed 42 and 22.5% at seeds 1337 and 2024. At the two later seeds, update norm still appeared in about 59% of the agent's explanations, although its correlation with the agent's decisions had dropped from +0.419 to −0.076. Training loss, the statistic that actually carries the attack, stayed under-cited.
 <!-- src: docs/contribution_b_results.md -->
 
-When given five-round histories instead of single rounds, about 35 to 45% of the agent's trend claims contradicted the sequence it was shown. Its decisions are also nondeterministic: three repeated calls at round 10 matched exactly in 27 of 30 cases, and all 30 agreed on trust versus flagged. The rolling-history variant failed its preregistered test, because a never-malicious silo rose as much as the attackers did.
+Shown five rounds of history, the agent described trends wrongly about 35 to 45% of the time. Its output also changes from call to call: asking three times about round 10 gave identical decisions in 27 of 30 cases, while all 30 agreed on whether a silo was trusted or flagged. The history-based variant did not pass the test written before it ran, since a silo that never attacked was flagged just as often as the attackers.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_b_results.md -->
 
 ### What the trust check supports
 
-The attack is worst-case by construction, and the attacker-selection rule picks silos along the same composition axis that every detector here reacts to. All four mechanisms tested responded to silo composition. The classical rules did not single out the attackers. ByzAgent's flags also responded to the attack, but only where flag rates were not already saturated. Its written reasons are partly unfaithful, its decisions vary between calls, and the rolling-history design failed. ByzAgent is not shown to outperform the classical rules, and this report makes no such claim.
+The attack is built to be worst-case, and the rule that picks attackers chooses them by composition, the very property all the detectors respond to. Every mechanism tested reacted to composition. The classical rules never picked out the attackers. ByzAgent did react to the attack as well, though only for silos whose flag rate was not already at the top. Some of its stated reasons are wrong, repeated calls can disagree, and its history-based version failed. ByzAgent is not shown to outperform the classical rules, and this report makes no such claim.
 
 ## Efficiency {#sec:r-efficiency}
 
@@ -224,12 +224,12 @@ Table: Serving and communication measurements (CPU, one laptop) {#tab:eff-summar
 | Wall time per round, median of 500 rounds | 51.4 s |
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/efficiency_results.md -->
 
-ONNX Runtime in fp32 gives the same predictions as PyTorch on all 143,513 validation rows and is about four times faster per flow, so it became the backend's default engine. At batch 1024 PyTorch is faster. Dynamic int8 quantization was tried and dropped: it changed only a small share of predictions, but those fell on small classes, and validation macro-F1 fell by 0.1428. Update compression saves bytes exactly, but its effect on accuracy is not detectable with three seeds either way. A loss-based pre-screen that would send only suspicious silos to the agent was replayed offline and rejected, because the seed-42 threshold did not transfer to seed 1337. Full tables are in Section 6.I.
+On every one of the 143,513 validation rows, ONNX Runtime in fp32 predicts exactly what PyTorch predicts, and it handles a single flow about four times faster, so the backend now uses it by default. At batch 1024 PyTorch is faster. Dynamic int8 quantization was tried and dropped: it changed only a small share of predictions, but those fell on small classes, and validation macro-F1 fell by 0.1428. Compressing updates cuts the bytes sent by a known amount; whether it changes accuracy cannot be seen with three seeds. A loss-based pre-screen that would send only suspicious silos to the agent was replayed offline and rejected, because the seed-42 threshold did not transfer to seed 1337. Full tables are in Section 6.I.
 <!-- src: docs/efficiency_results.md -->
 
 ## Negative and Null Results {#sec:r-negative}
 
-@tab:negative collects every hypothesis that failed or was not confirmed, with the section where each is reported. We list them together so that none is lost among the positive results.
+@tab:negative gathers each idea that failed or could not be confirmed, together with the sections that report it. We list them together so that none is lost among the positive results.
 
 Table: Failed, null and unconfirmed results {#tab:negative size=9.5}
 | Hypothesis or attempt | Outcome | Reported in |
@@ -266,13 +266,13 @@ Table: Failed, null and unconfirmed results {#tab:negative size=9.5}
 
 The limitations below bound every claim in this chapter. They are grouped by experiment; the full list from the canonical results documents is reproduced in Sections 6.E and 6.G.
 
-**Shared by both checks.** Three seeds were used throughout, because every seed is a full training run. Silos within one run share the same sequence of global models and are not independent, so the effective sample size is closer to the number of runs than to the number of silo rows; for this reason no p-values are reported. Everything ran in simulation on one machine, so no real network, latency or client failure was involved. The data is a single benchmark, CICIDS2017, and conclusions may not carry over to other traffic.
+**Shared by both checks.** Three seeds were used throughout, because every seed is a full training run. The silos of one run all train from the same global models, so they are not independent; the real sample size is nearer the count of runs than the count of silo rows, and we therefore give no p-values. Everything ran in simulation on one machine, so no real network, latency or client failure was involved. The data is a single benchmark, CICIDS2017, and conclusions may not carry over to other traffic.
 <!-- src: docs/contribution_a_results.md -->
 
-**Explanation check.** The α=0.1 result is directional, not significant, and the seed-noise floor rests on only three seed pairs. The SHAP sampling in the headline pipeline was not seeded. The chance level assumes that features are equally likely to be important, which real rankings are not. The faithfulness check covers one configuration and three of ten silos. Agreement anchors on the true class by design, which deliberately excludes disagreement about the prediction itself. SHAP's background replaces a missing feature with an average that is not a real network flow. Only top-k lists cross the boundary, so server-side analyses see a compressed summary of each silo's explanation. FedProx was run at one μ only. Silo size and skew cannot be separated experimentally with this partitioner.
+**Explanation check.** The α=0.1 result is directional, not significant, and the seed-noise floor rests on only three seed pairs. No seed was set for SHAP's sampling when the headline values were computed. The chance level assumes that features are equally likely to be important, which real rankings are not. The faithfulness check covers one configuration and three of ten silos. Agreement anchors on the true class by design, which deliberately excludes disagreement about the prediction itself. SHAP's background replaces a missing feature with an average that is not a real network flow. Only top-k lists cross the boundary, so server-side analyses see a compressed summary of each silo's explanation. FedProx was run at one μ only. Silo size and skew cannot be separated experimentally with this partitioner.
 <!-- src: docs/contribution_a_results.md -->
 
-**Trust check.** The attack is worst-case, not a model of a real attacker, and the baselines were handed the true f. Phase 2, the Phase 4 matrix and the gradual-mode attack are single runs. The attacker-selection rule is entangled with the composition axis that the detectors react to, and that entanglement is unresolved. A fixed attacker set chosen at seed 42 is a weaker and different attack at the other seeds. The agent's decisions vary between calls, and its rationale is only partly faithful. The seed-1337 silo-0 result cannot be attributed cleanly, because that silo held very little poisonable data at that seed.
+**Trust check.** The attack is worst-case, not a model of a real attacker, and the baselines were handed the true f. Each of the baseline runs, the history matrix and the gradual attack exists once. The attacker-selection rule is entangled with the composition axis that the detectors react to, and that entanglement is unresolved. A fixed attacker set chosen at seed 42 is a weaker and different attack at the other seeds. The agent's decisions vary between calls, and its rationale is only partly faithful. The seed-1337 silo-0 result cannot be attributed cleanly, because that silo held very little poisonable data at that seed.
 <!-- src: docs/contribution_b_results.md -->
 
 **System.** The dashboard's LLM sentences are a usability feature with no research claim behind them. Hot-swap retraining is an engineering feature of the live system, not an experiment.
@@ -287,23 +287,23 @@ Building the system meant working through a series of problems. The ones below a
 **RobustScaler degenerated.** RobustScaler is the usual choice for heavy-tailed flow features, but 28 of the 82 features have an interquartile range of zero, which leaves them unscaled or degenerate. The scaler pilot showed the robust variants far behind on validation, so the StandardScaler was locked.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-**BatchNorm does not federate.** BatchNorm keeps running statistics of each silo's own data, and averaging those across very different silos produces meaningless values. LayerNorm normalises each example on its own and has no such statistics, so it was locked instead.
+**BatchNorm does not federate.** BatchNorm keeps running statistics of each silo's own data, and averaging those across very different silos produces meaningless values. LayerNorm, which normalises within a single example and keeps no running statistics, was locked in its place.
 
 **The Flower runtime trained on the CPU.** We assumed federated training used the GPU. Flower builds an isolated runtime environment, and checking its installed packages showed the CPU build of PyTorch. The Flower app's dependencies were pinned on 2026-10-12 to the versions that the published runs had used, so that new runs reproduce the same numerics, and the project's hardware note was corrected on 2026-10-13.
 <!-- src: federated/pyproject.toml; PROJECT_INSTRUCTIONS.md -->
 
-**The round lottery.** Under non-IID data, validation macro-F1 can swing by up to 0.118 between the best round and round 20 of the same run. Reporting the final round would have been arbitrary, so every reported number uses the best-by-validation round. An earlier version of this comparison used test scores; on 2026-10-13 it was redone from validation curves only.
+**The round lottery.** Under non-IID data, validation macro-F1 can swing by up to 0.118 between the best round and round 20 of the same run. Reporting the final round would have been arbitrary, so every reported number uses the best-by-validation round. The first version of this comparison relied on test scores; on 2026-10-13 it was rebuilt from validation curves alone.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/test_set_exposure_audit.md -->
 
-**Test-set exposure was found and fixed.** An audit of every read of the test set found that three design rationales had quoted test scores, that client-side test scoring was still logged every round, and that the dashboard simulator replayed test rows. We re-checked each choice on validation (all three survived), turned the legacy test scoring off by default, switched the simulator to validation rows, wrote the full audit, and adopted a rule that only one preregistered configuration may ever be scored on the test set again.
+**Test-set exposure was found and fixed.** An audit of every read of the test set found that three design rationales had quoted test scores, that client-side test scoring was still logged every round, and that the dashboard simulator replayed test rows. We re-checked each choice on validation (all three survived), turned the legacy test scoring off by default, switched the simulator to validation rows, wrote the full audit, and agreed that from then on the test set would be used once more, for a single preregistered configuration, and never otherwise.
 <!-- src: docs/test_set_exposure_audit.md; PROJECT_INSTRUCTIONS.md -->
 
-**Single-draw parity flags were artifacts.** The first parity monitor flagged two silos that disappeared when the same checkpoints were explained again. Tracing the cause showed that one explainer draw had produced many tied deviations, which shrank that round's median absolute deviation to 0.042. The fix explains every checkpoint three times with fixed seeds and averages before thresholding.
+**Single-draw parity flags were artifacts.** The first parity monitor flagged two silos that disappeared when the same checkpoints were explained again. The cause turned out to be one explainer draw with an unusual number of tied values, which pushed the median absolute deviation for that round down to 0.042. The fix explains every checkpoint three times with fixed seeds and averages before thresholding.
 <!-- src: docs/contribution_a_results.md -->
 
 **Entropy failed as the skew covariate.** The planned covariate, label entropy, lost its effect, and even changed sign, once silo size was controlled. We report this failure and the switch to KL divergence in that order, rather than presenting KL as if it had been the plan.
 
-**Rolling history failed.** Giving ByzAgent five-round histories was meant to separate an attack, which changes over time, from composition, which does not. The preregistered rule judged it a failure: a never-malicious silo rose as much as the attackers, decision stability fell, and many trend claims were wrong. We kept the negative result and did not tune the prompt afterwards.
+**Rolling history failed.** Giving ByzAgent five-round histories was meant to separate an attack, which changes over time, from composition, which does not. The preregistered rule judged it a failure: an innocent silo was flagged as often as the real attackers, repeated decisions agreed less often, and many descriptions of trends were false. We kept the negative result and did not tune the prompt afterwards.
 
 **The seed-42 null was partly a ceiling.** The first ByzAgent results suggested that the agent detected composition and nothing else. Running two more seeds showed that seed 42's malicious silos were already flagged at the ceiling with no attack present, so lift could not appear there. The claim was revised to the locked wording above instead of being dropped or overstated.
 <!-- src: docs/contribution_b_results.md -->

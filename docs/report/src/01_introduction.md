@@ -6,11 +6,11 @@ Federated learning (FL) offers a way to train a shared model without moving the 
 
 When we started the project, we noticed that most of this work stops at accuracy. For a system that people would actually run, two further questions matter just as much, and they are the reason this project exists.
 
-The first question concerns explanations. When an analyst receives an alert, the label alone is not enough: the analyst wants to know which features of the flow made the model call it an attack. In a federation, every silo holds its own copy of the model, trained on its own skewed share of the traffic. If those copies rely on different features, the explanation an analyst sees depends on whose model was asked, and the explanation stops being a property of "the detector" at all. We wanted to measure how far the silos' explanations agree, how that agreement changes as the silos' data grows more different, and how much disagreement random seeds alone produce.
+The first question concerns explanations. When an analyst receives an alert, the label alone is not enough: the analyst wants to know which features of the flow made the model call it an attack. In a federation, each silo keeps a local copy of the model, fitted to a skewed slice of traffic. Suppose those copies lean on different features. Then the analyst's explanation changes with the silo that produced it, and it no longer describes "the detector" as a whole. We wanted to measure how far the silos' explanations agree, how that agreement changes as the silos' data grows more different, and how much disagreement random seeds alone produce.
 
 The second question concerns the participants. The server sees only weight updates, never data. A silo that quietly relabels its own training data can bend the shared model, and nothing in plain averaging would notice [@tolpegin2020; @nguyen2020poison]. Byzantine-robust aggregation rules were designed for this threat [@blanchard2017; @yin2018], but they look for updates that are geometric outliers. In a federation where honest silos hold very different data, an honest but unusual silo can look like an outlier too. We wanted to test what these rules actually exclude in such a setting, and whether a language-model agent that reads simple per-silo statistics can do better while also writing down its reasons.
 
-To study both questions in one place, we built XFed-IDS-ByzAgent. It is one system with five stages: data, federated training, an explanation check, a trust check and a dashboard. The explanation check and the trust check run on the same federated training, but they are different experiments with different evidence, and this report keeps their findings apart throughout.
+To study both questions in one place, we built XFed-IDS-ByzAgent. It is one system built in five stages. The data stage and federated training come first; the explanation check and the trust check follow; a dashboard sits on top. The explanation check and the trust check run on the same federated training, but they are different experiments with different evidence, and this report keeps their findings apart throughout.
 
 ## Objectives {#sec:objectives}
 
@@ -19,13 +19,13 @@ The project set out to do the following.
 - Prepare the corrected Distrinet release of CICIDS2017 as eight attack families plus a Benign class, with a documented cleaning record, a group-aware train/test split and a fixed validation set.
 - Train a shared detector across 10 simulated organizations with FedAvg under realistic label skew, using Dirichlet partitions at three skew levels and three seeds, and select every model and every round on validation data only.
 - Measure how closely each organization's SHAP explanation ranking matches the global model's ranking, using Jaccard@k and weighted Kendall's τ, and read each value against a chance level and a seed-noise floor built from centralized models.
-- Separate the effect of label skew on explanation agreement from the effect of silo size, which the Dirichlet partitioner ties together.
-- Build a trust check in which a worst-case label-flipping attack is run against the federation, and compare an LLM trust agent (ByzAgent) with Krum, Multi-Krum and coordinate-wise trimmed mean.
+- Tell the effect of label skew on explanation agreement apart from the effect of silo size, since the Dirichlet partitioner links the two.
+- Build a trust check in which a worst-case label-flipping attack is run against the federation, and compare an LLM trust agent (ByzAgent) with three classical rules: Krum, Multi-Krum and trimmed mean.
 - Audit the agent: how stable its decisions are, and how often the reasons it writes down match the numbers it was given.
 - Run one preregistered comparison of federated optimizers, scored on the test set exactly once.
 - Measure serving latency, communication per round and the effect of update compression.
 - Deliver a working dashboard that shows live detection, explanations and trust decisions together, with every displayed number linked to the file it came from.
-- Record every way the test set was read, and every negative or null result, so that nothing in the report claims more than the evidence supports.
+- Keep a record of each read of the test set and of each negative or null result, so the report never claims more than its evidence shows.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 ## Background and Literature Survey {#sec:literature}
@@ -40,7 +40,7 @@ Early applications in network security focused on the Internet of Things. DÏoT 
 
 Heterogeneous data, usually called non-IID data, is the central difficulty. When clients hold different label mixes, their local models pull in different directions and the averaged model can be worse than any client expects. Benchmarks create controlled non-IID splits by drawing each client's share of every class from a Dirichlet distribution whose concentration parameter sets the degree of skew [@hsu2019; @li2022noniid]. Several server-side and client-side remedies exist. FedProx adds a proximal term to each client's objective that keeps local weights close to the global model [@li2020fedprox]. Server momentum (FedAvgM) treats the averaged update as a gradient and applies momentum to it on the server [@hsu2019]. Adaptive server optimizers such as FedAdam and FedYogi apply Adam-style or Yogi-style updates on the server [@reddi2021]. We used the Flower framework to run all federated training [@beutel2020flower].
 
-What these studies share is their yardstick: detection accuracy. None of them asks whether the silo models detect the same attack for the same reason.
+What these studies share is their yardstick: detection accuracy. What none of them checks is whether two silos flag an attack because of the same features.
 
 ### Explainable intrusion detection and federated explanations
 
@@ -48,16 +48,16 @@ SHAP attributes a model's output to its input features using Shapley values from
 
 Several systems now add explanations to a federated detector. FEDFOREST builds an interpretable federated detector on gradient-boosted trees [@dong2022fedforest]. XFedHunter explains the detection of advanced persistent threats in software-defined networks [@thi2023xfedhunter]. Bilal et al. combine FedAvg with SHAP and LIME for malicious IoT traffic [@bilal2025], and Gholamrezazadeh and Montazerolghaem present a federated SHAP-based framework for distributed IDS [@gholamrezazadeh2026]. These systems produce explanations, but none of them compares the explanations of different participants with each other.
 
-Oki et al. come closest to our question [@oki2024]. They measured the distance between the per-class feature sets of a distributed IDS and a non-distributed one and reported that federated learning brings these explanations closer. The 2026 federated XAI survey of Gholizade et al. lists the behaviour of explanations on non-IID clients among the field's unsolved problems and notes that there is still no standard way to score how consistent federated explanations are [@gholizade2026].
+Oki et al. come closest to our question [@oki2024]. They measured the distance between the per-class feature sets of a distributed IDS and a non-distributed one and reported that federated learning brings these explanations closer. The 2026 federated XAI survey of Gholizade et al. names explanation behaviour on non-IID clients as an open problem, and observes that no agreed metric yet exists for scoring the consistency of federated explanations [@gholizade2026].
 <!-- src: paper/refs.bib -->
 
 ### Stability and consistency of explanations
 
-Outside federated learning, explanation stability has been studied directly. Attributions can change under small perturbations of the input that do not change the prediction [@ghorbani2019; @alvarezmelis2018], and sampling-based explainers carry their own estimation noise, for which credible intervals can be computed [@slack2021]. Watson et al. retrained models of identical architecture with different random seeds and data orderings and found low agreement among their explanations [@watson2022]. Their result means that two models can disagree about reasons even when nothing about their data differs. Krishna et al. formalised disagreement between explanation methods and showed that practitioners meet it often [@krishna2024].
+Outside federated learning, explanation stability has been studied directly. Attributions can change under small perturbations of the input that do not change the prediction [@ghorbani2019; @alvarezmelis2018], and explainers that work by sampling add estimation noise of their own, which can be summarised with credible intervals [@slack2021]. Watson et al. retrained models of identical architecture with different random seeds and data orderings and found low agreement among their explanations [@watson2022]. So two models may give different reasons for a decision even when their training data are identical. Krishna et al. formalised disagreement between explanation methods and showed that practitioners meet it often [@krishna2024].
 
 Two tools from this literature are used in our measurement. Kendall's rank correlation counts concordant and discordant pairs between two rankings [@kendall1938], and its weighted form gives more weight to disagreements near the top of the ranking, where an analyst actually looks [@vigna2015]. Deletion and insertion curves check faithfulness: they remove or add the highest-ranked inputs in order and track how the model's score changes [@petsiuk2018].
 
-The gap we saw is that federated studies report agreement numbers without the seed-noise reference that Watson et al.'s result implies they need. A federated agreement value means little until one knows how much agreement identical, centrally trained models reach.
+Federated studies, as far as we found, publish agreement values with no seed-noise reference beside them, even though Watson et al.'s result shows such a reference is needed. A federated agreement value means little until one knows how much agreement identical, centrally trained models reach.
 
 ### Byzantine-robust aggregation and poisoning
 
@@ -65,11 +65,11 @@ Krum chooses the single update whose summed distance to its nearest neighbours i
 
 On the attack side, Fang et al. showed that crafted local updates can bypass distance-based rules [@fang2020local]. Tolpegin et al. studied label flipping, the attack used in this project, in federated settings [@tolpegin2020], and Nguyen et al. demonstrated poisoning and backdoor attacks against federated IoT intrusion detectors in particular [@nguyen2020poison].
 
-Most of these evaluations assume that honest clients look alike. Under strong label skew they do not, and how that affects what the rules exclude is rarely measured.
+Most of these evaluations assume that honest clients look alike. With strong label skew, honest clients differ a great deal, and few studies measure how this changes what the rules throw out.
 
 ### Language-model agents for security decisions
 
-Agents that interleave written reasoning with actions [@yao2023react] have been applied to penetration testing [@deng2024pentestgpt] and to exploiting known vulnerabilities [@fang2024oneday], and a recent survey maps many other uses of large language models in security [@xu2026llmsec]. Llama 3 is one family of openly available models that can be run locally for such work [@grattafiori2024llama3]. A known weakness matters for us: the reasons a model writes down need not reflect what actually drove its answer [@turpin2023]. If an agent is placed inside an aggregation loop, its rationale has to be checked against the data it was given rather than taken at face value.
+Language-model agents that alternate between reasoning steps and actions [@yao2023react] have been used for penetration testing [@deng2024pentestgpt] and for exploiting vulnerabilities that are already public [@fang2024oneday], and a recent survey maps many other uses of large language models in security [@xu2026llmsec]. Llama 3 is one family of openly available models that can be run locally for such work [@grattafiori2024llama3]. A known weakness matters for us: a model's written explanation may not match the factors that really produced its answer [@turpin2023]. An agent that sits inside an aggregation loop therefore needs its stated reasons compared with its inputs; they cannot simply be trusted.
 
 ### CICIDS2017 and its corrections
 
@@ -77,14 +77,14 @@ CICIDS2017 is one of the most widely used IDS benchmarks [@sharafaldin2018]. Eng
 
 ### How this project differs from prior work
 
-The explanation check builds directly on Oki et al. [@oki2024]. They found that federated learning brings per-site explanations closer together; we vary label skew from severe to near-IID and look for the point where that effect gives out. We do not dispute their finding. We characterise where it stops holding.
+Our explanation check starts from the work of Oki et al. [@oki2024]. Their finding was that federated training pulls per-site explanations toward each other. We sweep label skew from severe to nearly IID to find where that pull stops working. We do not dispute their finding. We characterise where it stops holding.
 
-We also measure a reference that the federated IDS papers above leave out: how much feature rankings differ between centralized models whose only difference is the random seed. This seed-noise floor is the bar a federated difference has to clear before it can be blamed on federation, and it is one concrete answer to the missing consistency metric that Gholizade et al. point to [@gholizade2026].
+We also measure a reference that the federated IDS papers above leave out: how much feature rankings differ between centralized models whose only difference is the random seed. A federated gap has to exceed this seed-noise floor before federation can be held responsible for it. The floor also offers one practical reply to the lack of a consistency metric that Gholizade et al. describe [@gholizade2026].
 
 For the trust check, we test Krum and its variants on a federation of 10 silos with the true number of attackers handed to them as an oracle. We also audit how often the agent's own written reasons are accurate when checked against the statistics it saw.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-Two limits on our claims follow from this survey. We do not claim to be the first to measure explanation agreement in a federated IDS, and we do not present the combination of federated learning, intrusion detection and explainability as new, since recent work already combines them [@dong2022fedforest; @thi2023xfedhunter; @bilal2025; @gholamrezazadeh2026]. The one-sentence LLM summaries shown next to alerts in the dashboard are a usability feature, and we make no research claim about them.
+Two limits on our claims follow from this survey. This report makes no priority claim for measuring explanation agreement in a federated IDS. Nor does it present the combination of federated learning, intrusion detection and explainability as new, since recent work already combines them [@dong2022fedforest; @thi2023xfedhunter; @bilal2025; @gholamrezazadeh2026]. The dashboard's one-sentence LLM summaries beside each alert exist for usability only; they are not a research result.
 
 Table: How the closest works compare with this project. A mark means the property is shown in the work's abstract or text, as we read it. {#tab:related}
 | Work | FL | IDS | XAI | Consistency metric | Seed control | Byzantine defence | LLM agent |
@@ -101,7 +101,7 @@ Table: How the closest works compare with this project. A mark means the propert
 | PentestGPT [@deng2024pentestgpt] | | | | | | | ✓ |
 | This project | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
-@tab:related places the project among the closest works. The final row combines properties that the other rows show separately. We state that as a description of scope, not as a claim of novelty.
+@tab:related places the project among the closest works. The final row combines properties that the other rows show separately. We state that as a description of scope; it is not a claim that the combination is new.
 
 ## Organization of the Report {#sec:organization}
 

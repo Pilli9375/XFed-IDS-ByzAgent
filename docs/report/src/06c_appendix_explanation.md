@@ -1,13 +1,13 @@
 ## Explanation Check, Full Results {#sec:app-expl}
 
-This section gives every agreement result, the reference lines, the supporting diagnostics and the negative checks of the explanation check. It supports Sections 2.2.4 and 4.2. Unless stated otherwise, agreement is the median over eligible rows: silos with at least 400 training rows, and families with at least 20 rows in the silo.
+Here we collect the explanation check in full: each agreement result, both reference lines, the diagnostics behind them and the checks that came out negative. It supports Sections 2.2.4 and 4.2. Unless stated otherwise, agreement is the median over eligible rows: a silo must have 400 or more training rows, and a family needs 20 or more rows inside that silo.
 <!-- src: docs/contribution_a_results.md -->
 
 ### Two measurement choices
 
-Two choices shape every number in this section. First, each comparison uses the attribution vector of the row's true class, so a disagreement about the prediction itself is excluded by design. A version anchored on each model's own predicted class would answer a different question and would need its own eligibility rules. Second, as with any perturbation-based explainer, SHAP's stand-in for a "missing" feature is an average over the background, which is not a real network flow.
+Two choices shape every number in this section. First, rankings are compared for the true class of each row, which deliberately keeps disagreement about the predicted label out of the measure. Comparing each model's ranking for its own predicted class would be a different question, with eligibility rules of its own. Second, SHAP replaces a "missing" feature by its background average, as all perturbation explainers do, and such an averaged flow does not exist in real traffic.
 
-The evaluation rows are fixed: 14 rows drawn once from the test set with a fixed seed, two for each headline family, used only as inputs to the explainer and never as a score. The background for each silo is 200 rows drawn from that silo's own training partition, stratified by class under a fixed seed, and each explanation uses 4000 samples.
+The evaluation rows are fixed: 14 rows drawn once from the test set with a fixed seed, two for each headline family, used only as inputs to the explainer and never as a score. Each silo's background is a 200-row sample of its own training data, balanced over classes and drawn with a fixed seed; each explanation is computed with 4000 samples.
 <!-- src: docs/measurement_protocol.md; docs/test_set_exposure_audit.md -->
 
 ### Agreement by skew level and by family
@@ -56,10 +56,10 @@ The family pattern follows the overall one: every family agrees less at α=0.1, 
 **Chance.** For two independent, uniformly random k-subsets of n items, the expected intersection is k²/n and the expected union is 2k − k²/n. Their ratio approximates the expected Jaccard index. With k=10 and n=82 it is 0.065.
 <!-- src: docs/contribution_a_results.md -->
 
-**Seed-noise floor.** Three centralized models (seeds 42, 1337 and 2024) were explained on the same 14 rows, with the same number of samples and the same class-stratified 200-row background construction as the federated pipeline. @tab:floor-pairs in Section 4.2 gives each seed pair. The floor is the median of the three pair medians, reported with their range: 0.429 [0.429, 0.484] for Jaccard@10 and 0.663 [0.660, 0.690] for weighted τ.
+**Seed-noise floor.** Three centralized models (seeds 42, 1337 and 2024) were explained on the same 14 rows, using the federated pipeline's sample count and its way of building a balanced 200-row background. @tab:floor-pairs in Section 4.2 gives each seed pair. The floor is the median of the three pair medians, reported with their range: 0.429 [0.429, 0.484] for Jaccard@10 and 0.663 [0.660, 0.690] for weighted τ.
 <!-- src: site/public/data/headline.json; docs/measurement_protocol.md -->
 
-**Cluster bootstrap.** The bootstrap resamples (seed, silo) clusters with replacement 10,000 times, 29 clusters at α=0.1, and takes the median of all rows in each resample. At α=0.1 the 95% percentile interval is [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ. The Jaccard interval overlaps the floor's range, so the below-floor reading at α=0.1 is directional, not significant. An interval was computed only for α=0.1.
+**Cluster bootstrap.** At α=0.1 there are 29 (seed, silo) clusters. The bootstrap draws clusters with replacement, computes the median over every row of the drawn clusters, and repeats this 10,000 times. At α=0.1 the 95% percentile interval is [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ. The Jaccard interval overlaps the floor's range, so the below-floor reading at α=0.1 is directional, not significant. An interval was computed only for α=0.1.
 <!-- src: site/public/data/ci.json -->
 
 @fig:floor-alpha, produced by the project's plotting tools, draws the federated agreement against the floor's range with the α=0.1 interval overlaid. Its τ panel draws the floor median as the median over all 42 rows of the floor file, which differs slightly from the median of the three pair medians used in the text.
@@ -73,21 +73,21 @@ The family pattern follows the overall one: every family agrees less at α=0.1, 
 
 ### Size and label skew
 
-Under the partitioner, a silo's size is the sum over families of the family's size times the silo's share of it, a function of the same draw that sets the silo's skew. A raw size correlation therefore restates the skew effect. Silo size and Jaccard@10 correlate at r=+0.46 at α=0.1 and r=+0.07 at α=5.0, which is consistent with size carrying the skew signal, since skew and size variation are largest at α=0.1.
+Under the partitioner, a silo's size is the sum over families of the family's size times the silo's share of it, so size is decided by the very draw that decides skew. A plain correlation with size is therefore just the skew effect seen from another side. Silo size and Jaccard@10 correlate at r=+0.46 at α=0.1 and r=+0.07 at α=5.0, which is consistent with size carrying the skew signal, since skew and size variation are largest at α=0.1.
 <!-- src: docs/contribution_a_results.md -->
 
-Label entropy over the nine classes was the covariate fixed in advance. Its zero-order correlation with agreement at α=0.5 was weak and negative (r=−0.12 to −0.15). After conditioning on log size, its partial correlation weakened and changed sign, to +0.23 for Jaccard@10 and +0.13 for τ (n=30). That is the signature of a covariate whose apparent effect was carried by size, so it was dropped. KL divergence from the global label distribution was then tried in its place. Unlike entropy, which measures only how even a silo's label mix is, KL measures how far the mix is from the global one. It kept a strong partial correlation after the same conditioning (@tab:kl-partial in Section 4.2; @fig:kl-scatter and @fig:entropy-kl).
+Before looking at the data, we had chosen the entropy of a silo's nine-class label mix as the covariate. Its zero-order correlation with agreement at α=0.5 was weak and negative (r=−0.12 to −0.15). Holding log size fixed made the relation weaker and reversed its sign, to +0.23 for Jaccard@10 and +0.13 for τ (n=30). That is the signature of a covariate whose apparent effect was carried by size, so it was dropped. KL divergence from the global label distribution was then tried in its place. Unlike entropy, which measures only how even a silo's label mix is, KL measures how far the mix is from the global one. It kept a strong partial correlation after the same conditioning (@tab:kl-partial in Section 4.2; @fig:kl-scatter and @fig:entropy-kl).
 <!-- src: docs/contribution_a_results.md -->
 
-![Per-silo KL divergence from the global label mix against Jaccard@10 at the final round; filled markers are seed 42, open square and triangle are seeds 1337 and 2024](docs/report/figs/fig_kl_scatter.png){#fig:kl-scatter width=12}
+![Jaccard@10 at the final round plotted against each silo's KL divergence from the overall label mix; seed 42 uses filled markers, seeds 1337 and 2024 open squares and triangles](docs/report/figs/fig_kl_scatter.png){#fig:kl-scatter width=12}
 
 ![Zero-order and partial correlations of label entropy (pre-specified) and KL divergence (its replacement) with Jaccard@10, controlling for log silo size (from results/figures/)](results/figures/entropy_kl_partial_correlation.png){#fig:entropy-kl width=15}
 
-This narrows the limitation but does not remove it. The partial correlation is observational, computed on silos whose size and skew came from the same draw. Disentangling them causally needs size-equalized partitions, and this partitioner cannot produce partitions that vary skew while holding size fixed. No p-values are reported, because silos within one run are not independent.
+This narrows the limitation but does not remove it. The partial correlation comes from observation only, and in these silos one random draw fixed both size and skew. Disentangling them causally needs size-equalized partitions, and this partitioner cannot produce partitions that vary skew while holding size fixed. No p-values are reported, because silos within one run are not independent.
 
 ### Round-wise agreement
 
-Agreement was recomputed at rounds 5, 10, 15 and 20 with 1000 SHAP samples, a quarter of the headline setting. These values check the shape of convergence and are not comparable in size with the headline numbers. @tab:roundwise and @fig:roundwise give the means; @fig:roundwise-results and @fig:decoupling show the same data as plotted by the project's tools.
+To follow agreement over training, it was computed again at four rounds (5, 10, 15 and 20) using 1000 SHAP samples, one quarter of the headline setting. The point is the shape over time; the size of these values should not be compared with the headline results. @tab:roundwise and @fig:roundwise give the means; @fig:roundwise-results and @fig:decoupling show the same data as plotted by the project's tools.
 <!-- src: docs/contribution_a_results.md -->
 
 Table: Round-wise means (reduced SHAP fidelity) {#tab:roundwise}
@@ -104,7 +104,7 @@ Table: Round-wise means (reduced SHAP fidelity) {#tab:roundwise}
 | Validation macro-F1 | 5.0 | 0.860 | 0.984 | 0.949 | 0.950 |
 <!-- src: docs/contribution_a_results.md -->
 
-From round 5 to round 20, Jaccard@10 falls by 0.023 at α=0.1 and by 0.029 at α=0.5, while validation macro-F1 rises by 0.046 and 0.026. At α=5.0 the four Jaccard values span 0.004. No test was run on this trend; it is directional.
+Over these rounds, Jaccard@10 goes down by 0.023 (α=0.1) and 0.029 (α=0.5), while validation macro-F1 goes up by 0.046 and 0.026 respectively. At α=5.0 the four Jaccard values lie within 0.004 of each other. Because the trend was never tested statistically, it counts as directional.
 <!-- src: docs/contribution_a_results.md -->
 
 ![Round-wise mean Jaccard@10 (a) and mean validation macro-F1 (b) by α](docs/report/figs/fig_round_wise.png){#fig:roundwise width=13}
@@ -146,17 +146,17 @@ Table: FedAvg against FedProx (μ=0.0005): test macro-F1 per seed {#tab:fedprox-
 | 5.0 | 2024 | 0.9889 | 0.9919 | +0.0029 |
 <!-- src: docs/contribution_a_results.md -->
 
-At α=0.5, Jaccard@10 rises in all three seeds, shrinking from +0.0263 to +0.0042, while test macro-F1 moves by small amounts of mixed sign; weighted τ rises in two seeds and is negligibly lower in the third. At α=0.1, agreement and accuracy move in the same direction in every seed (both up at seeds 42 and 2024, both down at seed 1337), so three seeds cannot separate an explanation effect from an accuracy effect, and the result is inconclusive. At α=5.0 there is no consistent change. @fig:fedprox-seeds plots the per-seed comparison.
+At α=0.5, Jaccard@10 rises in all three seeds, shrinking from +0.0263 to +0.0042, and test macro-F1 changes only a little, up in one seed and down in two; weighted τ increases for two seeds and is very slightly lower for the third. At α=0.1, agreement and accuracy move in the same direction in every seed (both up at seeds 42 and 2024, both down at seed 1337), so with three seeds one cannot say whether FedProx changed the explanations or only the accuracy; this result is inconclusive. At α=5.0 there is no consistent change. @fig:fedprox-seeds plots the per-seed comparison.
 <!-- src: docs/contribution_a_results.md -->
 
 ![FedProx (μ=0.0005) against FedAvg, per seed, at α=0.1 and α=0.5: mean Jaccard@10, labelled with the change in test macro-F1 (from results/figures/)](results/figures/fedprox_vs_fedavg_per_seed.png){#fig:fedprox-seeds width=15.5}
 
 ### The parity monitor
 
-The parity monitor turns per-silo rankings into a fleet-wide drift flag, using only what would cross the client-to-server boundary: top-10 feature-index lists, with no SHAP magnitudes and no raw data. Each silo's per-row top-10 sets are combined by vote into one ordered list. Each silo's deviation is one minus the Jaccard index between its list and a consensus built from every other silo in the same draw. A silo is flagged when its modified z-score, computed from the median and the median absolute deviation (MAD), exceeds 3.5 [@iglewicz1993].
+The parity monitor turns per-silo rankings into a fleet-wide drift flag, using only what would cross the client-to-server boundary: top-10 feature-index lists, with no SHAP magnitudes and no raw data. Each silo's per-row top-10 sets are combined by vote into one ordered list. Each silo's deviation is one minus the Jaccard index between its list and a consensus built from every other silo in the same draw. A flag is raised when a silo's modified z-score, which uses the median and the median absolute deviation (MAD) instead of the mean and standard deviation, is above 3.5 [@iglewicz1993].
 <!-- src: docs/contribution_a_results.md -->
 
-Over the full sweep (9 configurations, 4 rounds each, 356 rows, 392.0 minutes of compute) the monitor raised 3 flags, all at α=0.5 and round 5 (@tab:parity, @fig:parity).
+The complete sweep covered 9 configurations at 4 rounds each, 356 rows in all, and took 392.0 minutes; it produced 3 flags, all at α=0.5 and round 5 (@tab:parity, @fig:parity).
 <!-- src: docs/contribution_a_results.md -->
 
 Table: Parity-monitor flags (three-draw average) {#tab:parity}
@@ -169,15 +169,15 @@ Table: Parity-monitor flags (three-draw average) {#tab:parity}
 
 ![Parity monitor: fleet parity by round and per-silo deviation, with flagged silos circled (from results/figures/)](results/figures/parity_monitor.png){#fig:parity width=15.5}
 
-Zero flags at α=0.1 does not mean that the α=0.1 fleet is healthy. The threshold judges a silo against its own fleet's spread in that round, not against an absolute level. At α=0.1, round 5, the median deviation across 29 eligible silos was 0.694, worse than any of the three flagged values at α=0.5. Yet nothing was flagged, because at severe skew every silo diverges from the consensus about equally, so none stands out. Absolute agreement should be read from the headline Jaccard and τ values, not from the flag count.
+The absence of flags at α=0.1 should not be read as a sign that those silos agree well. The threshold judges a silo against its own fleet's spread in that round, not against an absolute level. In round 5 at α=0.1, the 29 eligible silos had a median deviation of 0.694, which is larger than each of the three values flagged at α=0.5. Yet nothing was flagged, because at severe skew every silo diverges from the consensus about equally, so none stands out. Absolute agreement should be read from the headline Jaccard and τ values, not from the flag count.
 <!-- src: docs/contribution_a_results.md -->
 
-**The multi-draw fix.** An earlier version of the monitor, based on a single explainer draw, flagged two silos of `fedavg_a0.1_s1337` at round 5, with deviations of 0.947 and 0.889. Explaining the same checkpoints again with the same background and rows did not reproduce either flag. Tracing the cause showed that the original draw had produced an unusually tight cluster of tied deviations, a side effect of breaking ties among top-k votes over only 14 rows. That shrank the round's MAD to 0.042, about a third of what fresh draws gave, so an ordinary deviation crossed the threshold. The threshold formula was sound; judging it on one uncontrolled draw was not. The monitor now explains each checkpoint three times with fixed seeds (1001, 2002, 3003), computes each draw's deviations separately without mixing features across draws, and averages the three deviations per silo before thresholding. The numbers above come from this version.
+**The multi-draw fix.** An earlier version of the monitor, based on a single explainer draw, flagged two silos of `fedavg_a0.1_s1337` at round 5, with deviations of 0.947 and 0.889. Explaining the same checkpoints again with the same background and rows did not reproduce either flag. Tracing the cause showed that the original draw had produced an unusually tight cluster of tied deviations, a side effect of breaking ties among top-k votes over only 14 rows. That draw's MAD came out at 0.042, roughly one third of the value in new draws, and an ordinary deviation was therefore pushed over the threshold. Nothing was wrong with the formula; the mistake was to apply it to a single uncontrolled draw. In the current monitor, every checkpoint is explained three times with the fixed seeds 1001, 2002 and 3003; deviations are worked out for each draw on its own, never pooling features from different draws, and the three values for a silo are averaged before the threshold is applied. The numbers above come from this version.
 <!-- src: docs/contribution_a_results.md -->
 
 ### Faithfulness and explainer checks
 
-**Deletion and insertion.** Deletion and insertion curves [@petsiuk2018] replace features by the model's training mean, in ranked order, and track the probability assigned to the true class. They were run for one configuration (α=0.5, seed 42) on the global model and three of the ten silos (@tab:faith, @fig:deletion and @fig:insertion). Every deletion AUC lies below the matching insertion AUC, which fits attributions that track the model. There is no agreed threshold for these AUCs, and nothing downstream is gated on them, so this is a spot-check, not a gate.
+**Deletion and insertion.** These curves [@petsiuk2018] take the features in ranked order and set them to the training mean (deletion) or restore them from it (insertion), watching the probability the model gives to the true class. We ran them for a single configuration, α=0.5 with seed 42, on the global model and on three silos out of ten (@tab:faith, @fig:deletion and @fig:insertion). In each case the deletion AUC is lower than the insertion AUC, as it should be if the attributions follow the model. No accepted cut-off exists for such AUCs, and no later step depends on them; the check is a spot-check only.
 <!-- src: docs/contribution_a_results.md -->
 
 Table: Deletion AUC (lower is better) and insertion AUC (higher is better), α=0.5, seed 42 {#tab:faith}
@@ -193,21 +193,21 @@ Table: Deletion AUC (lower is better) and insertion AUC (higher is better), α=0
 
 ![Insertion faithfulness curves for the global model and three silos, α=0.5, seed 42 (from results/figures/)](results/figures/insertion_curve.png){#fig:insertion width=12}
 
-**Explainer and background checks.** KernelExplainer and GradientExplainer on the same models agree at median τ=0.730 and median Jaccard@10 0.538 (n=14), so the rankings are not an artifact of the explainer choice. Replacing per-silo backgrounds with a common one gives median τ=0.807 and Jaccard@10 0.603 (n=42), so cross-silo disagreement is not an artifact of background sampling.
+**Explainer and background checks.** Running KernelExplainer and GradientExplainer on identical models gives median τ=0.730 and median Jaccard@10 0.538 between them (n=14); the rankings therefore do not depend on which explainer is used. Giving every silo one shared background instead of its own yields median τ=0.807 and Jaccard@10 0.603 (n=42); the disagreement between silos therefore does not come from how backgrounds are sampled.
 <!-- src: docs/contribution_a_results.md -->
 
 **DeepExplainer.** DeepExplainer was rejected after a probe: on this model its additivity error is 2.43, against a tolerance of 0.01, because of the LayerNorm layers.
 <!-- src: docs/contribution_a_results.md -->
 
-**CPU against GPU.** SHAP on this small model ran about 3 times slower on the GPU than on the CPU, because kernel-launch overhead dominates a model with 19,849 parameters. All SHAP work therefore used the CPU.
+**CPU against GPU.** For a model of only 19,849 parameters, the cost of launching GPU kernels outweighs the work itself, and SHAP took about 3 times as long on the GPU as on the CPU. All SHAP work therefore used the CPU.
 <!-- src: docs/contribution_a_results.md; docs/efficiency_results.md -->
 
-**Unseeded sampling.** The Monte Carlo sampling inside GradientExplainer is not seeded in the headline pipeline. Re-explaining one global model with an identical background and identical rows gave a mean absolute difference of 0.0188 and a maximum of 0.403 between draws, while every deterministic part of the pipeline reproduced exactly. Every headline Jaccard and τ value reflects one unseeded draw per (configuration, silo). How often this noise moves a feature across the top-10 boundary has not been measured for the headline pipeline.
+**Unseeded sampling.** The headline pipeline sets no seed for GradientExplainer's internal random sampling. When one global model was explained twice with the same background and rows, the SHAP values differed by 0.0188 on average and by 0.403 at most, although every other, deterministic step gave identical output. Every headline Jaccard and τ value reflects one unseeded draw per (configuration, silo). How often this noise moves a feature across the top-10 boundary has not been measured for the headline pipeline.
 <!-- src: docs/contribution_a_results.md -->
 
 ### Generalization and near-duplication
 
-A nearest-neighbour audit compared, for each family, how far its test rows sit from their nearest training row with how far its training rows sit from each other (@tab:nn-audit). For most families the two distances are about equal. PortScan stands out: its test rows sit about 23 times further from the training data than its training rows sit from each other, so PortScan is the family whose test rows are genuinely new. Its recall is also bimodal across seeds (0.9505, 0.9506 and 0.9995).
+A nearest-neighbour audit compared, for each family, how far its test rows sit from their nearest training row with how far its training rows sit from each other (@tab:nn-audit). For most families the two distances are about equal. PortScan stands out: its test rows sit about 23 times further from the training data than its training rows sit from each other, which makes PortScan the one family whose test rows really differ from what training saw. Its recall is also bimodal across seeds (0.9505, 0.9506 and 0.9995).
 <!-- src: results/near_duplicate_audit.json; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md -->
 
 Table: Nearest-neighbour audit: median test-to-train distance over median train-to-train distance {#tab:nn-audit}
@@ -222,12 +222,12 @@ Table: Nearest-neighbour audit: median test-to-train distance over median train-
 | WebAttack | 250 | 0.0 | 0.0 | undefined |
 <!-- src: results/near_duplicate_audit.json -->
 
-For Bot and WebAttack both distances are zero: their test rows have exact copies in the training data once identifiers are removed. That raised a preregistered concern that their agreement numbers could be inflated. The concern was tested and not confirmed. Thin support, 3,527 Bot and 1,542 WebAttack training rows, explains their behaviour better.
+For Bot and WebAttack both distances are zero: their test rows have exact copies in the training data once identifiers are removed. That raised a preregistered concern that their agreement numbers could be inflated. The concern was tested and not confirmed. Their behaviour is better explained by how few training rows they have: 3,527 for Bot and 1,542 for WebAttack.
 <!-- src: docs/contribution_a_results.md -->
 
 ### An open pattern at α=0.5
 
-Three separate analyses single out α=0.5. All three parity flags occur there, although α=0.1 has worse absolute deviations. The KL partial correlation is stronger there than at α=0.1. And the FedProx agreement gain is consistent across seeds only there. We record this as an open pattern and propose no mechanism. The temptation to fit a story to it after the fact is resisted, and it is left for future work.
+Three separate analyses single out α=0.5. All three parity flags occur there, although α=0.1 has worse absolute deviations. The KL partial correlation is stronger there than at α=0.1. And the FedProx agreement gain is consistent across seeds only there. We note the pattern and leave it open, without offering an explanation for it. The temptation to fit a story to it after the fact is resisted, and it is left for future work.
 <!-- src: docs/contribution_a_results.md -->
 
 ### Limitations of the explanation check
@@ -265,12 +265,12 @@ Table: Limitations of the explanation check {#tab:expl-limits size=9.5}
 This section reports how well the SHAP values reconstruct the model's output, and whether poor reconstruction could explain the low agreement at α=0.1. It supports Section 4.2.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-For a row x, the relative residual is the largest over classes of |Σ SHAP − (f(x) − E[f])|, divided by the largest over classes of |f(x) − E[f]|, where f(x) is the model's logit and E[f] its average over the background.
+Let f(x) be the model's logit for row x and E[f] its mean over the background. The absolute residual is the maximum, across classes, of |Σ SHAP − (f(x) − E[f])|; dividing it by the maximum, across classes, of |f(x) − E[f]| gives the relative residual.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
 ### The validation pool
 
-For the served model, 500 validation rows were explained with 4000 samples (@tab:valpool). Of the 18 rows whose relative residual is above 8%, seven are Bot, four Benign and four WebAttack; the worst case, at 21.2%, is an Infiltration row. A range of "3–8%" quoted in earlier project notes could not be traced to any file, so it was dropped. For the 14 test rows used by the explanation check, the residual cannot be recomputed at all, because their stored SHAP files lack the model outputs it needs.
+We explained 500 validation rows with the served model, using 4000 samples each (@tab:valpool). Eighteen rows have a relative residual over 8%: 7 Bot rows, 4 Benign, 4 WebAttack and the single worst row, an Infiltration flow at 21.2%. Early notes had given a "3–8%" range, but no file supported it, so that range is no longer used. For the 14 test rows of the explanation check the residual cannot be computed again: their saved SHAP files do not store the model outputs needed.
 <!-- src: PROJECT_INSTRUCTIONS.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json -->
 
 Table: Additivity residuals on 500 validation rows {#tab:valpool}
@@ -282,10 +282,10 @@ Table: Additivity residuals on 500 validation rows {#tab:valpool}
 
 ### Audit of stored residuals
 
-Each stored SHAP file records one value: the worst residual among its 14 rows. Comparing that with a single-row maximum is therefore rough. Stored values range from 0.156 to 15.874. @tab:residaudit counts files above the validation-pool maximum of 3.336. Among final-round FedAvg files, 4 of 99 exceed it: silos 3 and 9 of α=0.1 seed 42, silo 8 of α=0.1 seed 1337, and the global model of α=5.0 seed 1337 (3.500). Two of the three silos are the smallest in their run.
+Each stored SHAP file records one value: the worst residual among its 14 rows. Comparing that with a single-row maximum is therefore rough. The smallest stored value is 0.156 and the largest 15.874. @tab:residaudit counts how many files exceed 3.336, the highest value seen in the validation pool. Of the 99 FedAvg files from final rounds, 4 do: silos 3 and 9 of α=0.1 seed 42, silo 8 of α=0.1 seed 1337, and the global model of α=5.0 seed 1337 (3.500). In two cases the silo is the smallest one of its run.
 <!-- src: results/inspection/residual_audit_summary.json; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md -->
 
-Table: Stored residual files above 3.336, and Spearman r between silo residual and Jaccard@10 (final round) {#tab:residaudit}
+Table: Files whose stored residual exceeds 3.336, and the final-round Spearman r linking residual to Jaccard@10 per silo {#tab:residaudit}
 | Pass | α=0.1 | α=0.5 | α=5.0 | Silo / global |
 |---|:-:|:-:|:-:|:-:|
 | FedAvg final | 3/33 | 0/33 | 1/33 | 3/90, 1/9 |
@@ -296,8 +296,8 @@ Table: Stored residual files above 3.336, and Spearman r between silo residual a
 
 ### Pre-specified sensitivity check and a post-hoc variant
 
-The exclusion rule was fixed before computing: drop any silo whose final-round residual exceeds 3.336. At α=0.1 the rule removes two silos that contribute eligible rows, 8 of the 220. The Jaccard@10 median stays at 0.333, and the τ median moves from 0.592 to 0.597. Nothing is removed at α=0.5 or α=5.0.
+The exclusion rule was fixed before computing: remove every silo with a final-round residual above 3.336. At α=0.1 this takes out two silos that had eligible rows, 8 rows out of 220. The Jaccard@10 median stays at 0.333, and the τ median moves from 0.592 to 0.597. Nothing is removed at α=0.5 or α=5.0.
 <!-- src: PROJECT_INSTRUCTIONS.md -->
 
-**Post-hoc, and not part of the pre-specified rule:** if the whole α=5.0 seed-1337 run is dropped because its global model is flagged, the α=5.0 medians are still 0.667 for Jaccard@10 and 0.844 for τ. The headline therefore does not depend on the high-residual files.
+**Post-hoc, and not part of the pre-specified rule:** removing the entire α=5.0, seed-1337 run, whose global model exceeded the limit, leaves the α=5.0 medians unchanged, with Jaccard@10 at 0.667 and τ at 0.844. The headline therefore does not depend on the high-residual files.
 <!-- src: PROJECT_INSTRUCTIONS.md -->

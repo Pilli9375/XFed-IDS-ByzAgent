@@ -1,10 +1,10 @@
 ## Preregistered Accuracy Study {#sec:app-prereg}
 
-This section gives the full preregistered optimizer comparison: the question, the candidates, the selection rule, the budget decisions, the validation results, the sealed checkpoints and the single test result. It supports Sections 2.2.6 and 4.1. The protocol, `docs/preregistration_accuracy.md`, was committed in two parts: the rule and candidates before any candidate ran, and the chosen configuration with sealed checkpoints before the single test evaluation.
+This section gives the full preregistered optimizer comparison: the question, the candidates, the selection rule, the budget decisions, the validation results, the sealed checkpoints and the single test result. It supports Sections 2.2.6 and 4.1. The protocol, `docs/preregistration_accuracy.md`, was committed in two parts: first the candidates and the rule for choosing among them, before any candidate had run; then the winner and the hashes of its checkpoints, before the test set was touched.
 
 ### Question and candidates
 
-The question was: under non-IID data, does a different federated optimizer raise the global model's macro-F1 over FedAvg, mainly at α=0.1, where FedAvg is weakest? @tab:prereg-grid lists the ten configurations in the protocol and what happened to each. FedAdam and FedYogi use Flower's default values β1=0.9, β2=0.99 and τ=0.001, written out explicitly. SCAFFOLD was not run: Flower has no strategy for it, it needs client state that persists across rounds, and its correction is derived for local SGD, while the locked local optimizer is AdamW.
+The question was: under non-IID data, does a different federated optimizer raise the global model's macro-F1 over FedAvg, mainly at α=0.1, where FedAvg is weakest? @tab:prereg-grid lists the ten configurations in the protocol and what happened to each. FedAdam and FedYogi use Flower's default values β1=0.9, β2=0.99 and τ=0.001, written out explicitly. SCAFFOLD was not run: Flower offers no implementation of it, it requires each client to keep state from round to round, and its correction term assumes plain SGD on the clients, whereas ours use AdamW.
 <!-- src: docs/preregistration_accuracy.md -->
 
 Table: Preregistered candidate grid and the status of each candidate {#tab:prereg-grid}
@@ -27,9 +27,9 @@ Table: Preregistered candidate grid and the status of each candidate {#tab:prere
 
 ### The selection rule
 
-The metric was best-by-validation macro-F1 over the seven headline classes, averaged over the three seeds per candidate and α. The rule, applied by `tools/select_federated_method.py`:
+The metric was computed with scikit-learn's precision, recall and F1 routine, counting a class with no predictions as zero, and standard deviations over seeds are population values, as in the published table. Candidates were scored by the macro-F1 of their best validated round on the seven headline classes, with the three seeds averaged for each candidate and α. The rule, applied by `tools/select_federated_method.py`:
 
-1. **Guard.** A candidate is eligible only if its α=0.5 mean is no more than 0.01 below FedAvg's, that is, at least 0.9325.
+1. **Guard.** To be eligible, a candidate's mean at α=0.5 may fall at most 0.01 short of FedAvg's, so it must reach 0.9325.
 2. **Pick.** Among eligible candidates, choose the highest α=0.1 mean.
 3. **Threshold.** If that mean is below FedAvg's α=0.1 mean plus 0.02 (0.5428), stop, report "no improvement" and do not touch the test set.
 4. **Ties.** Equal α=0.1 means to the fourth decimal go to the higher α=0.5 mean.
@@ -40,7 +40,7 @@ The protocol also listed stop-and-flag conditions: any α=0.1 run with validatio
 
 ### Budget decisions and the four-of-nine disclosure
 
-The budget was 12 hours of compute. @tab:prereg-budget records each budget decision in order. The guard reads only wall times, never a score. When the guard was added, five runs of fedavgm_m0.5 had finished and one of their scores (α=0.1, seed 42) had been seen; none of the four candidates the guard could drop had started. In the end, 4 of the 9 requested candidates were run.
+The budget was 12 hours of compute. @tab:prereg-budget records each budget decision in order. The guard reads only wall times, never a score. At the moment the guard was introduced, fedavgm_m0.5 had completed five runs and one of its scores, for α=0.1 and seed 42, had been looked at. The four candidates that the guard was able to remove had not begun. Of the 9 candidates originally requested, 4 were finally run.
 <!-- src: docs/preregistration_accuracy.md; docs/contribution_a_results.md -->
 
 Table: Budget decisions in the preregistered study {#tab:prereg-budget size=9.5}
@@ -51,7 +51,10 @@ Table: Budget decisions in the preregistered study {#tab:prereg-budget size=9.5}
 | Timing-only guard, added during the runs | Candidate runs took 10.2 to 18.6 min; at 7.40 h elapsed, mean run 17.8 min, projected 15.4 h | Drop the four later candidates |
 <!-- src: docs/preregistration_accuracy.md -->
 
-**Regression check.** Repeating FedAvg through the new code path reproduced the published α=0.1, seed-42 validation curve at every one of its 21 rounds, with a largest difference of 0.0. The published FedAvg runs are therefore a like-for-like baseline.
+**Regression check.** FedAvg was run again through the new code. For α=0.1 and seed 42 its validation curve matched the published one in all 21 rounds, and the biggest difference was 0.0. Even the one-round timing run had already reproduced the published validation scores of rounds 0 and 1 (0.1303 and 0.2452). The Flower runtime for these runs uses the CPU build of PyTorch, with package versions pinned to those of the published runs.
+<!-- src: docs/preregistration_accuracy.md -->
+
+**Earlier exposure, disclosed.** FedProx with μ=0.01 had been run once before, at α=0.5 and seed 42, and that run had been scored on the test set under the old harness; it collapsed, with validation macro-F1 0.7114. Because that candidate was among those dropped, its earlier test score cannot overlap with the preregistered evaluation. The published FedAvg runs are therefore a like-for-like baseline.
 <!-- src: docs/preregistration_accuracy.md -->
 
 ### Validation results and selection
@@ -69,12 +72,12 @@ Table: Validation selection: mean best-by-validation macro-F1 per candidate {#ta
 | FedYogi, η=0.01 | 0.4627 | 0.9004 | Fail |
 <!-- src: docs/preregistration_accuracy.md -->
 
-Before the test, the protocol recorded a warning that could not be explained away afterwards. FedAvgM's α=0.1 validation curves oscillate strongly, and its best-by-validation rounds are often spikes; its final-round α=0.1 validation mean is 0.5248, close to FedAvg's 0.5062. Taking the maximum over 21 noisy rounds inflates validation more for a jumpier method, so part of its validation gain was expected to shrink on test.
+Before the test, the protocol recorded a warning that could not be explained away afterwards. At α=0.1 FedAvgM's validation curves swing up and down sharply, so the round it picks is often a peak; at the last round its mean is 0.5248, not far from FedAvg's 0.5062. Picking the highest of 21 noisy rounds flatters an unsteady method more, so we expected some of its validation advantage to disappear on the test set.
 <!-- src: docs/preregistration_accuracy.md -->
 
 ### Sealing and the single test evaluation
 
-The chosen configuration was trained at α=5.0 as well, and its nine best-by-validation checkpoints were sealed by SHA256 (@tab:sealed). The test script then checked that the protocol file was committed and contained every hash, re-hashed every checkpoint, recomputed each validation score (each had to equal the logged value exactly), wrote a lock file, and scored the nine checkpoints on the 478,376 test rows once. The script is never run again, and nothing was tuned after the result.
+FedAvgM was also trained at α=5.0, after which the SHA256 hashes of all nine selected checkpoints were committed (@tab:sealed). The test script then checked that the protocol file was committed and contained every hash, re-hashed every checkpoint, recomputed each validation score (each had to equal the logged value exactly), created a lock file and only then evaluated the nine checkpoints, a single time, on the 478,376 test rows. The script is never run again, and nothing was tuned after the result.
 <!-- src: docs/preregistration_accuracy.md -->
 
 Table: Sealed checkpoints of FedAvgM (momentum 0.9): best round, validation macro-F1 and file SHA256 prefix {#tab:sealed}
@@ -101,7 +104,7 @@ Table: The single preregistered test evaluation: macro-F1 over 7 classes, FedAvg
 | 5.0 | 0.990 ± 0.001 | 0.9911 ± 0.0005 | 0.9900 → 0.9918 | 0.9905 → 0.9906 | 0.9889 → 0.9910 |
 <!-- src: docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md -->
 
-Table: FedAvgM (momentum 0.9) per-class test F1, mean over 3 seeds {#tab:prereg-class}
+Table: Test F1 for each class under FedAvgM with momentum 0.9, averaged across 3 seeds {#tab:prereg-class}
 | Class | α=0.1 | α=0.5 | α=5.0 |
 |---|:-:|:-:|:-:|
 | Benign | 0.9417 | 0.9988 | 0.9993 |
@@ -117,10 +120,10 @@ Table: FedAvgM (momentum 0.9) per-class test F1, mean over 3 seeds {#tab:prereg-
 
 ### Reading and limits
 
-At α=0.5 the change is stability: the mean rose from 0.941 to 0.985 and the seed spread shrank from 0.057 to 0.0005. Most of that is one seed that FedAvg handled badly (seed 2024, 0.8605 to 0.9856); seed 1337 moved by −0.001. At α=0.1 every seed gains (+0.113, +0.058, +0.060), but whole families still score near zero in some seeds (per-class standard deviation 0.31 to 0.46 for Bot, BruteForce, DoS, PortScan and WebAttack). The validation gain at α=0.1 (+0.084) was larger than the test gain (+0.077), as the pre-test warning anticipated. At α=5.0 the change is +0.0001 to +0.0021 per seed, within the centralized model's own seed spread.
+At α=0.5 the change is stability: the mean rose from 0.941 to 0.985 and the seed spread shrank from 0.057 to 0.0005. The change comes mainly from seed 2024, where FedAvg had done poorly (0.8605, now 0.9856); seed 1337 changed by −0.001. At α=0.1 each seed improves, by +0.113, +0.058 and +0.060, yet in some seeds entire families are still close to zero; for five families (Bot, BruteForce, DoS, PortScan and WebAttack) the standard deviation of per-class F1 across seeds lies between 0.31 and 0.46. As the warning recorded before the test predicted, the gain on validation (+0.084) exceeded the gain on test (+0.077). At α=5.0 the seeds move by between +0.0001 and +0.0021, no more than the centralized model varies across its own seeds.
 <!-- src: docs/contribution_a_results.md -->
 
-The limits are stated with the result. Three seeds give no significance test. Only 4 of the 9 requested candidates were compared, so this is "the best of these four", not a tuned optimum: momentum was not swept beyond 0.5 and 0.9, and the server learning rate stayed at 1.0. These runs trained on the CPU through Flower's isolated runtime. Finally, the explanation and trust findings are FedAvg findings; whether momentum changes explanation agreement is untested.
+The limits are stated with the result. Three seeds give no significance test. Only 4 of the 9 requested candidates were compared, so this is "the best of these four", not a tuned optimum: only two momentum values, 0.5 and 0.9, were tried, and the server learning rate was never changed from 1.0. These runs trained on the CPU through Flower's isolated runtime. Finally, both checks were carried out on FedAvg; nobody has yet tested what server momentum does to explanation agreement.
 <!-- src: docs/contribution_a_results.md -->
 
 ## Efficiency, Full Results {#sec:app-efficiency}
@@ -130,7 +133,7 @@ This section gives the full serving, communication, compression and agent pre-sc
 
 ### Serving speed and the int8 decision
 
-The deployed checkpoint (`fedavg_a0.5_s42`, round 18, 19,849 parameters) was timed on the AMD Ryzen 7 7435HS CPU (8 cores, 16 threads) with 8 intra-op threads for both engines. The loader re-checks validation macro-F1 against the training log before timing, and never reads the test file. Each of three sessions ran 500 warm-up single-row calls, then 3 repeats of 5,000 single-row calls on validation rows, and then 5 passes over the validation set at batch 1024 (140 full batches, 143,360 rows). Only the forward pass on already-scaled rows is timed. @tab:serving-latency and @tab:serving-size give the median of the three sessions with [minimum, maximum].
+The deployed checkpoint (`fedavg_a0.5_s42`, round 18, 19,849 parameters) was timed on the AMD Ryzen 7 7435HS CPU (8 cores, 16 threads) with 8 intra-op threads for both engines. The loader re-checks validation macro-F1 against the training log before timing, and never reads the test file. Three timing sessions were run. Each began with 500 single-row warm-up calls, followed by 5,000 single-row calls on validation rows, done 3 times, and finished with 5 complete passes over the validation set in batches of 1024 (140 full batches, 143,360 rows). Only the forward pass on already-scaled rows is timed. @tab:serving-latency and @tab:serving-size give the median of the three sessions with [minimum, maximum].
 <!-- src: docs/efficiency_results.md -->
 
 Table: Serving variants: validation macro-F1 and per-flow latency (median of 3 sessions [min, max]) {#tab:serving-latency size=9.5}
@@ -149,7 +152,7 @@ Table: Serving variants: throughput and size on disk {#tab:serving-size}
 | ONNX Runtime int8 (dynamic) | 1,256,956 [1,225,154, 1,260,406] | 25,957 |
 <!-- src: docs/efficiency_results.md -->
 
-ONNX Runtime fp32 gives identical predictions to PyTorch on all 143,513 validation rows. At batch 1 its p50 latency is about four times lower, while at batch 1024 it is slower than PyTorch on this CPU. It is the only variant whose validation macro-F1 equals PyTorch's to three decimals, so it became the backend's default engine. At start-up the backend exports the verified model in memory and refuses to start unless every validation prediction equals PyTorch's; this check passed with 0 differences, and 50 of 50 sampled prediction requests returned the same family and confidence from both engines. A hot-swapped model always uses PyTorch.
+ONNX Runtime fp32 gives identical predictions to PyTorch on all 143,513 validation rows. At batch 1 its p50 latency is about four times lower, while at batch 1024 it is slower than PyTorch on this CPU. It is the only variant whose validation macro-F1 equals PyTorch's to three decimals, so it became the backend's default engine. When it starts, the backend converts the checked model to ONNX in memory and compares the two engines on every validation row, stopping if any prediction differs; this check passed with 0 differences, and 50 of 50 sampled prediction requests returned the same family and confidence from both engines. A hot-swapped model always uses PyTorch.
 <!-- src: docs/efficiency_results.md -->
 
 Dynamic int8 quantization changed only 0.54% of predictions (agreement 0.994593), but those changes fell on small classes (@tab:int8), and validation macro-F1 fell by 0.1428, far beyond the 0.005 bound the session had set. Before quantizing, the model's Gemm operations had to be rewritten as a matrix multiply and an add, because the dynamic quantizer does not handle Gemm. That rewrite alone, still in fp32, matches PyTorch on 100% of validation rows, so the drop comes from quantization itself. int8 was dropped and is not offered.
@@ -165,7 +168,7 @@ Table: Validation F1 of the classes hurt by int8 quantization {#tab:int8}
 
 ### Communication per round
 
-@tab:comm gives the bytes moved per federated round, computed from the parameter count and cross-checked against the harness logs. Over 500 logged rounds from 25 three-epoch method runs, the logs match the arithmetic exactly for FedAvg, FedAvgM and FedYogi in both directions. These counts exclude message metadata, configuration records and network framing; the simulation runs on one machine, so no real network is involved.
+@tab:comm gives the bytes moved per federated round, computed from the parameter count and cross-checked against the harness logs. In 500 rounds logged by 25 runs with three local epochs, the recorded byte counts equal the calculated ones in both directions for FedAvg, FedAvgM and FedYogi. These counts exclude message metadata, configuration records and network framing; the simulation runs on one machine, so no real network is involved.
 <!-- src: docs/efficiency_results.md -->
 
 Table: Bytes moved per federated round (served model, 10 silos) {#tab:comm}
@@ -201,7 +204,7 @@ Table: Wall time per round over 500 logged rounds {#tab:walltime}
 
 ### Update compression
 
-Two schemes compress the silo-to-server update, the difference between the trained local weights and the received global weights: fp16, a cast to 16-bit floats; and int8, a symmetric per-tensor 8-bit quantization with one float32 scale per tensor. The server adds the decompressed update back to the global model it sent and then runs the unchanged FedAvg aggregation; the broadcast stays fp32. Runs used FedAvg on the validation-only path at α=0.5 with three seeds and were compared with each seed's published FedAvg run. An uncompressed run on the edited harness reproduced the published seed-42 curve exactly (21 of 21 rounds, best 0.9760 at round 18). @tab:comp-bytes gives the bytes, which are exact.
+Two schemes compress the silo-to-server update, the difference between the trained local weights and the received global weights: fp16, a cast to 16-bit floats; and int8, a symmetric per-tensor 8-bit quantization with one float32 scale per tensor. The server adds the decompressed update back to the global model it sent and then runs the unchanged FedAvg aggregation; the broadcast stays fp32. Runs used FedAvg on the validation-only path at α=0.5 with three seeds and were compared with each seed's published FedAvg run. Before comparing, an uncompressed run through the modified code was checked against the published seed-42 run; all 21 rounds were identical, with the best score again 0.9760 at round 18. @tab:comp-bytes gives the bytes, which are exact.
 <!-- src: docs/efficiency_results.md -->
 
 Table: Uplink bytes per round under update compression {#tab:comp-bytes}
@@ -214,7 +217,7 @@ Table: Uplink bytes per round under update compression {#tab:comp-bytes}
 
 @tab:comp-f1 reports the effect on validation macro-F1 with all four statistics, per seed and as mean ± standard deviation.
 
-Table: Compressed minus uncompressed validation macro-F1 at α=0.5 (per seed 42 / 1337 / 2024, then mean ± sd) {#tab:comp-f1 size=9}
+Table: Change in validation macro-F1 caused by compression at α=0.5, listed for seeds 42, 1337 and 2024 and then as mean ± sd {#tab:comp-f1 size=9}
 | Scheme | Best-by-validation | Final round (20) | Final-5 mean | Mean of rounds 1–20 |
 |---|:-:|:-:|:-:|:-:|
 | fp16, per seed | +0.0036 / +0.0011 / −0.0068 | +0.0037 / −0.0016 / +0.0083 | −0.0465 / +0.0223 / −0.0037 | −0.0029 / +0.0168 / −0.0011 |
@@ -223,12 +226,12 @@ Table: Compressed minus uncompressed validation macro-F1 at α=0.5 (per seed 42 
 | int8, mean ± sd | −0.0011 ± 0.0048 | +0.0127 ± 0.1025 | +0.0081 ± 0.0316 | +0.0034 ± 0.0034 |
 <!-- src: docs/efficiency_results.md -->
 
-In absolute terms, best-by-validation macro-F1 moved from 0.9760 to 0.9796 (fp16) and 0.9780 (int8) at seed 42, from 0.9871 to 0.9883 and 0.9884 at seed 1337, and from 0.8644 to 0.8576 and 0.8578 at seed 2024. Seed 2024 crossed the session's 0.005 flag bound for both schemes; it was flagged and is reported, not tuned. The three-seed mean change is small and its sign is not consistent across seeds, while per-round validation F1 in these same runs swings far more than any of these changes: a 16-bit rounding of the update is enough to move training onto a different path. At three seeds, therefore, a compression effect of this size cannot be told apart from trajectory noise. The data show neither that compression is harmless within 0.005 nor that it is harmful. Compression also showed no measurable wall-time effect (rounds 2 to 20 median: 51.7 s uncompressed; 51.7, 27.8 and 50.1 s for fp16; 51.5, 50.9 and 50.7 s for int8), because the simulation moves bytes within one machine.
+In absolute terms, best-by-validation macro-F1 moved from 0.9760 to 0.9796 (fp16) and 0.9780 (int8) at seed 42, from 0.9871 to 0.9883 and 0.9884 at seed 1337, and from 0.8644 to 0.8576 and 0.8578 at seed 2024. For both schemes, seed 2024 went past the 0.005 limit set for this session. We report it as it is and did not tune anything in response. The three-seed mean change is small and its sign is not consistent across seeds, while per-round validation F1 in these same runs swings far more than any of these changes: a 16-bit rounding of the update is enough to move training onto a different path. At three seeds, therefore, a compression effect of this size cannot be told apart from trajectory noise. The data show neither that compression is harmless within 0.005 nor that it is harmful. Compression also showed no measurable wall-time effect (rounds 2 to 20 median: 51.7 s uncompressed; 51.7, 27.8 and 50.1 s for fp16; 51.5, 50.9 and 50.7 s for int8), because the simulation moves bytes within one machine.
 <!-- src: docs/efficiency_results.md -->
 
 ### A training-loss pre-screen in front of ByzAgent
 
-ByzAgent makes one batched LLM call per round for all ten silos. A pre-screen would send a silo to the agent only if its training loss exceeds t times the round's median and trust every other silo automatically. It saves in two ways: whole calls avoided, in rounds where no silo passes the screen, and silo slots avoided within a call. The rule for choosing t was fixed before any loss ratio was looked at: take the largest t in the grid that keeps every flag the agent had placed on a poisoned silo, in both seed-42 sudden attack runs. That gave t=10; at t=15, retention falls to 0.95. @tab:prescreen replays the rule on the other seeds against the logged agent decisions.
+ByzAgent makes one batched LLM call per round for all ten silos. The idea of a pre-screen is to pass to the agent only those silos whose training loss is above t times the median for that round, and to trust all the others without asking. It saves in two ways: whole calls avoided, in rounds where no silo passes the screen, and silo slots avoided within a call. The rule for choosing t was fixed before any loss ratio was looked at: take the largest t in the grid that keeps every flag the agent had placed on a poisoned silo, in both seed-42 sudden attack runs. That gave t=10; at t=15, retention falls to 0.95. @tab:prescreen replays the rule on the other seeds against the logged agent decisions.
 <!-- src: docs/efficiency_results.md -->
 
 Table: Pre-screen replay at t=10 (flag rates: replay / logged) {#tab:prescreen size=9.5}
@@ -240,12 +243,12 @@ Table: Pre-screen replay at t=10 (flag rates: replay / logged) {#tab:prescreen s
 | Seed 2024, f=3 sudden | 5.0% | 64.5% | 0.765 | 0.733 / 0.767 | 0.100 / 0.421 |
 <!-- src: docs/efficiency_results.md -->
 
-The seed-42 threshold does not transfer. At seed 1337 the pre-screen hides the attack: 59 of 60 poisoned silo-rounds never reach the agent, and only 1 of the 29 logged flags on poisoned silos survives. Poisoned silo 0 is 95.4% Benign at that seed, so relabelling its few attack rows barely moves its loss (ratio 0.45 to 0.99), while clean extreme silos reach 11.2 times (silo 2) and 24.6 times (silo 4) the median in the clean run. A stronger flip can even lower the loss: in the seed-42 gradual run at full flip fraction, the poisoned silos' ratios fall to 0.005, 0.096 and 0.126, because labels that are all Benign are self-consistent. For scale, logged agent calls without a pre-screen took a median of 41.1 to 47.6 seconds each. The replay uses one sample of a nondeterministic agent and assumes the agent would decide the same way on a shorter prompt. The planned live run was not done, and the result is reported as a negative one with no redesign planned.
+The seed-42 threshold does not transfer. At seed 1337 the pre-screen hides the attack: only 1 of the 60 poisoned silo-rounds is sent to the agent, and of the 29 flags the agent had placed on poisoned silos, just 1 remains; at seed 2024, by contrast, 44 of 46 such flags survive. Poisoned silo 0 is 95.4% Benign at that seed, so flipping the handful of attack rows it holds hardly changes its loss (ratio 0.45 to 0.99), while clean extreme silos reach 11.2 times (silo 2) and 24.6 times (silo 4) the median in the clean run. Flipping more can actually reduce the loss. In the seed-42 gradual run, once every eligible row is flipped, the attackers' ratios drop to 0.005, 0.096 and 0.126: labels that are all Benign agree with each other, so the model fits them easily. For scale, logged agent calls without a pre-screen took a median of 41.1 to 47.6 seconds each. The replay relies on a single run of an agent whose answers vary, and it supposes that the agent would answer the same way if shown fewer silos. The planned live run was not done, and the result is reported as a negative one with no redesign planned.
 <!-- src: docs/efficiency_results.md -->
 
 ## Test-Set Exposure Audit {#sec:app-testaudit}
 
-This section restates, in our own words, the audit of every way the 478,376-row test set was read, and the provenance of the choices made along the way. It supports Section 2.2.7. "Selected" in the tables means that a choice was made from what the read returned.
+This section restates, in our own words, the audit of every way the 478,376-row test set was read, and the provenance of the choices made along the way. It supports Section 2.2.7. In these tables, "selected" means that some decision was based on the result of that read.
 <!-- src: docs/test_set_exposure_audit.md -->
 
 ### Every read of the test set
@@ -266,7 +269,7 @@ Table: Every way the test set was read {#tab:exposure size=9.5}
 | 9 | One preregistered evaluation of nine sealed checkpoints | No | Selection and sealing came first (Section 6.H) |
 <!-- src: docs/test_set_exposure_audit.md -->
 
-Several paths were checked and found not to touch the test set at all: hot-swap retraining, model loading in the backend (validation only), XGBoost tuning (early-stopped on validation), every statistic given to ByzAgent, the preregistered method runs, and three checkpoint-only folders.
+The audit also confirmed that the following code paths never read the test set: hot-swap retraining, model loading in the backend (validation only), XGBoost tuning (early-stopped on validation), every statistic given to ByzAgent, the preregistered method runs, and three checkpoint-only folders.
 
 ### Provenance of the locked choices
 
@@ -284,10 +287,10 @@ Table: Which split chose each locked setting {#tab:provenance-full size=9.5}
 | Stopping epoch and best round | Validation | n/a | No |
 <!-- src: docs/test_set_exposure_audit.md -->
 
-The audit's outcome was that two locked choices (3 local epochs and FedProx μ=0.0005) and the scaler's written rationale rest on test scores as recorded. Re-checked on validation, all three are the values validation prefers. The sentence "no model selection, stopping round, hyperparameter or method choice used any test score" could therefore not be written truthfully, and the project uses instead the disclosure in Section 2.2.7, which names the three choices.
+The audit's outcome was that two locked choices (3 local epochs and FedProx μ=0.0005) and the scaler's written rationale rest on test scores as recorded. Re-checked on validation, all three are the values validation prefers. A blanket statement that no choice of any kind ever used a test score would therefore have been false. The project instead uses the disclosure given in Section 2.2.7, which lists the three choices by name.
 <!-- src: docs/test_set_exposure_audit.md -->
 
 ### The rule going forward
 
-On 2026-10-12 the team decided that the test set may be evaluated one further time, once, for a single federated configuration selected beforehand on validation data only, and that no other configuration will ever be scored on it. That evaluation is the preregistered study in Section 6.H. Since 2026-10-13 the dashboard simulator replays validation rows and computes no aggregate. The public site's replay uses 500 stored outputs for test rows that were extracted for display before the rule.
+The team's decision of 2026-10-12 allows exactly one more use of the test set: a single evaluation of one federated configuration, chosen in advance using validation data alone. Every other configuration stays off the test set for good. That evaluation is the preregistered study in Section 6.H. Since 2026-10-13 the dashboard simulator replays validation rows and computes no aggregate. The public site's replay uses 500 stored outputs for test rows that were extracted for display before the rule.
 <!-- src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md -->

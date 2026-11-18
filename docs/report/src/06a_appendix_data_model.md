@@ -4,7 +4,7 @@ This chapter holds the full detail behind Chapters 2 to 5. Each section opens by
 
 ## Dataset and Cleaning {#sec:app-data}
 
-This section gives every data-preparation step with its row counts. It supports Section 2.2.1 and the accuracy results of Section 4.1.
+This section records each step of data preparation and how many rows each step kept or removed. It supports Section 2.2.1 and the accuracy results of Section 4.1.
 
 ### Dataset lineage: the Distrinet release against the original
 
@@ -20,7 +20,7 @@ Table: The two correction stages behind the dataset used {#tab:lineage}
 
 A third, separate correction branch [@lanvin2023] addresses other issues, such as mislabelled port scans and duplicated captures. It was not used.
 
-The raw data hold 2,099,976 flows in five day files. Each file has the same 91 columns: 7 identifiers, 1 label, 1 attempted-category code and 82 numeric candidate features. No column name carries stray whitespace, a known trap in the original release, and every candidate feature parsed as numeric. The identifiers dropped are the row id, flow id, source and destination addresses, source and destination ports, and the timestamp.
+Before cleaning there are 2,099,976 flows, one file per capture day, five files in all. The files share an identical set of 91 columns. Of these, 82 are numeric features; the remaining nine are seven identifier columns, the label and a code for attempted attacks. No column name carries stray whitespace, a known trap in the original release, and every candidate feature parsed as numeric. The identifiers dropped are the row id, flow id, source and destination addresses, source and destination ports, and the timestamp.
 <!-- src: data/README.md -->
 
 ### The "Attempted" convention
@@ -28,7 +28,7 @@ The raw data hold 2,099,976 flows in five day files. Each file has the same 91 c
 Engelen et al. label a flow "X – Attempted" when it belongs to an attack class X that needs a payload but carries none: the attack was launched but did not land. Version 4 also has an attempted-category column, a reason code with 7 distinct values. We verified that a non-default category agrees with the "Attempted" label suffix on every one of the 2,099,976 rows, so the pipeline reads only the suffix.
 <!-- src: data/README.md -->
 
-The authors' own benchmark folds attempted flows into Benign, and that was our first plan. @tab:attempted shows why we dropped it: for several families, attempts are most of the class, and folding them away would have removed most of Bot and both web-attack subtypes. Attempted flows therefore join their parent family under one uniform rule. The cost, stated openly, is that each family's score mixes attacks that landed with attempts that did not.
+The authors' own benchmark folds attempted flows into Benign, and that was our first plan. @tab:attempted shows why we dropped it: for several families, attempts are most of the class, and folding them away would have removed most of Bot and both web-attack subtypes. Attempted flows therefore join their parent family under one uniform rule. We accept one cost and say so: each family's score blends successful attacks with ones that failed to land.
 
 Table: Share of attempted flows in raw families {#tab:attempted}
 | Raw family | Completed | Attempted | Attempted share |
@@ -60,15 +60,15 @@ Table: Raw labels folded into each family (attempted variants included) {#tab:fa
 | Infiltration | Infiltration |
 | Heartbleed | Heartbleed |
 
-The 67,072 "Infiltration – Portscan" flows needed a decision, because there are more of them than in six other families combined. By name they belong to Infiltration, since they are the internal scan phase of the infiltration scenario. By their features they are a port scan: short flows, low byte counts, many probes. Routing them to Infiltration would have built a class almost entirely shaped like port scans, and every Infiltration explanation would really have explained a scan. They were routed to PortScan. The cost is that Infiltration shrinks to 66 flows.
+The 67,072 "Infiltration – Portscan" flows needed a decision, because there are more of them than in six other families combined. Their name points to Infiltration, because they come from the scanning step inside that scenario. By their features they are a port scan: short flows, low byte counts, many probes. Routing them to Infiltration would have built a class almost entirely shaped like port scans, and every Infiltration explanation would really have explained a scan. They were routed to PortScan. As a result, only 66 flows are left in Infiltration.
 <!-- src: data/README.md -->
 
-Families with fewer than 1,000 flows are kept in the data but excluded from the headline macro-F1, and are reported per class with their counts. Two families fall below the floor: Infiltration (66) and Heartbleed (11). The headline metric therefore averages six attack families and Benign.
+A family with under 1,000 flows stays in the dataset, but it is left out of the headline macro-F1 and reported on its own, with its count. Two families fall below the floor: Infiltration (66) and Heartbleed (11). The headline metric therefore averages six attack families and Benign.
 <!-- src: data/README.md -->
 
 ### Cleaning
 
-Cleaning ran in the order load, family mapping, non-finite values, conflicts, duplicates. The mapping has to come first, because conflicts are judged on the family.
+The cleaning steps ran in a fixed sequence: loading, mapping to families, removing non-finite values, removing conflicts and, last, removing duplicates. The mapping has to come first, because conflicts are judged on the family.
 
 **Non-finite values.** Four columns carry non-finite or sentinel values (@tab:nonfinite). The infinite values come from exactly 5 flows with zero duration, since both rate columns divide by duration; those 5 rows were dropped. The negative values in the two ICMP columns are not corruption: −1 is the flow meter's "not applicable" marker for non-ICMP flows, which is almost every flow. No action was taken on them.
 <!-- src: data/README.md -->
@@ -82,7 +82,7 @@ Table: Columns with non-finite or sentinel values in the raw data {#tab:nonfinit
 | ICMP Type | 0 | 0 | 2,099,373 |
 <!-- src: data/README.md -->
 
-**Family conflicts.** Groups of identical feature vectors that carry more than one family cannot be learned: no classifier separates identical inputs mapped to different targets. Such groups were dropped whole (@tab:conflicts). Even in the corrected data, then, about forty-four thousand flows look exactly like benign traffic once identifiers are removed. That is a ceiling set by the feature space itself, not by any model. Conflicts are keyed on the family. An earlier version keyed them on the raw label and silently deleted 58,307 learnable rows, because "Infiltration – Portscan" and "Portscan" appeared to conflict even though both map to PortScan. The bug was caught only by logging which label pairs conflicted.
+**Family conflicts.** If one feature vector appears with two different families, no model can learn to tell them apart: no classifier separates identical inputs mapped to different targets. Such groups were dropped whole (@tab:conflicts). Even in the corrected data, then, about forty-four thousand flows look exactly like benign traffic once identifiers are removed. That is a ceiling set by the feature space itself, not by any model. Conflicts are keyed on the family. Our first version compared raw labels instead, and it quietly threw away 58,307 rows that could be learned: "Infiltration – Portscan" and "Portscan" looked like a conflict although both end up in PortScan. The bug was caught only by logging which label pairs conflicted.
 <!-- src: data/README.md -->
 
 Table: Family conflicts removed {#tab:conflicts}
@@ -92,7 +92,7 @@ Table: Family conflicts removed {#tab:conflicts}
 | Bot and Infiltration | 115 | 15 |
 <!-- src: data/README.md -->
 
-**Duplicates.** Before cleaning, 18.3% of rows are exact copies of another row, and they sit almost entirely in scan and bot traffic (@tab:dups). These are mostly not repeated records of one event. A port scan probes many ports with packets of the same shape, which differ only in the port number, a column we drop. Bot beacons are periodic and nearly identical by design. Once identifiers are removed, many distinct events collapse into identical rows. We therefore drop a duplicate group only when it spans more than one day file, which matches the capture-overlap problems reported for this dataset. Duplicates are keyed on the raw label, which records provenance, while conflicts are keyed on the family, which is the training target. Keying duplicates on the family in an earlier version wrongly deleted 58,228 rows that were distinct events.
+**Duplicates.** In the raw data, 18.3% of rows duplicate some other row exactly, and these copies come almost only from scanning and botnet traffic (@tab:dups). These are mostly not repeated records of one event. A port scan probes many ports with packets of the same shape, which differ only in the port number, a column we drop. Bot beacons are periodic and nearly identical by design. Once identifiers are removed, many distinct events collapse into identical rows. So a group of duplicates is removed only if its copies come from different capture days, the pattern expected from the overlapping captures documented for this dataset. Duplicates are keyed on the raw label, which records provenance, while conflicts are keyed on the family, which is the training target. When an earlier version matched duplicates by family instead, it removed 58,228 rows that were in fact separate events.
 <!-- src: data/README.md -->
 
 Table: Labels with the largest share of rows in duplicate groups (raw data) {#tab:dups}
@@ -104,7 +104,7 @@ Table: Labels with the largest share of rows in duplicate groups (raw data) {#ta
 | BENIGN | 222,500 | 14.0% |
 <!-- src: data/README.md -->
 
-**Near-constant features.** Eight of the 82 features take one value in at least 99.9% of rows: Bwd URG Flags, Subflow Bwd Packets, Fwd URG Flags, URG Flag Count, ICMP Type, ICMP Code, ECE Flag Count and CWR Flag Count. None is strictly constant. All 82 were kept, since dropping features on a variance rule before any importance evidence would discard signal; the ICMP columns, for instance, are the only ones that could describe an ICMP-based attack.
+**Near-constant features.** For 8 features out of 82, a single value covers at least 99.9% of rows: Bwd URG Flags, Subflow Bwd Packets, Fwd URG Flags, URG Flag Count, ICMP Type, ICMP Code, ECE Flag Count and CWR Flag Count. None is strictly constant. All 82 were kept, since dropping features on a variance rule before any importance evidence would discard signal; the ICMP columns, for instance, are the only ones that could describe an ICMP-based attack.
 <!-- src: data/README.md -->
 
 @tab:clean-steps summarises the cleaning.
@@ -121,13 +121,13 @@ Table: Cleaning steps and rows removed {#tab:clean-steps}
 
 ### Final distribution and the group-aware split
 
-The cleaned data are heavily imbalanced: Benign is 75% of all flows. This is why macro-F1 is the headline metric and why every aggregate is reported with per-class results. Imbalance is handled with a class-weighted loss rather than SMOTE, for three reasons. SMOTE would have to run inside each silo to respect the privacy premise, and at α=0.1 most silos hold too few minority examples for neighbour interpolation to work. Flow features are linked by construction (a rate is bytes divided by duration), and straight-line interpolation breaks those links. And synthetic rows would enter the explanation comparison that the project measures.
+The cleaned data are heavily imbalanced: Benign is 75% of all flows. This is why macro-F1 is the headline metric and why every aggregate is reported with per-class results. Imbalance is handled with a class-weighted loss rather than SMOTE, for three reasons. SMOTE would have to run inside each silo to respect the privacy premise, and at α=0.1 most silos hold too few minority examples for neighbour interpolation to work. Flow features are linked by construction (a rate is bytes divided by duration), and straight-line interpolation breaks those links. Finally, made-up rows would feed into the very explanation comparison this project sets out to measure.
 <!-- src: data/README.md -->
 
-After cleaning, 213,752 rows still share a feature vector with at least one other row, and the 1,913,502 rows contain only 1,714,074 distinct vectors. A random split would put copies of one vector on both sides of the split and hand the model free correct answers. Deleting the copies would have stripped most of PortScan. Instead, every distinct vector is treated as a group, using a stratified group k-fold split, and the pipeline verifies afterwards that no vector appears on both sides, raising an error if one does. The split is a single global 75/25 split made before any partitioning, so the centralized and federated models are tested on the identical held-out set. @tab:split gives the result.
+Even after cleaning, 213,752 rows have a twin with the same feature vector; the 1,913,502 cleaned rows hold just 1,714,074 different vectors. A random split would put copies of one vector on both sides of the split and hand the model free correct answers. Deleting the copies would have stripped most of PortScan. Instead, every distinct vector is treated as a group, using a stratified group k-fold split, and the pipeline verifies afterwards that no vector appears on both sides, raising an error if one does. The split is a single global 75/25 split made before any partitioning, so the centralized and federated models are tested on the identical held-out set. @tab:split gives the result.
 <!-- src: data/README.md -->
 
-Table: Families after cleaning and the group-aware split {#tab:split}
+Table: Family counts after cleaning, and their division by the grouped split {#tab:split}
 | Family | Flows | Training pool | Test | Test share (%) |
 |---|---:|---:|---:|---:|
 | Benign | 1,440,899 | 1,080,674 | 360,225 | 25.0 |
@@ -188,13 +188,13 @@ This section describes how the training pool was divided among the ten silos and
 
 ### Method and measured heterogeneity
 
-For each family k separately, a vector of silo shares is drawn as p_k ~ Dir(α·1). The share p_k[i] is the fraction of family k that goes to silo i. Shares are applied by cutting each family's shuffled index list at cumulative boundaries, which gives exact proportions rather than the noise of sampling; this matters for the small families. α=0.1 gives pathological skew, where a family lands almost entirely in one silo; α=0.5 gives realistic skew; and α=5.0 is a near-IID control. The control is needed to tell "federation costs accuracy" apart from "non-IID data costs accuracy", which are different claims.
+For each family k separately, a vector of silo shares is drawn as p_k ~ Dir(α·1). The share p_k[i] is the fraction of family k that goes to silo i. Each family's rows are shuffled and divided at the running totals of the shares. The proportions are therefore exact, with no sampling noise, which matters most for the small families. At α=0.1 the skew is extreme, and a family usually ends up nearly whole in a single silo. α=0.5 gives skew of a realistic size, and α=5.0 acts as a control close to IID. The control is needed to tell "federation costs accuracy" apart from "non-IID data costs accuracy", which are different claims.
 <!-- src: data/README.md -->
 
-@tab:empty-cells counts the (silo, family) cells that receive no flows. The counts fall cleanly as α grows. Even at α=5.0 a few cells stay empty, because Heartbleed has only 8 training flows and cannot fill ten silos. Averaged over families, the silo that receives the most of a family gets 0.694 of it at α=0.1, 0.372 at α=0.5 and 0.177 at α=5.0, against 0.100 for a uniform split.
+@tab:empty-cells counts the (silo, family) cells that receive no flows. The counts fall cleanly as α grows. Even at α=5.0 a few cells stay empty, because Heartbleed has only 8 training flows and cannot fill ten silos. The largest single-silo share of a family, averaged across families, is 0.694 at α=0.1, 0.372 at α=0.5 and 0.177 at α=5.0; a perfectly even split would make it 0.100.
 <!-- src: data/README.md -->
 
-Table: Empty (silo, family) cells out of 90 per partition {#tab:empty-cells}
+Table: Number of empty (silo, family) cells in each partition, of 90 possible {#tab:empty-cells}
 | α | Seed 42 | Seed 1337 | Seed 2024 |
 |:-:|:-:|:-:|:-:|
 | 0.1 | 38 | 29 | 31 |
@@ -216,7 +216,7 @@ The nine tables give the number of training-pool flows of each family in each si
 <!-- src: data/README.md -->
 
 Table: Training-pool flows per silo and family, α=0.1, seed 42 {#tab:silo-a01-s42 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 0 | 361 | 10 | 31,541 | 0 | 0 | 0 | 133,559 | 0 | 165,471 |
 | 1 | 446 | 176 | 847 | 0 | 285 | 0 | 0 | 501 | 0 | 2,255 |
@@ -231,7 +231,7 @@ Table: Training-pool flows per silo and family, α=0.1, seed 42 {#tab:silo-a01-s
 <!-- src: data/processed/partitions/label_distribution_a0.1_s42.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=0.1, seed 1337 {#tab:silo-a01-s1337 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 1,056,872 | 9 | 0 | 10,114 | 2 | 0 | 0 | 62 | 0 | 1,067,059 |
 | 1 | 39 | 3 | 0 | 2,478 | 259 | 0 | 0 | 0 | 4 | 2,783 |
@@ -246,7 +246,7 @@ Table: Training-pool flows per silo and family, α=0.1, seed 1337 {#tab:silo-a01
 <!-- src: data/processed/partitions/label_distribution_a0.1_s1337.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=0.1, seed 2024 {#tab:silo-a01-s2024 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 4,392 | 3 | 0 | 60 | 41,074 | 0 | 0 | 346 | 0 | 45,875 |
 | 1 | 28,871 | 1 | 2,130 | 9,179 | 1,796 | 3 | 0 | 0 | 19 | 41,999 |
@@ -261,7 +261,7 @@ Table: Training-pool flows per silo and family, α=0.1, seed 2024 {#tab:silo-a01
 <!-- src: data/processed/partitions/label_distribution_a0.1_s2024.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=0.5, seed 42 {#tab:silo-a05-s42 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 9,032 | 175 | 884 | 20,008 | 10,459 | 3 | 0 | 57,326 | 59 | 97,946 |
 | 1 | 43,700 | 8 | 58 | 741 | 3,464 | 0 | 25 | 93 | 31 | 48,120 |
@@ -276,7 +276,7 @@ Table: Training-pool flows per silo and family, α=0.5, seed 42 {#tab:silo-a05-s
 <!-- src: data/processed/partitions/label_distribution_a0.5_s42.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=0.5, seed 1337 {#tab:silo-a05-s1337 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 446,187 | 268 | 134 | 9,671 | 4,913 | 0 | 0 | 5,846 | 468 | 467,487 |
 | 1 | 29,347 | 955 | 439 | 6,294 | 12,773 | 0 | 20 | 394 | 4 | 50,226 |
@@ -291,7 +291,7 @@ Table: Training-pool flows per silo and family, α=0.5, seed 1337 {#tab:silo-a05
 <!-- src: data/processed/partitions/label_distribution_a0.5_s1337.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=0.5, seed 2024 {#tab:silo-a05-s2024 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 96,295 | 157 | 2 | 17,854 | 23,904 | 0 | 3 | 11,740 | 12 | 149,967 |
 | 1 | 167,756 | 111 | 1,453 | 2,131 | 454 | 3 | 1 | 359 | 237 | 172,505 |
@@ -306,7 +306,7 @@ Table: Training-pool flows per silo and family, α=0.5, seed 2024 {#tab:silo-a05
 <!-- src: data/processed/partitions/label_distribution_a0.5_s2024.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=5.0, seed 42 {#tab:silo-a50-s42 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 77,153 | 566 | 929 | 8,316 | 17,158 | 0 | 3 | 4,039 | 73 | 108,237 |
 | 1 | 73,649 | 514 | 736 | 8,781 | 6,731 | 1 | 3 | 23,115 | 180 | 113,710 |
@@ -321,7 +321,7 @@ Table: Training-pool flows per silo and family, α=5.0, seed 42 {#tab:silo-a50-s
 <!-- src: data/processed/partitions/label_distribution_a5.0_s42.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=5.0, seed 1337 {#tab:silo-a50-s1337 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 108,587 | 283 | 388 | 2,877 | 18,808 | 1 | 4 | 13,459 | 218 | 144,625 |
 | 1 | 81,967 | 380 | 598 | 4,893 | 11,637 | 1 | 5 | 6,091 | 156 | 105,728 |
@@ -336,7 +336,7 @@ Table: Training-pool flows per silo and family, α=5.0, seed 1337 {#tab:silo-a50
 <!-- src: data/processed/partitions/label_distribution_a5.0_s1337.csv; results/partition_check.json -->
 
 Table: Training-pool flows per silo and family, α=5.0, seed 2024 {#tab:silo-a50-s2024 size=9}
-| Silo | Benign | Bot | Brute Force | DDoS | DoS | Heart-bleed | Infil-tration | Port Scan | Web Attack | Total |
+| Silo | Benign | Bot | BruteForce | DDoS | DoS | Heartbleed | Infiltration | PortScan | WebAttack | Total |
 |:-:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 277,111 | 653 | 746 | 8,085 | 4,996 | 0 | 10 | 9,938 | 147 | 301,686 |
 | 1 | 125,504 | 289 | 428 | 5,938 | 16,455 | 1 | 2 | 11,232 | 107 | 159,956 |
