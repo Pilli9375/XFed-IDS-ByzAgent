@@ -347,6 +347,12 @@ This appendix gives every agreement result, the reference lines, the supporting
 diagnostics and the negative checks, supporting Section~VI-B. Unless stated, agreement
 is the median over eligible rows (silos with at least 400 training rows; families with % src: docs/contribution_a_results.md
 at least 20 rows in the silo). % src: docs/contribution_a_results.md
+Two measurement choices shape every number here. Each comparison uses the attribution
+vector of the row's true class, so disagreement about the prediction itself is left out
+by design; a version anchored on each model's own predicted class would answer a
+different question and would need its own eligibility rules. And, as with any
+perturbation-based explainer, SHAP's stand-in for a ``missing'' feature is a background
+average, which is not a real network flow.
 
 \subsection{Agreement by $\alpha$ and by family}
 Table~\ref{tab:agree_alpha} gives the median and interquartile range of each metric per
@@ -690,7 +696,11 @@ the $\alpha=5.0$ medians are still 0.667 for Jaccard@10 and 0.844 for $\tau$. % 
 This appendix gives every phase of the trust check, supporting Section~VI-C. Unless
 stated, results are for $\alpha=0.5$, seed 42, 10 silos and 20 rounds; Phase 2, the % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 Phase 4 matrix and the gradual attack are single runs by design. The attack is a
-worst-case, full-knowledge construction throughout.
+worst-case, full-knowledge construction throughout. The trust check does not claim that
+ByzAgent beats the classical rules; its value is in what it shows about all of them and
+in the audit of its stated reasons. A planned benchmarking harness pitting ByzAgent
+against the baselines was not built, because both baselines already fail for reasons
+such a harness would not add evidence to.
 
 \subsection{Phase 0: attack construction and strength}
 The attack flips 40\% of each malicious silo's non-Benign rows to Benign (seed 9001). % src: docs/contribution_b_results.md
@@ -1223,7 +1233,10 @@ FedYogi, $\eta=0.01$ & 0.4627 & 0.9004 & fail\\ % src: docs/preregistration_accu
 \end{tabular}
 \end{table}
 
-\emph{Sealing.} FedAvgM with momentum 0.9 was selected (Table~\ref{tab:prereg_val}). % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
+\emph{Sealing.} FedAvgM with momentum 0.9 was selected (Table~\ref{tab:prereg_val}), % src: docs/preregistration_accuracy.md
+clearing the $\alpha=0.1$ threshold of 0.5428. The protocol's stop-and-flag conditions did % src: docs/preregistration_accuracy.md
+not trigger: no partition hash mismatched, and no $\alpha=0.1$ run scored above the % src: docs/preregistration_accuracy.md
+centralized MLP's 0.990 on validation. % src: docs/preregistration_accuracy.md
 Before the test, the protocol recorded that its $\alpha=0.1$ validation curves oscillate % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 and that at the final round its $\alpha=0.1$ validation mean, 0.5248, sits near % src: docs/preregistration_accuracy.md
 FedAvg's 0.5062, so part of the gain was expected to shrink. % src: docs/preregistration_accuracy.md
