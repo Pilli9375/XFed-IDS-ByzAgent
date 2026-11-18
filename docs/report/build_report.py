@@ -972,10 +972,11 @@ class Report:
         for k, person in enumerate(people):
             reg = person.get("Reg. No.", "").strip()
             photo = None
-            for ext in (".jpg", ".jpeg", ".png"):
-                cand = PHOTOS / f"{reg}{ext}"
-                if cand.exists():
-                    photo = cand
+            for folder in (PHOTOS, PRIVATE):  # private/photos/ or directly in private/
+                for ext in (".jpg", ".jpeg", ".png"):
+                    cand = folder / f"{reg}{ext}"
+                    if photo is None and cand.exists():
+                        photo = cand
             if photo is None:
                 self.missing_photos.append(f"{person.get('Name', '?')} ({reg})")
             t = self.doc.add_table(rows=1, cols=2 if photo else 1)
