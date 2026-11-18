@@ -59,9 +59,11 @@ PHOTOS = PRIVATE / "photos"
 BIB = ROOT / "paper" / "refs.bib"
 
 # ------------------------------------------------------------------ front-page variables
-# Fill DEPARTMENT in when it is known (e.g. "Networking and Security") and rebuild.
-# While it is the literal marker "[DEPARTMENT]" it is printed highlighted in yellow.
-DEPARTMENT = "[DEPARTMENT]"
+# Leave DEPARTMENT empty while there is no separate department: the certificate then reads "HoD"
+# (above the School and University lines) and the acknowledgement thanks "the Head of the Department,
+# School of Computer Science and Engineering". Set a name (e.g. "Networking and Security") and rebuild
+# to print "HoD, Department of <name>" and "the Head of the Department, Department of <name>".
+DEPARTMENT = ""
 TITLE = "XFED-IDS-BYZAGENT: EXPLAINABLE AND TRUST-AWARE FEDERATED INTRUSION DETECTION"
 GUIDE = "Prof. Gargi Madala"
 MONTH_YEAR = "NOVEMBER 2026"
@@ -562,8 +564,7 @@ class Report:
         for r in list(p._p):
             if r.tag != qn("w:pPr"):
                 p._p.remove(r)
-        add_run_like(p, "HoD, Department of ", rpr)
-        add_run_like(p, DEPARTMENT, rpr, highlight=(DEPARTMENT == "[DEPARTMENT]"))
+        add_run_like(p, f"HoD, Department of {DEPARTMENT}" if DEPARTMENT else "HoD", rpr)
 
         # acknowledgement
         heading = None
@@ -599,10 +600,10 @@ class Report:
             if r.tag != qn("w:pPr"):
                 p._p.remove(r)
         add_run_like(p, "We express our sincere thanks to Dr. S. Sudhakar Ilango, Dean, SCOPE, Dr. Saroj Kumar "
-                        "Panigrahy, Associate Dean, SCOPE, and the Head of the Department, Department of ", rpr)
-        add_run_like(p, DEPARTMENT, rpr, highlight=(DEPARTMENT == "[DEPARTMENT]"))
-        add_run_like(p, ", for the continuous encouragement, academic support, and facilities provided throughout "
-                        "the project.", rpr)
+                        "Panigrahy, Associate Dean, SCOPE, and the Head of the Department, "
+                        + (f"Department of {DEPARTMENT}" if DEPARTMENT else "School of Computer Science and Engineering")
+                        + ", for the continuous encouragement, academic support, and facilities provided "
+                        "throughout the project.", rpr)
         p = P(T_ACK_GUIDE)
         rpr = copy.deepcopy(p.runs[0]._r.rPr)
         set_text(p, p.text.replace("<Name of the Guide>", GUIDE))
