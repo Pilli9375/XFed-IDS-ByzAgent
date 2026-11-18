@@ -2,7 +2,7 @@
 
 Sources compared: 54 saved abstracts of cited papers (`paper/_sources/`, git-ignored), `README.md`, and every Markdown file under `docs/handbook/`.
 
-**Sentences sharing an 8-word run: 16 total; 16 exempt (locked wording the project requires verbatim, or runs made of result numbers); 0 counted.**
+**Sentences sharing an 8-word run: 17 total; 17 exempt (locked wording the project requires verbatim, or runs made of result numbers); 0 counted.**
 
 - EXEMPT (locked wording or numbers only): "FedAvg reaches test macro-F1 of 0.516\, \,0.048, 0.941\, \,0.057 and 0.990\, \,0.001."
   - `0 516 0 048 0 941 0 057` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/07_reference.md
@@ -10,6 +10,10 @@ Sources compared: 54 saved abstracts of cited papers (`paper/_sources/`, git-ign
   - `it produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
   - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
 - EXEMPT (locked wording or numbers only): "Multi-Krum excluded a malicious silo 0\% of the time."
+  - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
+  - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
+- EXEMPT (locked wording or numbers only): "The classical rules did not single out the attackers (Multi-Krum excluded a malicious silo 0\% of the time); ByzAgent's flags also responded to the attack where silos were not already saturated."
   - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
   - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md
   - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md

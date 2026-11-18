@@ -107,8 +107,10 @@ first and failed this test.
 \item A trust check that sets a language-model agent (ByzAgent) against three classical
 aggregators, namely trimmed mean, Krum and Multi-Krum, under a worst-case label-flipping
 attack.
-All four mechanisms respond to silo composition, not only to the attack, and we audit
-how often the agent's stated reasons match the numbers it was shown.
+All four mechanisms respond to silo composition. The classical rules did not single out
+the attackers (Multi-Krum excluded a malicious silo 0\% of the time); ByzAgent's flags % src: PROJECT_INSTRUCTIONS.md
+also responded to the attack where silos were not already saturated. We also audit how
+often the agent's stated reasons match the numbers it was shown.
 \item An evaluation protocol that selects every model and round on validation data, a
 written audit of every way the test set was read, one preregistered optimizer
 comparison, and serving and communication measurements for the deployed model.
@@ -449,7 +451,8 @@ from 0.592 to 0.787 and 0.844. Every level is 5.1--10.3 times the chance Jaccard
 0.065, so the rankings carry real signal. The more useful comparison is with the % src: PROJECT_INSTRUCTIONS.md
 seed-noise floor. For centralized models that share everything except the seed, the
 median pairwise Jaccard@10 is 0.429 (pair medians span 0.429 to 0.484). At $\alpha=5.0$ and $\alpha=0.5$ % src: PROJECT_INSTRUCTIONS.md
-silos agree with the global model more than seed noise alone would allow. At
+the median agreement sits above the range of the seed-noise floor; we computed an % src: PROJECT_INSTRUCTIONS.md
+interval only at $\alpha=0.1$. At % src: site/public/data/ci.json
 $\alpha=0.1$ the median falls under the floor while accuracy is still 0.516. We read % src: PROJECT_INSTRUCTIONS.md
 this as directional, not significant, because the $\alpha=0.1$ cluster-bootstrap % src: PROJECT_INSTRUCTIONS.md
 interval of [0.250, 0.429] overlaps the floor range. % src: PROJECT_INSTRUCTIONS.md
@@ -459,7 +462,8 @@ interval of [0.250, 0.429] overlaps the floor range. % src: PROJECT_INSTRUCTIONS
 \includegraphics[width=\columnwidth]{figs/fig_agreement_alpha.pdf}
 \caption{Silo-versus-global explanation agreement by $\alpha$ (eligible rows; box = IQR,
 line = median). Hatched band: centralized-seed instability floor. Dotted line: chance
-Jaccard@10.}
+Jaccard@10. IQRs computed for this paper from agreement\_metrics.csv
+(paper/figs/derived\_values.json).}
 \label{fig:agree}
 \end{figure}
 
@@ -587,9 +591,7 @@ attacker-selection rule picks silos on the same composition axis that every dete
 here reacts to. Under this partition, a strong attacker drawn from ordinary silos could
 not be built, so we cannot say whether the failures are general to these rules or tied
 to our selection. The agent's rationale is partly unfaithful, its decisions vary
-between calls, and the rolling-history design failed its preregistered test. The
-language-model summaries in the dashboard are a convenience for analysts and carry no
-research claim.
+between calls, and the rolling-history design failed its preregistered test.
 
 % =====================================================================================
 \section{Conclusion and Future Work}
@@ -598,8 +600,8 @@ mild label skew and loses it at strong skew. Explanation agreement between silos
 global model follows the same direction, and at strong skew it falls to the level that
 random seeds produce on their own, a result we report as directional. In a separate
 experiment, both the classical robust rules and an LLM trust agent reacted to silo
-composition as well as to a worst-case attack, and the agent's written reasons were only
-partly accurate. Next steps include a partitioning design that varies size and skew
+composition; only the agent also showed attack-responsive flags, and only where silos
+were not already saturated. The agent's written reasons were only partly accurate. Next steps include a partitioning design that varies size and skew
 independently, seeded multi-draw SHAP for the headline numbers, more seeds for the floor,
 attacker selection that does not ride the composition axis, and a check of whether
 server momentum changes explanation agreement.
