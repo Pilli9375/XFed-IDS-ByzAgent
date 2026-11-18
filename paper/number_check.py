@@ -111,6 +111,8 @@ for fname in FILES:
             if any(f"\\end{{{e}}}" in line for e in SKIP_ENVS):
                 in_env = False
             continue
+        if "numcheck: ignore" in line:
+            continue
         stripped = line.lstrip()
         if stripped.startswith("%"):
             continue
