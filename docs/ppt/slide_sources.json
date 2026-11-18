@@ -1,0 +1,367 @@
+{
+ "slides": [
+  {
+   "slide": 1,
+   "builder": "s_title",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/main.tex"
+   ]
+  },
+  {
+   "slide": 2,
+   "builder": "s_outline",
+   "speaker": "Adithya",
+   "sources": []
+  },
+  {
+   "slide": 3,
+   "builder": "s_overview",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 4,
+   "builder": "s_problem",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/main.tex"
+   ]
+  },
+  {
+   "slide": 5,
+   "builder": "s_objectives",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 6,
+   "builder": "s_related",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/main.tex",
+    "paper/refs.bib"
+   ]
+  },
+  {
+   "slide": 7,
+   "builder": "s_improve",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 8,
+   "builder": "s_arch",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "paper/main.tex"
+   ]
+  },
+  {
+   "slide": 9,
+   "builder": "s_modules",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 10,
+   "builder": "s_tools",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/main.tex",
+    "docs/env_versions_2026-11-18.txt",
+    "requirements.txt",
+    "federated/pyproject.toml",
+    "frontend/package-lock.json",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 11,
+   "builder": "s_dataset",
+   "speaker": "Shaun",
+   "sources": [
+    "data/README.md",
+    "docs/efficiency_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 12,
+   "builder": "s_partition",
+   "speaker": "Shaun",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "data/README.md",
+    "results/partition_check.json",
+    "docs/ppt/figs/alpha_silo_counts.csv"
+   ]
+  },
+  {
+   "slide": 13,
+   "builder": "s_params",
+   "speaker": "Shaun",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "configs/model.yaml",
+    "configs/agent.yaml",
+    "docs/measurement_protocol.md",
+    "docs/preregistration_accuracy.md"
+   ]
+  },
+  {
+   "slide": 14,
+   "builder": "s_accuracy",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "data/README.md",
+    "docs/preregistration_accuracy.md"
+   ]
+  },
+  {
+   "slide": 15,
+   "builder": "s_expl",
+   "speaker": "Tharun",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/contribution_a_results.md",
+    "results/inspection/centralized_instability_floor.csv"
+   ]
+  },
+  {
+   "slide": 16,
+   "builder": "s_expl_rob",
+   "speaker": "Tharun",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/contribution_a_results.md",
+    "results/inspection/residual_sensitivity.json"
+   ]
+  },
+  {
+   "slide": 17,
+   "builder": "s_trust1",
+   "speaker": "Sampath",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/contribution_b_results.md",
+    "paper/main.tex"
+   ]
+  },
+  {
+   "slide": 18,
+   "builder": "s_trust2",
+   "speaker": "Sampath",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/contribution_b_results.md",
+    "configs/agent.yaml"
+   ]
+  },
+  {
+   "slide": 19,
+   "builder": "s_eff",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/efficiency_results.md",
+    "paper/main.tex"
+   ]
+  },
+  {
+   "slide": 20,
+   "builder": "s_dash",
+   "speaker": "Adithya",
+   "sources": []
+  },
+  {
+   "slide": 21,
+   "builder": "s_honesty",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/test_set_exposure_audit.md",
+    "paper/number_check.md",
+    "docs/report/number_check.md",
+    "paper/citation_check.md",
+    "paper/overlap_check.md",
+    "docs/efficiency_results.md",
+    "docs/contribution_b_results.md"
+   ]
+  },
+  {
+   "slide": 22,
+   "builder": "s_summary",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/main.tex",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 23,
+   "builder": "build",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/refs.bib"
+   ]
+  },
+  {
+   "slide": 24,
+   "builder": "build",
+   "speaker": "Adithya",
+   "sources": [
+    "paper/refs.bib"
+   ]
+  },
+  {
+   "slide": 25,
+   "builder": "s_thanks",
+   "speaker": "Adithya",
+   "sources": []
+  },
+  {
+   "slide": 26,
+   "builder": "build",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/test_set_exposure_audit.md",
+    "docs/preregistration_accuracy.md"
+   ]
+  },
+  {
+   "slide": 27,
+   "builder": "build",
+   "speaker": "Tharun",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "docs/contribution_a_results.md"
+   ]
+  },
+  {
+   "slide": 28,
+   "builder": "build",
+   "speaker": "Sampath",
+   "sources": [
+    "docs/contribution_b_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "slide": 29,
+   "builder": "build",
+   "speaker": "Sampath",
+   "sources": [
+    "docs/contribution_b_results.md",
+    "PROJECT_INSTRUCTIONS.md",
+    "configs/agent.yaml"
+   ]
+  },
+  {
+   "slide": 30,
+   "builder": "build",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md",
+    "paper/main.tex",
+    "results/aggregated/federated_per_family.csv",
+    "results/partition_check.json"
+   ]
+  },
+  {
+   "slide": 31,
+   "builder": "build",
+   "speaker": "Adithya",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  }
+ ],
+ "demo": [
+  {
+   "time": "0:00",
+   "text": "This is XFed-IDS. Ten organisations trained this detector together without sharing traffic. The flows on the left are validation rows replayed as live traffic, never test rows.",
+   "sources": [
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "time": "0:30",
+   "text": "Top row: our preregistered FedAvgM model's test macro-F1, 0.9852 at α=0.5, scored once. Per-flow latency 45.7 µs with ONNX. Upload per round falls 50% with fp16 updates. Each number links to the file it came from.",
+   "sources": [
+    "results/federated_methods/test_once/result.json",
+    "results/efficiency/inference_speed_summary.json",
+    "docs/efficiency_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "time": "1:00",
+   "text": "The model says DoS. On the right is why: SHAP shows which features pushed it there, here packet-length statistics. Base value, output and residual are shown, because SHAP's sums aren't exact and we measured that.",
+   "sources": []
+  },
+  {
+   "time": "1:30",
+   "text": "This sentence is an LLM summary for the analyst. It is labelled 'not a research result': a usability feature, not a research claim.",
+   "sources": []
+  },
+  {
+   "time": "1:50",
+   "text": "We don't hide mistakes. Here is a flow the model got wrong.",
+   "sources": []
+  },
+  {
+   "time": "2:15",
+   "text": "This is the trust check, a separate experiment. Open circle: how often our agent flagged each organisation with no attack. Filled: under attack. At seed 1337, org 5 goes from 0.00 to 0.95: real detection. But some orgs are flagged in almost every round with no attack at all; the note under the chart names them. That is the compositional confound.",
+   "sources": [
+    "docs/contribution_b_results.md"
+   ]
+  },
+  {
+   "time": "3:00",
+   "text": "Investigate answers four questions, trust first. Multi-Krum excluded a poisoned org 0% of the time. ByzAgent's result, in our locked words: [read the quote on screen].",
+   "sources": [
+    "docs/contribution_b_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "time": "3:40",
+   "text": "Explanation check. Chance is 0.065, the seed-noise floor is 0.429. At α=5.0 agreement is 0.667; at α=0.1 it is 0.333, below the floor: directional, not significant, the intervals overlap.",
+   "sources": [
+    "docs/contribution_a_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "time": "4:20",
+   "text": "1,587,920 bytes per round; compression saves up to 74.9% of upload with no detectable effect at n=3; and two ideas we tested and dropped.",
+   "sources": [
+    "results/efficiency/communication.json",
+    "docs/efficiency_results.md",
+    "PROJECT_INSTRUCTIONS.md"
+   ]
+  },
+  {
+   "time": "4:40",
+   "text": "Finally, Limits shows our claims and limitations verbatim from the project instructions. We'd rather you read them here than find them yourself.",
+   "sources": []
+  },
+  {
+   "time": "5:00",
+   "text": "Back to the slides for what we checked and what failed.",
+   "sources": []
+  }
+ ]
+}
