@@ -1,12 +1,12 @@
 % Appendices: the complete record. Input by main.tex only when \iffullversion is true.
-% Same rules as the body: every number has a trailing "% src:" comment.
+% Same rules as the body: every number has a trailing src comment.
 
 \section{Dataset and Cleaning}
 \label{app:data}
 This appendix gives every data-preparation step with its row counts and supports
 Section~IV-A. All counts come from the data-stage decision record \texttt{data/README.md}.
 
-\emph{Lineage.} The flows are the Distrinet CICIDS2017 files, version 4, released with
+\emph{Lineage.} The flows are the Distrinet CICIDS2017 files, version 4, released with % src: data/README.md; PROJECT_INSTRUCTIONS.md
 Liu et al.~\cite{liu2022}. They descend from the corrections of Engelen et
 al.~\cite{engelen2021}, which fixed flow construction, feature extraction and labelling
 in the original release~\cite{sharafaldin2018} and introduced the ``Attempted'' label for
@@ -19,7 +19,7 @@ code disagrees with the label suffix on none of the rows, so only the suffix is 
 dataset authors' own benchmark does. The counts in Table~\ref{tab:attempted} changed that
 plan: for several families most flows are attempts, and folding them away would have
 emptied Bot and the web attacks. Attempted flows join their parent family under one rule.
-The cost is that per-family scores mix completed and failed attacks.
+As a result, each family's score blends attacks that landed with attempts that did not.
 
 \begin{table}[h]
 \centering
@@ -72,7 +72,7 @@ Heartbleed & Heartbleed\\
 
 \emph{Cleaning.} The order is load, family mapping, non-finite values, conflicts,
 duplicates (Table~\ref{tab:clean}). Five flows with zero duration produce infinite rates % src: data/README.md
-and are dropped. The ICMP type and code columns hold $-1$ for non-ICMP flows; this is a
+and are dropped. The ICMP type and code columns hold $-1$ for non-ICMP flows; this is a % src: data/README.md; PROJECT_INSTRUCTIONS.md
 sentinel, not corruption. Groups of identical feature vectors that carry more than one
 family cannot be learned and are dropped whole: 43,890 rows in 756 Benign/PortScan % src: data/README.md
 groups and 115 rows in 15 Bot/Infiltration groups. Even after correction, then, about % src: data/README.md
@@ -98,9 +98,10 @@ Retained (8.88\% dropped) & 1,913,502\\ % src: data/README.md
 \end{tabular}
 \end{table}
 
-\emph{Duplicates.} The raw exact-duplicate rate is 18.3\%, almost all in scan and bot % src: data/README.md
-traffic: 99.2\% of Portscan rows and 95.0\% of Infiltration--Portscan rows sit in % src: data/README.md
-duplicate groups. Once ports and addresses are removed, many distinct probes collapse to
+\emph{Duplicates.} Before cleaning, 18.3\% of rows are exact copies of another row, and % src: data/README.md
+nearly all of them are scan or bot flows: duplicate groups hold 99.2\% of the Portscan % src: data/README.md
+rows and 95.0\% of the Infiltration--Portscan rows. % src: data/README.md
+Once ports and addresses are removed, many distinct probes collapse to
 one vector, so same-day repeats are kept. Only groups that span more than one day file
 are removed, since those match the capture-overlap problems reported for this dataset.
 Duplicates are keyed on the raw label (provenance), conflicts on the family (target);
@@ -111,8 +112,9 @@ keying duplicates on the family once deleted 58,228 rows that were distinct even
 
 \emph{Floor and split.} Families below 1,000 flows stay in the data but leave the % src: data/README.md
 headline metric. Table~\ref{tab:families} gives the final distribution and the split.
-After cleaning, 213,752 rows still share a feature vector with another row (1,714,074 % src: data/README.md
-distinct vectors). The split therefore treats each distinct vector as a group
+Even after cleaning, 213,752 rows have at least one identical twin, and the 1,913,502 % src: data/README.md
+rows contain only 1,714,074 distinct vectors. % src: data/README.md
+The split therefore treats each distinct vector as a group
 (stratified group k-fold), checks that no vector appears on both sides, and raises if
 one does. All seven headline families land at exactly 25.0\% test share. % src: data/README.md
 
@@ -143,13 +145,13 @@ Total & 1,913,502 & 1,435,126 & 478,376 & 25.0\\ % src: data/README.md
 
 \emph{Imbalance.} Benign is 75\% of the data. We use class-weighted loss rather than % src: data/README.md
 SMOTE: interpolation would have to run per silo, where minority classes are often a
-handful of rows at $\alpha=0.1$; flow features are linked by construction (rate equals
+handful of rows at $\alpha=0.1$; flow features are linked by construction (rate equals % src: data/README.md; PROJECT_INSTRUCTIONS.md
 bytes over duration); and synthetic rows would enter the explanation comparison.
 
 \emph{Partitions.} Proportions are applied by cutting each family's shuffled index list
 at cumulative boundaries, so shares are exact rather than multinomial draws.
-Table~\ref{tab:emptycells} shows the measured heterogeneity. The mean largest single-silo
-share of a family is 0.694 at $\alpha=0.1$, 0.372 at $\alpha=0.5$ and 0.177 at % src: data/README.md
+Table~\ref{tab:emptycells} shows the measured heterogeneity. Averaged over families, the
+silo that receives most of a family gets 0.694 of it at $\alpha=0.1$, 0.372 at $\alpha=0.5$ and 0.177 at % src: data/README.md
 $\alpha=5.0$ (uniform: 0.100). Silo sizes are very uneven at $\alpha=0.1$; the largest % src: data/README.md
 silo holds 636,676 rows ($\alpha=0.1$, seed 42, silo 2). Heartbleed, with 8 training % src: results/inspection/silo_size_vs_agreement.csv
 flows, cannot fill ten silos, so some cells are empty even at $\alpha=5.0$. The manifest % src: data/README.md
@@ -158,12 +160,12 @@ catches a single flipped entry among 1.4 million. % src: data/README.md
 
 \begin{table}[h]
 \centering
-\caption{Empty (silo, family) cells out of 90 per partition}
+\caption{Empty (silo, family) cells out of 90 per partition} % src: data/README.md; PROJECT_INSTRUCTIONS.md
 \label{tab:emptycells}
 \footnotesize
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-$\alpha$ & seed 42 & seed 1337 & seed 2024\\
+$\alpha$ & seed 42 & seed 1337 & seed 2024\\ % src: data/README.md; PROJECT_INSTRUCTIONS.md
 \midrule
 0.1 & 38 & 29 & 31\\ % src: data/README.md
 0.5 & 7 & 10 & 8\\ % src: data/README.md
@@ -186,7 +188,7 @@ validation macro-F1 over the seven headline classes.
 
 \begin{table}[h]
 \centering
-\caption{Centralized pilots: validation macro-F1 (7 classes)}
+\caption{Centralized pilots: validation macro-F1 (7 classes)} % src: configs/model.yaml; docs/test_set_exposure_audit.md; PROJECT_INSTRUCTIONS.md
 \label{tab:pilots}
 \footnotesize
 \begin{tabular}{@{}llr@{}}
@@ -199,14 +201,14 @@ Scaler & standard & 0.9941\\ % src: results/pilots/scaler_comparison.csv
 Class weights & none & 0.9899\\ % src: results/pilots/weights_comparison.csv
  & inverse sqrt & 0.9741\\ % src: results/pilots/weights_comparison.csv
  & effective number, $\beta=0.999$ & 0.9941\\ % src: results/pilots/weights_comparison.csv
- & effective number, $\beta=0.9999$ & 0.9898\\ % src: results/pilots/weights_comparison.csv
- & effective number, $\beta=0.99999$ & 0.9617\\ % src: results/pilots/weights_comparison.csv
+ & effective number, $\beta=0.9999$ & 0.9898\\ % src: results/pilots/weights_comparison.csv; docs/handbook/XFed_Team_Handbook.md
+ & effective number, $\beta=0.99999$ & 0.9617\\ % src: results/pilots/weights_comparison.csv; configs/model.yaml
 Architecture & [128, 64], dropout 0.1 & 0.9939\\ % src: results/pilots/architecture_comparison.csv
- & [128, 64], dropout 0.3 & 0.9931\\ % src: results/pilots/architecture_comparison.csv
+ & [128, 64], dropout 0.3 & 0.9931\\ % src: results/pilots/architecture_comparison.csv; configs/model.yaml
  & [256, 128], dropout 0.1 & 0.9912\\ % src: results/pilots/architecture_comparison.csv
- & [256, 128], dropout 0.3 & 0.9878\\ % src: results/pilots/architecture_comparison.csv
+ & [256, 128], dropout 0.3 & 0.9878\\ % src: results/pilots/architecture_comparison.csv; configs/model.yaml
  & [512, 256, 128], dropout 0.1 & 0.9936\\ % src: results/pilots/architecture_comparison.csv
- & [512, 256, 128], dropout 0.3 & 0.9938\\ % src: results/pilots/architecture_comparison.csv
+ & [512, 256, 128], dropout 0.3 & 0.9938\\ % src: results/pilots/architecture_comparison.csv; configs/model.yaml
 \bottomrule
 \end{tabular}
 \end{table}
@@ -221,9 +223,9 @@ use up to 50 epochs with early stopping on validation macro-F1 (patience 5) and 
 the learning rate on plateaus (patience 3). The validation set is 10\% of the training % src: configs/model.yaml
 pool, drawn with seed 42 and held out of every silo. % src: configs/model.yaml
 
-\emph{Provenance.} Three choices were first recorded with test-set numbers as their
-justification. Table~\ref{tab:provenance} shows that validation selects the same value in
-each case. FedProx $\mu=0.01$ collapsed at $\alpha=0.5$, seed 42 (validation macro-F1 % src: docs/test_set_exposure_audit.md
+\emph{Provenance.} For three choices, our first written rationale quoted test-set
+scores. Table~\ref{tab:provenance} repeats each comparison on validation, and the same
+value wins every time. FedProx $\mu=0.01$ collapsed at $\alpha=0.5$, seed 42 (validation macro-F1 % src: docs/test_set_exposure_audit.md
 0.7114), which is why $\mu=0.0005$ was carried forward. % src: docs/test_set_exposure_audit.md
 
 \begin{table*}[t]
@@ -252,29 +254,29 @@ Section~VI-A. Test values are single evaluations of validation-selected checkpoi
 
 \begin{table}[h]
 \centering
-\caption{FedAvg runs: best round by validation, its validation and test macro-F1, and the round-20 validation score}
+\caption{FedAvg runs: best round by validation, its validation and test macro-F1, and the round-20 validation score} % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 \label{tab:fedruns}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{@{}llrrrrr@{}}
 \toprule
-$\alpha$ & Seed & Best rd & Val & Test & Val rd 20 & Gap\\
+$\alpha$ & Seed & Best rd & Val & Test & Val rd 20 & Gap\\ % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 \midrule
-0.1 & 42 & 20 & 0.5440 & 0.5426 & 0.5440 & 0.0000\\ % src: results/federated/round_lottery_val.csv
-0.1 & 1337 & 16 & 0.4551 & 0.4481 & 0.4181 & 0.0370\\ % src: results/federated/round_lottery_val.csv
-0.1 & 2024 & 16 & 0.5694 & 0.5572 & 0.5565 & 0.0129\\ % src: results/federated/round_lottery_val.csv
-0.5 & 42 & 18 & 0.9760 & 0.9753 & 0.9745 & 0.0014\\ % src: results/federated/round_lottery_val.csv
-0.5 & 1337 & 11 & 0.9871 & 0.9866 & 0.8699 & 0.1172\\ % src: results/federated/round_lottery_val.csv
-0.5 & 2024 & 17 & 0.8644 & 0.8605 & 0.8492 & 0.0152\\ % src: results/federated/round_lottery_val.csv
-5.0 & 42 & 18 & 0.9898 & 0.9900 & 0.8713 & 0.1184\\ % src: results/federated/round_lottery_val.csv
-5.0 & 1337 & 18 & 0.9898 & 0.9905 & 0.9866 & 0.0032\\ % src: results/federated/round_lottery_val.csv
-5.0 & 2024 & 20 & 0.9913 & 0.9889 & 0.9913 & 0.0000\\ % src: results/federated/round_lottery_val.csv
+0.1 & 42 & 20 & 0.5440 & 0.5426 & 0.5440 & 0.0000\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+0.1 & 1337 & 16 & 0.4551 & 0.4481 & 0.4181 & 0.0370\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+0.1 & 2024 & 16 & 0.5694 & 0.5572 & 0.5565 & 0.0129\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+0.5 & 42 & 18 & 0.9760 & 0.9753 & 0.9745 & 0.0014\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+0.5 & 1337 & 11 & 0.9871 & 0.9866 & 0.8699 & 0.1172\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+0.5 & 2024 & 17 & 0.8644 & 0.8605 & 0.8492 & 0.0152\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+5.0 & 42 & 18 & 0.9898 & 0.9900 & 0.8713 & 0.1184\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+5.0 & 1337 & 18 & 0.9898 & 0.9905 & 0.9866 & 0.0032\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
+5.0 & 2024 & 20 & 0.9913 & 0.9889 & 0.9913 & 0.0000\\ % src: results/federated/round_lottery_val.csv; results/inspection/best_rounds_manifest.json
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:fedruns} is the round lottery on validation. Best and round-20 checkpoints
-differ by up to 0.118 (rounded from 0.1184, $\alpha=5.0$, seed 42), so selecting on % src: PROJECT_INSTRUCTIONS.md
+Table~\ref{tab:fedruns} is the round lottery on validation. Best and round-20 checkpoints % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
+differ by up to 0.118 (rounded from 0.1184, $\alpha=5.0$, seed 42), so selecting on % src: PROJECT_INSTRUCTIONS.md; results/federated/round_lottery_val.csv
 validation is required. Test values for each run are from
 \texttt{results/inspection/best\_rounds\_manifest.json}. An earlier version of this
 comparison used test scores of the unselected round-20 checkpoints (maximum 0.1199); it % src: docs/contribution_a_results.md
@@ -290,16 +292,16 @@ best-by-validation round.}
 
 \begin{table}[h]
 \centering
-\caption{Centralized references per seed (test macro-F1, 7 classes; validation in brackets)}
+\caption{Centralized references per seed (test macro-F1, 7 classes; validation in brackets)} % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 \label{tab:centralseed}
 \footnotesize
 \begin{tabular}{@{}lrr@{}}
 \toprule
 Seed & Centralized MLP & XGBoost\\
 \midrule
-42 & 0.9931 [0.9947] & 0.9947 [0.9962]\\ % src: results/centralized/baseline_s42/metrics.json
-1337 & 0.9886 [0.9942] & 0.9946 [0.9967]\\ % src: results/centralized/baseline_s1337/metrics.json
-2024 & 0.9884 [0.9946] & 0.9945 [0.9953]\\ % src: results/centralized/baseline_s2024/metrics.json
+42 & 0.9931 [0.9947] & 0.9947 [0.9962]\\ % src: results/centralized/baseline_s42/metrics.json; results/xgboost/xgb_s42/metrics.json; PROJECT_INSTRUCTIONS.md
+1337 & 0.9886 [0.9942] & 0.9946 [0.9967]\\ % src: results/centralized/baseline_s1337/metrics.json; results/xgboost/xgb_s1337/metrics.json; PROJECT_INSTRUCTIONS.md
+2024 & 0.9884 [0.9946] & 0.9945 [0.9953]\\ % src: results/centralized/baseline_s2024/metrics.json; results/xgboost/xgb_s2024/metrics.json; PROJECT_INSTRUCTIONS.md
 Mean $\pm$ std & 0.9900 $\pm$ 0.0022 & 0.9946 $\pm$ 0.0001\\ % src: PROJECT_INSTRUCTIONS.md
 \bottomrule
 \end{tabular}
@@ -308,27 +310,27 @@ Mean $\pm$ std & 0.9900 $\pm$ 0.0022 & 0.9946 $\pm$ 0.0001\\ % src: PROJECT_INST
 The XGBoost values in Table~\ref{tab:centralseed} come from each seed's
 \texttt{metrics.json} under \texttt{results/xgboost/}.
 Table~\ref{tab:perclass} gives per-class test F1, including the two classes below the
-floor. Under FedAvg at $\alpha=0.1$, Bot and WebAttack are almost never detected, and
+floor. Under FedAvg at $\alpha=0.1$, Bot and WebAttack are almost never detected, and % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 BruteForce, DoS and PortScan swing widely between seeds.
 
 \begin{table*}[t]
 \centering
-\caption{Per-class test F1 (mean over 3 seeds; FedAvg also shows std). Infiltration and Heartbleed are per class only.}
+\caption{Per-class test F1 (mean over 3 seeds; FedAvg also shows std). Infiltration and Heartbleed are per class only.} % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 \label{tab:perclass}
 \footnotesize
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Class & FedAvg $\alpha=0.1$ & FedAvg $\alpha=0.5$ & FedAvg $\alpha=5.0$ & Centralized MLP & XGBoost\\
+Class & FedAvg $\alpha=0.1$ & FedAvg $\alpha=0.5$ & FedAvg $\alpha=5.0$ & Centralized MLP & XGBoost\\ % src: results/federated/round_lottery_val.csv; PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md
 \midrule
-Benign & 0.9449 $\pm$ 0.0130 & 0.9984 $\pm$ 0.0004 & 0.9993 $\pm$ 0.0000 & 0.9973 & 0.9996\\ % src: results/aggregated/federated_per_family.csv
-Bot & 0.1253 $\pm$ 0.1003 & 0.9404 $\pm$ 0.0410 & 0.9696 $\pm$ 0.0012 & 0.9733 & 0.9804\\ % src: results/aggregated/federated_per_family.csv
-BruteForce & 0.5730 $\pm$ 0.4182 & 0.9929 $\pm$ 0.0023 & 0.9954 $\pm$ 0.0002 & 0.9972 & 0.9978\\ % src: results/aggregated/federated_per_family.csv
-DDoS & 0.9976 $\pm$ 0.0018 & 0.9998 $\pm$ 0.0001 & 0.9999 $\pm$ 0.0001 & 1.0000 & 1.0000\\ % src: results/aggregated/federated_per_family.csv
-DoS & 0.6025 $\pm$ 0.4308 & 0.9947 $\pm$ 0.0047 & 0.9979 $\pm$ 0.0000 & 0.9981 & 0.9987\\ % src: results/aggregated/federated_per_family.csv
-PortScan & 0.3197 $\pm$ 0.4521 & 0.9965 $\pm$ 0.0005 & 0.9974 $\pm$ 0.0000 & 0.9813 & 0.9987\\ % src: results/aggregated/federated_per_family.csv
-WebAttack & 0.0490 $\pm$ 0.0693 & 0.6627 $\pm$ 0.4207 & 0.9691 $\pm$ 0.0058 & 0.9831 & 0.9870\\ % src: results/aggregated/federated_per_family.csv
-Infiltration & 0.0000 $\pm$ 0.0000 & 0.3767 $\pm$ 0.0669 & 0.4362 $\pm$ 0.0502 & 0.7954 & 0.8148\\ % src: results/aggregated/federated_per_family.csv
-Heartbleed & 0.3333 $\pm$ 0.4714 & 0.6000 $\pm$ 0.4320 & 0.9524 $\pm$ 0.0673 & 1.0000 & 1.0000\\ % src: results/aggregated/federated_per_family.csv
+Benign & 0.9449 $\pm$ 0.0130 & 0.9984 $\pm$ 0.0004 & 0.9993 $\pm$ 0.0000 & 0.9973 & 0.9996\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+Bot & 0.1253 $\pm$ 0.1003 & 0.9404 $\pm$ 0.0410 & 0.9696 $\pm$ 0.0012 & 0.9733 & 0.9804\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+BruteForce & 0.5730 $\pm$ 0.4182 & 0.9929 $\pm$ 0.0023 & 0.9954 $\pm$ 0.0002 & 0.9972 & 0.9978\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+DDoS & 0.9976 $\pm$ 0.0018 & 0.9998 $\pm$ 0.0001 & 0.9999 $\pm$ 0.0001 & 1.0000 & 1.0000\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+DoS & 0.6025 $\pm$ 0.4308 & 0.9947 $\pm$ 0.0047 & 0.9979 $\pm$ 0.0000 & 0.9981 & 0.9987\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+PortScan & 0.3197 $\pm$ 0.4521 & 0.9965 $\pm$ 0.0005 & 0.9974 $\pm$ 0.0000 & 0.9813 & 0.9987\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+WebAttack & 0.0490 $\pm$ 0.0693 & 0.6627 $\pm$ 0.4207 & 0.9691 $\pm$ 0.0058 & 0.9831 & 0.9870\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+Infiltration & 0.0000 $\pm$ 0.0000 & 0.3767 $\pm$ 0.0669 & 0.4362 $\pm$ 0.0502 & 0.7954 & 0.8148\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
+Heartbleed & 0.3333 $\pm$ 0.4714 & 0.6000 $\pm$ 0.4320 & 0.9524 $\pm$ 0.0673 & 1.0000 & 1.0000\\ % src: results/aggregated/federated_per_family.csv; results/aggregated/centralized_per_family.csv; results/aggregated/xgboost_per_family.csv
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -336,7 +338,7 @@ Heartbleed & 0.3333 $\pm$ 0.4714 & 0.6000 $\pm$ 0.4320 & 0.9524 $\pm$ 0.0673 & 1
 The centralized and XGBoost per-class columns are from
 \texttt{results/aggregated/centralized\_per\_family.csv} and
 \texttt{xgboost\_per\_family.csv}. With every class counted, centralized macro-F1 is
-0.9695 and XGBoost 0.9752 (means over seeds). % src: results/aggregated/centralized_headline.csv
+0.9695 and XGBoost 0.9752 (means over seeds). % src: results/aggregated/centralized_headline.csv; results/aggregated/xgboost_headline.csv
 
 % -------------------------------------------------------------------------------------
 \section{Explanation Check, Full}
@@ -361,7 +363,7 @@ The quartiles were computed for this paper from
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lccc@{}}
 \toprule
- & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$\\
+ & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$\\ % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \midrule
 Eligible / all rows & 220 / 406 & 388 / 420 & 420 / 420\\ % src: site/public/data/agreement_by_alpha.json
 Jaccard@5 & 0.250 & 0.429 & 0.667\\ % src: site/public/data/agreement_by_alpha.json
@@ -380,7 +382,7 @@ Weighted $\tau$ & 0.592 [0.413, 0.712] & 0.787 [0.725, 0.827] & 0.844 [0.818, 0.
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}l rcc rcc rcc@{}}
 \toprule
- & \multicolumn{3}{c}{$\alpha=0.1$} & \multicolumn{3}{c}{$\alpha=0.5$} & \multicolumn{3}{c}{$\alpha=5.0$}\\
+ & \multicolumn{3}{c}{$\alpha=0.1$} & \multicolumn{3}{c}{$\alpha=0.5$} & \multicolumn{3}{c}{$\alpha=5.0$}\\ % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(l){8-10}
 Family & $n$ & Jaccard@10 & $\tau$ & $n$ & Jaccard@10 & $\tau$ & $n$ & Jaccard@10 & $\tau$\\
 \midrule
@@ -397,7 +399,7 @@ WebAttack & 16 & 0.292 [0.250, 0.333] & 0.416 [0.335, 0.583] & 48 & 0.538 [0.429
 
 \subsection{Reference lines and uncertainty}
 Chance Jaccard@$k$ is the ratio of the expected intersection $k^2/n$ to the expected
-union $2k-k^2/n$ for two independent uniform $k$-subsets of $n$ items; with $k=10$ and
+union $2k-k^2/n$ for two independent uniform $k$-subsets of $n$ items; with $k=10$ and % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 $n=82$ it is 0.065. The instability floor uses three centralized models (seeds 42, 1337, % src: docs/measurement_protocol.md
 2024) explained with the same 14 rows, 4000 samples and class-stratified 200-row % src: docs/measurement_protocol.md
 background construction as the federated pipeline. Table~\ref{tab:floor} gives each seed
@@ -405,7 +407,7 @@ pair; the floor is the median of the pair medians, with their range.
 
 \begin{table}[h]
 \centering
-\caption{Centralized-seed instability floor per seed pair (median over 14 rows)}
+\caption{Centralized-seed instability floor per seed pair (median over 14 rows)} % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \label{tab:floor}
 \footnotesize
 \begin{tabular}{@{}lrr@{}}
@@ -424,17 +426,18 @@ The cluster bootstrap resamples (seed, silo) clusters with replacement, 10,000 t
 (29 clusters at $\alpha=0.1$), and takes the median of all rows in each resample. At % src: site/public/data/ci.json
 $\alpha=0.1$ the 95\% percentile interval is [0.250, 0.429] for Jaccard@10 and % src: site/public/data/ci.json
 [0.541, 0.661] for weighted $\tau$. The Jaccard interval overlaps the floor range, so the % src: site/public/data/ci.json
-below-floor reading at $\alpha=0.1$ is directional, not significant. An interval was
-computed only for $\alpha=0.1$; none exists on disk for the other two levels.
+below-floor reading at $\alpha=0.1$ is directional, not significant. An interval was % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
+computed only for $\alpha=0.1$; none exists on disk for the other two levels. % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 
 \subsection{Size and label skew}
 Under the partitioner, a silo's size is $\sum_k N_k\,p_k[i]$, a function of the same
 draw that sets its skew. A raw size correlation therefore restates the skew effect:
 silo size and Jaccard@10 correlate at $r=+0.46$ at $\alpha=0.1$ and $r=+0.07$ at % src: docs/contribution_a_results.md
-$\alpha=5.0$. Label entropy over the nine classes was the covariate fixed in advance. Its
-zero-order correlation with agreement at $\alpha=0.5$ was weak and negative, and after
-conditioning on log size its partial correlation changed sign, so it was dropped. KL
-divergence from the global family distribution was tested next (Table~\ref{tab:kl}).
+$\alpha=5.0$. Label entropy over the nine classes was the covariate fixed in advance. Its % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
+zero-order correlation with agreement at $\alpha=0.5$ was weak and negative, and after % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
+conditioning on log size its partial correlation changed sign, so it was dropped. We
+then tried the KL divergence between each silo's label mix and the global one
+(Table~\ref{tab:kl}).
 Fig.~\ref{fig:kl} shows the per-silo values. A design that varies size and skew
 independently is not possible with this partitioner, so the analysis stays observational.
 
@@ -445,7 +448,7 @@ independently is not possible with this partitioner, so the analysis stays obser
 \footnotesize
 \begin{tabular}{@{}llllr@{}}
 \toprule
-Order & Covariate & $\alpha$ & Partial $r$ (J@10 / $\tau$) & $n$\\
+Order & Covariate & $\alpha$ & Partial $r$ (J@10 / $\tau$) & $n$\\ % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \midrule
 1st & entropy & 0.5 & $+0.23$ / $+0.13$ & 30\\ % src: docs/contribution_a_results.md
 2nd & KL from global & 0.1 & $-0.57$ / -- & 29\\ % src: docs/contribution_a_results.md
@@ -458,7 +461,7 @@ Order & Covariate & $\alpha$ & Partial $r$ (J@10 / $\tau$) & $n$\\
 \centering
 \includegraphics[width=\columnwidth]{figs/fig_kl_scatter.pdf}
 \caption{Per-silo KL divergence from the global label mix against Jaccard@10 (final
-round). Filled: seed 42; open square and triangle: seeds 1337 and 2024.}
+round). Filled: seed 42; open square and triangle: seeds 1337 and 2024.} % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \label{fig:kl}
 \end{figure}
 
@@ -479,7 +482,7 @@ trend; it is directional.
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
-Metric & $\alpha$ & Rd 5 & Rd 10 & Rd 15 & Rd 20\\
+Metric & $\alpha$ & Rd 5 & Rd 10 & Rd 15 & Rd 20\\ % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \midrule
 Jaccard@10 & 0.1 & 0.359 & 0.350 & 0.334 & 0.336\\ % src: docs/contribution_a_results.md
  & 0.5 & 0.560 & 0.542 & 0.548 & 0.531\\ % src: docs/contribution_a_results.md
@@ -504,15 +507,15 @@ Val macro-F1 & 0.1 & 0.460 & 0.461 & 0.464 & 0.506\\ % src: docs/contribution_a_
 \subsection{FedProx at $\mu=0.0005$}
 FedProx~\cite{li2020fedprox} was run at one value, $\mu=0.0005$, carried forward from an % src: docs/contribution_a_results.md
 exploratory run; it was never swept. Table~\ref{tab:fedprox} compares it with FedAvg per
-seed using the mean over eligible rows (not the median used elsewhere). At $\alpha=0.5$
+seed using the mean over eligible rows (not the median used elsewhere). At $\alpha=0.5$ % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 Jaccard@10 rises in all three seeds while test macro-F1 moves by small amounts of mixed
-sign. At $\alpha=0.1$ agreement and accuracy move together in each seed, so $n=3$ cannot
+sign. At $\alpha=0.1$ agreement and accuracy move together in each seed, so $n=3$ cannot % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 separate an explanation effect from an accuracy effect; we treat it as inconclusive. At
-$\alpha=5.0$ there is no consistent change.
+$\alpha=5.0$ there is no consistent change. % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 
 \begin{table*}[t]
 \centering
-\caption{FedAvg vs FedProx ($\mu=0.0005$): mean agreement over eligible rows and test macro-F1 per seed}
+\caption{FedAvg vs FedProx ($\mu=0.0005$): mean agreement over eligible rows and test macro-F1 per seed} % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \label{tab:fedprox}
 \footnotesize
 \begin{tabular}{@{}ll rrr rrr rrr@{}}
@@ -535,12 +538,12 @@ $\alpha$ & Seed & FedAvg & FedProx & $\Delta$ & FedAvg & FedProx & $\Delta$ & Fe
 \end{table*}
 
 \subsection{Parity monitor}
-The parity monitor turns each silo's top-10 index list into a leave-one-out deviation
+The parity monitor turns each silo's top-10 index list into a leave-one-out deviation % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 from the fleet consensus and flags silos whose modified z-score, computed from the
 median and the median absolute deviation, exceeds 3.5~\cite{iglewicz1993}. It uses only % src: docs/contribution_a_results.md
 what would cross the client-server boundary. Over the full sweep (9 configurations, % src: docs/contribution_a_results.md
 4 rounds, 356 rows) it raised 3 flags, all at $\alpha=0.5$, round 5 % src: docs/contribution_a_results.md
-(Table~\ref{tab:parity}). Zero flags at $\alpha=0.1$ does not mean the fleet is healthy:
+(Table~\ref{tab:parity}). Zero flags at $\alpha=0.1$ does not mean the fleet is healthy: % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 at round 5 the median deviation across 29 eligible silos was 0.694, worse than any of % src: docs/contribution_a_results.md
 the flagged values, but every silo diverged about equally, so none stood out.
 
@@ -560,9 +563,9 @@ Run & Seed & Silo & Deviation\\
 \end{tabular}
 \end{table}
 
-An earlier single-draw version flagged two silos in \texttt{fedavg\_a0.1\_s1337}, round 5
-(deviations 0.947 and 0.889), that did not reproduce when the same checkpoints were % src: docs/contribution_a_results.md
-explained again. The cached draw happened to produce many tied deviations, which shrank
+When the monitor still relied on one explainer draw, it flagged two silos of % src: docs/contribution_a_results.md
+\texttt{fedavg\_a0.1\_s1337} at round 5 (deviations 0.947 and 0.889); explaining the same % src: docs/contribution_a_results.md
+checkpoints again did not reproduce either flag. The cached draw happened to produce many tied deviations, which shrank
 that round's median absolute deviation to 0.042, about a third of what fresh draws gave. % src: docs/contribution_a_results.md
 The threshold formula was sound; judging it on one draw was not. The monitor now explains
 each checkpoint three times with fixed seeds (1001, 2002, 3003), computes each draw's % src: docs/contribution_a_results.md
@@ -570,15 +573,15 @@ deviation separately and averages before thresholding.
 
 \subsection{Faithfulness and explainer checks}
 Deletion and insertion curves~\cite{petsiuk2018} replace features by the model's
-training mean in ranked order. They were run for one configuration ($\alpha=0.5$, seed
-42) on the global model and three of ten silos (Table~\ref{tab:faith}). Every deletion
+training mean in ranked order. They were run for one configuration ($\alpha=0.5$, seed % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
+42) on the global model and three of ten silos (Table~\ref{tab:faith}). Every deletion % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 AUC lies below the matching insertion AUC, which fits attributions that track the
 model. There is no agreed threshold for these AUCs, and nothing downstream is gated on
 them; this is a spot-check, not a gate.
 
 \begin{table}[h]
 \centering
-\caption{Deletion (lower is better) and insertion (higher is better) AUC, $\alpha=0.5$, seed 42}
+\caption{Deletion (lower is better) and insertion (higher is better) AUC, $\alpha=0.5$, seed 42} % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 \label{tab:faith}
 \footnotesize
 \begin{tabular}{@{}lrr@{}}
@@ -613,7 +616,7 @@ agreement could be inflated. The concern was tested and not confirmed; thin supp
 (3,527 Bot and 1,542 WebAttack training rows) explains their behaviour better. % src: docs/contribution_a_results.md
 
 \subsection{An open pattern at $\alpha=0.5$}
-Three separate analyses single out $\alpha=0.5$: all parity flags occur there, the KL
+Three separate analyses single out $\alpha=0.5$: all parity flags occur there, the KL % src: docs/contribution_a_results.md; docs/measurement_protocol.md; PROJECT_INSTRUCTIONS.md
 partial correlation is strongest there, and the FedProx agreement gain is clean only
 there. We record this as an open pattern and propose no mechanism.
 
@@ -626,19 +629,20 @@ residual is the largest over classes of $|\sum\mathrm{SHAP}-(f(x)-E[f])|$ divide
 largest over classes of $|f(x)-E[f]|$.
 
 \emph{Validation pool.} For the served model, 500 validation rows were explained with % src: results/shap/fedavg_a0.5_s42/val_pool_summary.json
-4000 samples (Table~\ref{tab:valpool}). Eighteen rows exceed 8\%, mostly Bot (7), Benign % src: PROJECT_INSTRUCTIONS.md
-(4) and WebAttack (4); the maximum, 21.2\%, is one Infiltration row. An earlier % src: PROJECT_INSTRUCTIONS.md
-``3--8\%'' figure had no backing file and was dropped. It cannot be recomputed for the 14
-test rows, because their stored SHAP files hold no model outputs.
+4000 samples (Table~\ref{tab:valpool}). Of the 18 rows above 8\%, seven are Bot, four % src: PROJECT_INSTRUCTIONS.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
+Benign and four WebAttack; the worst case, at 21.2\%, is an Infiltration row. A range % src: PROJECT_INSTRUCTIONS.md
+of ``3--8\%'' quoted in earlier project notes could not be traced to any file, so we % src: PROJECT_INSTRUCTIONS.md
+dropped it. For the 14 test rows the residual cannot be recomputed at all: their saved % src: PROJECT_INSTRUCTIONS.md
+SHAP files lack the model outputs it needs.
 
 \begin{table}[h]
 \centering
-\caption{Additivity residuals on 500 validation rows}
+\caption{Additivity residuals on 500 validation rows} % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 \label{tab:valpool}
 \footnotesize
 \begin{tabular}{@{}lrrr@{}}
 \toprule
- & Median & p95 & Max\\
+ & Median & p95 & Max\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 \midrule
 Relative & 3.2\% & 7.7\% & 21.2\%\\ % src: PROJECT_INSTRUCTIONS.md
 Absolute (logit) & 0.472 & 1.105 & 3.336\\ % src: docs/contribution_a_results.md
@@ -646,22 +650,22 @@ Absolute (logit) & 0.472 & 1.105 & 3.336\\ % src: docs/contribution_a_results.md
 \end{tabular}
 \end{table}
 
-\emph{Audit of stored residuals.} Each stored file records the largest residual over its
-14 rows, so comparing it with a per-row maximum is coarse. Table~\ref{tab:residaudit}
+\emph{Audit of stored residuals.} A stored value is the worst residual among 14 rows, % src: PROJECT_INSTRUCTIONS.md
+which makes any comparison with a single-row maximum rough. Table~\ref{tab:residaudit} % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 counts files above the validation-pool maximum of 3.336. Among final-round FedAvg files, % src: results/inspection/residual_audit_summary.json
 4 of 99 exceed it: silos 3 and 9 of $\alpha=0.1$ seed 42, silo 8 of $\alpha=0.1$ seed % src: results/inspection/residual_audit_summary.json
-1337 (two of the three are the smallest silo in their configuration), and the global
+1337 (two of these three silos are the smallest in their run), and the global % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 model of $\alpha=5.0$ seed 1337 (3.500). Stored values range from 0.156 to 15.874. % src: docs/contribution_a_results.md
 
 \begin{table}[h]
 \centering
-\caption{Stored residual files above 3.336, and Spearman $r$ between silo residual and Jaccard@10 (FedAvg, final round)}
+\caption{Stored residual files above 3.336, and Spearman $r$ between silo residual and Jaccard@10 (FedAvg, final round)} % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 \label{tab:residaudit}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Pass & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$ & Silo / global\\
+Pass & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$ & Silo / global\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; results/shap/fedavg_a0.5_s42/val_pool_summary.json
 \midrule
 FedAvg final & 3/33 & 0/33 & 1/33 & 3/90, 1/9\\ % src: results/inspection/residual_audit_summary.json
 FedAvg round-wise & 26/132 & 0/132 & 5/132 & 29/360, 2/36\\ % src: results/inspection/residual_audit_summary.json
@@ -673,27 +677,29 @@ Spearman $r$ ($n$), final & $-0.237$ (29) & 0.202 (30) & 0.11 (30) & \\ % src: r
 \end{table}
 
 \emph{Sensitivity.} The exclusion rule was fixed before computing: drop any silo whose
-final-round residual exceeds 3.336. At $\alpha=0.1$ this removes 2 silos with eligible % src: results/inspection/residual_sensitivity.json
-rows (8 of 220 rows); Jaccard@10 stays at 0.333 and weighted $\tau$ moves from 0.592 to % src: PROJECT_INSTRUCTIONS.md
-0.597. Nothing is removed at $\alpha=0.5$ or $5.0$. \emph{Post-hoc, outside the rule:} % src: PROJECT_INSTRUCTIONS.md
-dropping the whole $\alpha=5.0$ seed-1337 run, whose global model is flagged, leaves
-Jaccard@10 at 0.667 and $\tau$ at 0.844. % src: PROJECT_INSTRUCTIONS.md
+final-round residual exceeds 3.336. At $\alpha=0.1$ the rule takes out two silos that % src: PROJECT_INSTRUCTIONS.md
+contribute eligible rows, 8 of the 220; the Jaccard@10 median does not move from 0.333, % src: PROJECT_INSTRUCTIONS.md
+and the $\tau$ median goes from 0.592 to 0.597. % src: PROJECT_INSTRUCTIONS.md
+Nothing is removed at $\alpha=0.5$ or $5.0$. \emph{Post-hoc, outside the rule:} % src: PROJECT_INSTRUCTIONS.md
+if the whole $\alpha=5.0$ seed-1337 run is removed because its global model is flagged, % src: PROJECT_INSTRUCTIONS.md
+the $\alpha=5.0$ medians are still 0.667 for Jaccard@10 and 0.844 for $\tau$. % src: PROJECT_INSTRUCTIONS.md
 
 % -------------------------------------------------------------------------------------
 \section{Trust Check, Full}
 \label{app:trust}
 This appendix gives every phase of the trust check, supporting Section~VI-C. Unless
-stated, results are for $\alpha=0.5$, seed 42, 10 silos and 20 rounds; Phase 2, the
+stated, results are for $\alpha=0.5$, seed 42, 10 silos and 20 rounds; Phase 2, the % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 Phase 4 matrix and the gradual attack are single runs by design. The attack is a
 worst-case, full-knowledge construction throughout.
 
 \subsection{Phase 0: attack construction and strength}
 The attack flips 40\% of each malicious silo's non-Benign rows to Benign (seed 9001). % src: docs/contribution_b_results.md
-The attacker set maximises the minimum per-family coverage over the six non-Benign
-headline families at flip fraction 1.0 across all $\binom{10}{3}=120$ triples; $\{0,3,5\}$ % src: docs/contribution_b_results.md
-reaches 38.60\% (on DoS). A secondary $f=2$ condition, $\{0,3\}$, reaches 16.73\%. An % src: docs/contribution_b_results.md
+Among all $\binom{10}{3}=120$ triples, the attacker set is the one whose weakest % src: docs/contribution_b_results.md
+attack family would be most covered if every eligible row were flipped; for
+$\{0,3,5\}$ that weakest family is DoS, at 38.60\%. % src: docs/contribution_b_results.md
+A secondary $f=2$ condition, $\{0,3\}$, reaches 16.73\%. An % src: docs/contribution_b_results.md
 earlier rule that picked size-representative silos $\{0,1,9\}$ reached 13.98\% coverage % src: docs/contribution_b_results.md
-with three families under 5\% and was retired as too weak. Logged flips matched the
+with three families under 5\% and was retired as too weak. Logged flips matched the % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 expected coverage within one to two percentage points on every family.
 Table~\ref{tab:phase0} reports all four statistics; Fig.~\ref{fig:phase0} shows the
 curves. The final-five mean drops by 3.7 to 7.7 points and orders correctly by coverage, % src: docs/contribution_b_results.md
@@ -702,13 +708,13 @@ maximum is insensitive to such a shift. Both statistics are therefore always rep
 
 \begin{table*}[t]
 \centering
-\caption{Phase 0: validation macro-F1 over 20 rounds ($\Delta$ vs clean)}
+\caption{Phase 0: validation macro-F1 over 20 rounds ($\Delta$ vs clean)} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:phase0}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Statistic & Clean & $\{0,1,9\}$ (retired) & $\{0,3,5\}$, $f=3$ & $\{0,3\}$, $f=2$\\
+Statistic & Clean & $\{0,1,9\}$ (retired) & $\{0,3,5\}$, $f=3$ & $\{0,3\}$, $f=2$\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 Mean & 0.8535 & 0.8180 ($-0.0355$) & 0.8236 ($-0.0299$) & 0.8253 ($-0.0282$)\\ % src: docs/contribution_b_results.md
 Median & 0.8487 & 0.8436 ($-0.0051$) & 0.8438 ($-0.0048$) & 0.8489 (+0.0003)\\ % src: docs/contribution_b_results.md
@@ -721,8 +727,8 @@ Max & 0.9760 & 0.9710 ($-0.0049$) & 0.9763 (+0.0004) & 0.9867 (+0.0107)\\ % src:
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig_phase0_curves.pdf}
-\caption{Validation macro-F1 of the clean run and the three $\{0,3,5\}$/$\{0,3\}$
-poisoned runs at seed 42; shaded: final-five window.}
+\caption{Validation macro-F1 of the clean run and the three $\{0,3,5\}$/$\{0,3\}$ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
+poisoned runs at seed 42; shaded: final-five window.} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{fig:phase0}
 \end{figure}
 
@@ -735,7 +741,7 @@ non-monotonic ($-0.001$ to $-0.041$). % src: docs/contribution_b_results.md
 
 \begin{table}[h]
 \centering
-\caption{Sudden vs gradual $\{0,3,5\}$ ($\Delta$ vs clean)}
+\caption{Sudden vs gradual $\{0,3,5\}$ ($\Delta$ vs clean)} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:gradual}
 \footnotesize
 \begin{tabular}{@{}lrrr@{}}
@@ -767,7 +773,7 @@ silos narrows under attack in every round.
 \footnotesize
 \begin{tabular}{@{}lrrrrrrl@{}}
 \toprule
-Statistic & $f=3$ poisoned & $f=3$ control & Ratio & $f=2$ poisoned & $f=2$ control & Ratio & Verdict\\
+Statistic & $f=3$ poisoned & $f=3$ control & Ratio & $f=2$ poisoned & $f=2$ control & Ratio & Verdict\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 train\_loss & 140.9 & 4.17 & 33.8$\times$ & 51.8 & 0.34 & 154.3$\times$ & clear separation\\ % src: docs/contribution_b_results.md
 cosine\_to\_peer\_mean & 1.78 & 1.59 & 1.11$\times$ & 1.24 & 1.06 & 1.17$\times$ & within natural variance\\ % src: docs/contribution_b_results.md
@@ -791,12 +797,12 @@ Multi-Krum and trimmed mean.
 
 \begin{table*}[t]
 \centering
-\caption{Phase 2 outcomes: validation macro-F1 statistics over 20 rounds and recovery fraction}
+\caption{Phase 2 outcomes: validation macro-F1 statistics over 20 rounds and recovery fraction} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:phase2}
 \footnotesize
 \begin{tabular}{@{}llrrrrrl@{}}
 \toprule
-Defence & Condition & Mean & Median & Final-5 & Max & Recovery & Verdict\\
+Defence & Condition & Mean & Median & Final-5 & Max & Recovery & Verdict\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 Multi-Krum & $f=3$ $\{0,3,5\}$ & 0.7716 & 0.8018 & 0.8534 & 0.8633 & $-0.2766$ & fails\\ % src: docs/contribution_b_results.md
 Multi-Krum & $f=2$ $\{0,3\}$ & 0.8368 & 0.8474 & 0.9766 & 0.9812 & 1.3490 & ``succeeds'': compositional artifact\\ % src: docs/contribution_b_results.md
@@ -818,7 +824,7 @@ so $f/n$ is its chance rate. Classical Krum always excludes nine, so its chance 
 never excluded a malicious silo. Instead it removed the same large, Benign-heavy silos
 (30.3\% and 23.0\% of the fleet, over 90\% Benign) in every round of every condition, % src: docs/contribution_b_results.md
 including the clean control, where it excluded exactly $\{2,7,9\}$ in 20 of 20 rounds. % src: docs/contribution_b_results.md
-At $f=2$, dropping $\{2,7\}$ raises the malicious silos' weight in the surviving aggregate
+At $f=2$, dropping $\{2,7\}$ raises the malicious silos' weight in the surviving aggregate % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 from 9.8\% to 21.0\% while they stay fully included, so the 1.3490 recovery cannot be % src: docs/contribution_b_results.md
 mitigation; a defence cannot beat the no-attack run by removing an attack it kept. At
 $f=3$ the same mechanism ($\{2,7,9\}$ removed) lifts the malicious share to 32.6\%. % src: docs/contribution_b_results.md
@@ -840,10 +846,10 @@ Classical Krum & $f=2$ & 1.0000 & 0.900\\ % src: docs/contribution_b_results.md
 \end{tabular}
 \end{table}
 
-\emph{Trimmed mean.} Its chance baseline is $2\beta$, not $f/n$: the trim count per
-coordinate is set by $\beta$ at both ends. The raw malicious excess over $2\beta$ is
+\emph{Trimmed mean.} Its chance baseline is $2\beta$, not $f/n$: the trim count per % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
+coordinate is set by $\beta$ at both ends. The raw malicious excess over $2\beta$ is % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 small and positive (+0.0551 at $f=3$, +0.0556 at $f=2$), but splitting the clean silos % src: docs/contribution_b_results.md
-into ordinary (1, 4, 6, 8) and large Benign-heavy (2, 7, 9) shows the composition excess
+into ordinary (1, 4, 6, 8) and large Benign-heavy (2, 7, 9) shows the composition excess % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 is larger than the malicious one (Table~\ref{tab:trim}). In the clean control the
 $\{2,7,9\}$ excess is +0.1726, within 0.002--0.006 of both attack runs; silos 3 and 5, % src: docs/contribution_b_results.md
 the label-mix extremes (0.3\% and 0.1\% Benign), trim even more (0.7606 and 0.7216). % src: docs/contribution_b_results.md
@@ -867,18 +873,18 @@ $f=2$ & 0.3191 & +0.1365 & +0.1787\\ % src: docs/contribution_b_results.md
 \subsection{Phase 3: ByzAgent}
 \emph{Model selection.} Three local models were tried on 22 synthetic cases % src: docs/contribution_b_results.md
 (Table~\ref{tab:llmselect}); all fit in 6\,GB of VRAM (3.7--4.8\,GB resident) and unload % src: docs/contribution_b_results.md
-within 3--8\,s. Llama~3.1 8B was chosen. Asking it to cite the numbers it used raised % src: docs/contribution_b_results.md
-the share of explanations that cite real values to 91.6\% on a held-out synthetic subset. % src: docs/contribution_b_results.md
+within 3--8\,s. Llama~3.1 8B was chosen. Telling it to quote the values behind each % src: docs/contribution_b_results.md
+decision lifted grounded explanations to 91.6\% on held-out synthetic cases. % src: docs/contribution_b_results.md
 
 \begin{table}[h]
 \centering
-\caption{Agent model selection on 22 synthetic cases}
+\caption{Agent model selection on 22 synthetic cases} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:llmselect}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Model (4-bit) & JSON parse & ID coverage & Cites real numbers\\
+Model (4-bit) & JSON parse & ID coverage & Cites real numbers\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 llama3.1:8b-instruct & 100\% & 100\% & 65.1\%\\ % src: docs/contribution_b_results.md
 qwen2.5:7b-instruct & 100\% & 100\% & 0.8\%\\ % src: docs/contribution_b_results.md
@@ -907,7 +913,7 @@ aggregate that is never shipped. An earlier summary claimed that the asymmetry a
 the oracle-$f$ baselines was also written to a file named \texttt{agent\_config.json};
 no such file exists, and the claim has been corrected rather than back-filled.
 
-\emph{Decisions.} Table~\ref{tab:agentdec} counts flags over 200 silo-rounds per
+\emph{Decisions.} Table~\ref{tab:agentdec} counts flags over 200 silo-rounds per % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 condition, and Table~\ref{tab:agentsilo} gives per-silo rates. The malicious silos and a % src: docs/contribution_b_results.md
 never-malicious silo (8) are the four lowest-Benign silos at seed 42 (9.2\%, 0.3\%, 0.1\% % src: docs/contribution_b_results.md
 and 12.3\% Benign, against 81.5--98.0\% for the rest). Their flag rates are already % src: docs/contribution_b_results.md
@@ -917,7 +923,7 @@ same confound.
 
 \begin{table}[h]
 \centering
-\caption{ByzAgent flags (downweight or quarantine), seed 42}
+\caption{ByzAgent flags (downweight or quarantine), seed 42} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:agentdec}
 \footnotesize
 \begin{tabular}{@{}lll@{}}
@@ -933,13 +939,13 @@ $f=2$ $\{0,3\}$ & 40/40 = 1.00 & 41/160 = 0.256\\ % src: docs/contribution_b_res
 
 \begin{table}[h]
 \centering
-\caption{Per-silo ByzAgent flag rate, seed 42 (others: silos 1, 2, 4, 6, 7, 9)}
+\caption{Per-silo ByzAgent flag rate, seed 42 (others: silos 1, 2, 4, 6, 7, 9)} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:agentsilo}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
-Silo & Role & Clean & $f=3$ & $f=2$ & Benign\\
+Silo & Role & Clean & $f=3$ & $f=2$ & Benign\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 0 & mal.\ (both) & 0.95 & 1.00 & 1.00 & 9.2\%\\ % src: docs/contribution_b_results.md
 3 & mal.\ (both) & 1.00 & 1.00 & 1.00 & 0.3\%\\ % src: docs/contribution_b_results.md
@@ -951,8 +957,9 @@ others & never & 0.00--0.25 & 0.00--0.05 & 0.00--0.05 & 81.5--98.0\%\\ % src: do
 \end{table}
 
 \emph{Why no matched control exists.} In this partition, holding enough attack traffic
-to poison well and having a low Benign share are the same property. The six high-Benign
-silos together hold 211 of the federation's 3,174 Bot rows (6.65\%). The best triple % src: docs/contribution_b_results.md
+to poison well and having a low Benign share are the same property. Of the 3,174 Bot % src: docs/contribution_b_results.md
+rows in the federation, the six high-Benign silos own just 211 (6.65\%). % src: docs/contribution_b_results.md
+The best triple % src: docs/contribution_b_results.md
 from that group, $\{2,4,9\}$, reaches 5.42\% minimum coverage against 38.60\% for % src: docs/contribution_b_results.md
 $\{0,3,5\}$ (7.1 times weaker); the best pair, $\{2,4\}$, reaches 4.35\% against 16.73\% % src: docs/contribution_b_results.md
 (3.85 times). A control that is both compositionally ordinary and strong cannot be built. % src: docs/contribution_b_results.md
@@ -976,7 +983,7 @@ update norm (25.1\% to 42.6\%); training loss (3.8\% to 4.7\%) and validation ac
 
 \begin{table}[h]
 \centering
-\caption{Seed 42: citation frequency (clean / $f=3$ / $f=2$), decision-severity $\rho$, citation strict error}
+\caption{Seed 42: citation frequency (clean / $f=3$ / $f=2$), decision-severity $\rho$, citation strict error} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:fidelity42}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
@@ -995,12 +1002,12 @@ cosine\_to\_peer\_mean & 7 / 11.5 / 3\% & +0.298 & too few\\ % src: docs/contrib
 
 \begin{table}[h]
 \centering
-\caption{Decision-severity correlation: seed 42 vs pooled seeds 1337/2024 ($n=800$)}
+\caption{Decision-severity correlation: seed 42 vs pooled seeds 1337/2024 ($n=800$)} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:fidelitynew}
 \footnotesize
 \begin{tabular}{@{}lrr@{}}
 \toprule
-Statistic & Seed 42 & New seeds\\
+Statistic & Seed 42 & New seeds\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 val\_accuracy & $-0.745$ & $-0.577$\\ % src: docs/contribution_b_results.md
 cosine\_to\_global & $-0.808$ & $-0.474$\\ % src: docs/contribution_b_results.md
@@ -1011,16 +1018,16 @@ cosine\_to\_peer\_mean & +0.298 & $-0.118$\\ % src: docs/contribution_b_results.
 \end{tabular}
 \end{table}
 
-At the new seeds, update norm loses its link with the decisions and its sign flips, yet
-it is still cited in about 59\% of explanations and is wrong in 42.6\% of the citations % src: docs/contribution_b_results.md
-checked, above the coin-flip line once ambiguous cases are excluded. The project's
+At the new seeds, update norm no longer tracks the decisions and its sign even reverses.
+The agent nonetheless mentions it in roughly 59\% of explanations, and 42.6\% of those % src: docs/contribution_b_results.md
+mentions misstate it, which is worse than a coin flip once ambiguous cases are set aside. The project's
 wording follows from these numbers: ByzAgent produces decisions plus a rationale of
 measured fidelity.
 
 \subsection{Multi-seed validation and the ceiling effect}
-Partitions at seeds 1337 and 2024 match the manifest exactly. Neither reproduces seed
+Partitions at seeds 1337 and 2024 match the manifest exactly. Neither reproduces seed % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 42's bimodal composition (a 69-point gap between extreme and ordinary silos). At seed % src: docs/contribution_b_results.md
-1337 only silo 5 of the attacker set is extreme, and silo 0 is the most ordinary silo in
+1337 only silo 5 of the attacker set is extreme, and silo 0 is the most ordinary silo in % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 the fleet (95.44\% Benign), which lets the two hypotheses make opposite predictions. At % src: docs/contribution_b_results.md
 these seeds $\{0,3,5\}$ is a weaker attack: rank 8 of 120 at seed 1337 and 33 of 120 at % src: docs/contribution_b_results.md
 seed 2024, with weakest-family coverage of 7.91\% (Bot) and 4.85\% (BruteForce). % src: docs/contribution_b_results.md
@@ -1028,12 +1035,12 @@ Table~\ref{tab:portability} shows that the macro-F1 effect does not reproduce.
 
 \begin{table}[h]
 \centering
-\caption{Attack effect by seed, $\{0,3,5\}$ sudden ($\Delta$ vs clean)}
+\caption{Attack effect by seed, $\{0,3,5\}$ sudden ($\Delta$ vs clean)} % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:portability}
 \footnotesize
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Seed & Mean & Median & Final-5 mean & Max\\
+Seed & Mean & Median & Final-5 mean & Max\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 42 & $-0.0299$ & $-0.0048$ & $-0.0766$ & +0.0004\\ % src: docs/contribution_b_results.md
 1337 & $-0.0095$ & +0.0052 & +0.0274 & +0.0017\\ % src: docs/contribution_b_results.md
@@ -1043,7 +1050,7 @@ Seed & Mean & Median & Final-5 mean & Max\\
 \end{table}
 
 Table~\ref{tab:lift} gives lift over each silo's own clean rate (also Fig.~\ref{fig:lift}).
-Where the clean rate is low, the agent responds to the attack: silo 5 at seed 1337
+Where the clean rate is low, the agent responds to the attack: silo 5 at seed 1337 % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 (+0.95) and seed 2024 (+0.75), silo 3 at seed 1337 (+0.40). Where it is already at the % src: docs/contribution_b_results.md
 ceiling (silo 3 at seed 2024, clean 1.00) lift stays flat. Canary silos that are extreme % src: docs/contribution_b_results.md
 but never malicious saturate at 1.00 at seed 1337 (silos 2, 4, 7); at seed 2024 silo 9 % src: docs/contribution_b_results.md
@@ -1061,7 +1068,7 @@ little attack to see''.
 \footnotesize
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Seed & Silo 0 & Silo 3 & Silo 5\\
+Seed & Silo 0 & Silo 3 & Silo 5\\ % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 42 & +0.05 & +0.00 & +0.00\\ % src: docs/contribution_b_results.md
 1337 & +0.05 & +0.40 & +0.95\\ % src: docs/contribution_b_results.md
@@ -1071,7 +1078,7 @@ Seed & Silo 0 & Silo 3 & Silo 5\\
 \end{table}
 
 The resulting claim, which replaces the stronger reading that the agent tracks only
-composition, is the one stated in Section~VI-C. It bounds the seed-42 result without
+composition, is the one stated in Section~VI-C. It bounds the seed-42 result without % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 retracting it. An attacker set pinned by silo index and chosen at one seed changes
 strength and character under another partition draw; this is a methodological point
 about how attackers are specified in non-IID FL studies.
@@ -1080,7 +1087,7 @@ about how attackers are specified in non-IID FL studies.
 The rolling-history variant shows the agent the last five rounds per silo (fewer early % src: docs/contribution_b_results.md
 on, disclosed in the prompt). It was tested in a six-cell matrix (three conditions, two
 modes; 138 live calls) under a rule written before the data existed: if the history % src: docs/contribution_b_results.md
-mode's lift is comparable to the current-round lift, or if canary silo 8 rises with the
+mode's lift is comparable to the current-round lift, or if canary silo 8 rises with the % src: docs/contribution_b_results.md; PROJECT_INSTRUCTIONS.md
 malicious silos, history does not separate them. Tables~\ref{tab:phase4} and
 \ref{tab:phase4lift} give the results. The canary's history lift (+0.60 sudden, +0.45 % src: docs/contribution_b_results.md
 gradual) equals or exceeds every malicious silo's, so the negative branch applies. Its
@@ -1150,14 +1157,14 @@ two parts: the selection rule and candidates before any candidate run, and the c
 configuration with sealed checkpoints before the single test evaluation.
 
 \emph{Question and candidates.} Does another federated optimizer raise macro-F1 over
-FedAvg, mainly at $\alpha=0.1$? Table~\ref{tab:prereggrid} lists the ten configurations.
+FedAvg, mainly at $\alpha=0.1$? Table~\ref{tab:prereggrid} lists the ten configurations. % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 FedAdam and FedYogi use $\beta_1=0.9$, $\beta_2=0.99$, $\tau=0.001$, Flower's defaults. % src: docs/preregistration_accuracy.md
 SCAFFOLD was not run: Flower has no strategy for it, it needs client state across rounds,
 and its correction assumes local SGD while ours is AdamW.
 
 \begin{table}[h]
 \centering
-\caption{Preregistered candidate grid (server lr 1.0 for FedAvgM)}
+\caption{Preregistered candidate grid (server lr 1.0 for FedAvgM)} % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:prereggrid}
 \footnotesize
 \begin{tabular}{@{}llll@{}}
@@ -1179,10 +1186,11 @@ fedyogi & FedYogi & $\eta=0.001$ & guard cut\\ % src: docs/preregistration_accur
 \end{table}
 
 \emph{Selection rule.} The metric is best-by-validation macro-F1 over the seven headline
-classes, averaged over seeds. (1) A candidate is eligible only if its $\alpha=0.5$ mean is
-at least FedAvg's minus 0.01 (0.9325). (2) Among eligible candidates pick the highest % src: docs/preregistration_accuracy.md
+classes, averaged over seeds. (1) A candidate qualifies only when its $\alpha=0.5$ mean is no % src: docs/preregistration_accuracy.md
+more than 0.01 below FedAvg's, i.e., at least 0.9325. % src: docs/preregistration_accuracy.md
+(2) Among eligible candidates pick the highest % src: docs/preregistration_accuracy.md
 $\alpha=0.1$ mean. (3) If that is below FedAvg's $\alpha=0.1$ mean plus 0.02 (0.5428), % src: docs/preregistration_accuracy.md
-stop and do not touch the test set. (4) Ties go to the higher $\alpha=0.5$ mean.
+stop and do not touch the test set. (4) Ties go to the higher $\alpha=0.5$ mean. % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 
 \emph{Budget and the four-of-nine disclosure.} One timed round gave 62.2\,s per round % src: docs/preregistration_accuracy.md
 plus 53.6\,s start-up, 21.6 min per run and 20.9\,h for 58 runs against a 12\,h budget, % src: docs/preregistration_accuracy.md
@@ -1190,12 +1198,12 @@ so before any candidate ran the grid was cut. A full FedAvg regression run then 
 34.7\,s per round (12.7 min per run, 12.3\,h projected), and the cut was revised to drop % src: docs/preregistration_accuracy.md
 only $\mu=0.1$. Candidate runs took 10.2--18.6 min, so a timing-only guard was added: % src: docs/preregistration_accuracy.md
 before each candidate starts, if logged wall time plus the mean run time times the runs
-still needed exceeds 12\,h, that candidate and all later ones are dropped. It reads no
+still needed exceeds 12\,h, that candidate and all later ones are dropped. It reads no % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 score. When it was added, five fedavgm\_m0.5 runs had finished and one of their scores % src: docs/preregistration_accuracy.md
 ($\alpha=0.1$, seed 42) had been seen. It dropped four candidates at 7.40\,h elapsed % src: docs/preregistration_accuracy.md
 (17.8 min mean run, 15.4\,h projected), so 4 of the 9 requested candidates were run. % src: docs/preregistration_accuracy.md
-The FedAvg re-run on the new code path matched the published $\alpha=0.1$ seed-42 curve
-at all 21 rounds (maximum difference 0.0). % src: docs/preregistration_accuracy.md
+Repeating FedAvg through the new code reproduced the published $\alpha=0.1$, seed-42 % src: docs/preregistration_accuracy.md
+validation curve at every one of its 21 rounds (largest difference 0.0). % src: docs/preregistration_accuracy.md
 
 \begin{table}[h]
 \centering
@@ -1204,7 +1212,7 @@ at all 21 rounds (maximum difference 0.0). % src: docs/preregistration_accuracy.
 \footnotesize
 \begin{tabular}{@{}lrrl@{}}
 \toprule
-Candidate & $\alpha=0.1$ & $\alpha=0.5$ & Guard\\
+Candidate & $\alpha=0.1$ & $\alpha=0.5$ & Guard\\ % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 FedAvg (published) & 0.5228 & 0.9425 & --\\ % src: docs/preregistration_accuracy.md
 FedAvgM, momentum 0.5 & 0.5386 & 0.9502 & pass\\ % src: docs/preregistration_accuracy.md
@@ -1215,10 +1223,11 @@ FedYogi, $\eta=0.01$ & 0.4627 & 0.9004 & fail\\ % src: docs/preregistration_accu
 \end{tabular}
 \end{table}
 
-\emph{Sealing.} FedAvgM with momentum 0.9 was selected (Table~\ref{tab:prereg_val}).
-Before the test, the protocol recorded that its $\alpha=0.1$ validation curves oscillate
-and that its final-round $\alpha=0.1$ validation mean (0.5248) is close to FedAvg's % src: docs/preregistration_accuracy.md
-(0.5062), so part of the gain was expected to shrink. It was then trained at $\alpha=5.0$, % src: docs/preregistration_accuracy.md
+\emph{Sealing.} FedAvgM with momentum 0.9 was selected (Table~\ref{tab:prereg_val}). % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
+Before the test, the protocol recorded that its $\alpha=0.1$ validation curves oscillate % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
+and that at the final round its $\alpha=0.1$ validation mean, 0.5248, sits near % src: docs/preregistration_accuracy.md
+FedAvg's 0.5062, so part of the gain was expected to shrink. % src: docs/preregistration_accuracy.md
+It was then trained at $\alpha=5.0$, % src: docs/preregistration_accuracy.md
 and its nine best-by-validation checkpoints were sealed by SHA256 in commit
 \texttt{1a17277} (Table~\ref{tab:sealed}). A script checked the committed protocol and
 every hash, recomputed each validation score, wrote a lock file and scored the nine
@@ -1226,7 +1235,7 @@ checkpoints on the 478,376 test rows once. % src: docs/preregistration_accuracy.
 
 \begin{table}[h]
 \centering
-\caption{Sealed checkpoints (file SHA256, first 12 hex digits)}
+\caption{Sealed checkpoints (file SHA256, first 12 hex digits)} % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:sealed}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -1249,13 +1258,13 @@ $\alpha$ & Seed & Round & Val & SHA256 prefix\\
 
 \begin{table*}[t]
 \centering
-\caption{Single preregistered test evaluation (macro-F1, 7 classes)}
+\caption{Single preregistered test evaluation (macro-F1, 7 classes)} % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:prereg_test}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lll@{}}
 \toprule
-$\alpha$ & FedAvg $\to$ FedAvgM, mean $\pm$ std & Per seed 42 / 1337 / 2024\\
+$\alpha$ & FedAvg $\to$ FedAvgM, mean $\pm$ std & Per seed 42 / 1337 / 2024\\ % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 0.1 & 0.516 $\pm$ 0.048 $\to$ 0.5930 $\pm$ 0.0632 & 0.5426$\to$0.6558 / 0.4481$\to$0.5065 / 0.5572$\to$0.6167\\ % src: docs/contribution_a_results.md
 0.5 & 0.941 $\pm$ 0.057 $\to$ 0.9852 $\pm$ 0.0005 & 0.9753$\to$0.9846 / 0.9866$\to$0.9856 / 0.8605$\to$0.9856\\ % src: docs/contribution_a_results.md
@@ -1266,12 +1275,12 @@ $\alpha$ & FedAvg $\to$ FedAvgM, mean $\pm$ std & Per seed 42 / 1337 / 2024\\
 
 \begin{table}[h]
 \centering
-\caption{FedAvgM (momentum 0.9) per-class test F1, mean over 3 seeds}
+\caption{FedAvgM (momentum 0.9) per-class test F1, mean over 3 seeds} % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:prereg_class}
 \footnotesize
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Class & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$\\
+Class & $\alpha=0.1$ & $\alpha=0.5$ & $\alpha=5.0$\\ % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 Benign & 0.9417 & 0.9988 & 0.9993\\ % src: docs/contribution_a_results.md
 Bot & 0.3949 & 0.9646 & 0.9705\\ % src: docs/contribution_a_results.md
@@ -1286,14 +1295,14 @@ Infiltration (per class) & 0.0000 & 0.4843 & 0.6239\\ % src: docs/contribution_a
 \end{tabular}
 \end{table}
 
-\emph{Reading.} At $\alpha=0.5$ the change is mostly one seed that FedAvg handled badly
+\emph{Reading.} At $\alpha=0.5$ the change is mostly one seed that FedAvg handled badly % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 (seed 2024); seed 1337 moved by $-0.001$. At $\alpha=0.1$ every seed gains (+0.113, % src: docs/contribution_a_results.md
 +0.058, +0.060), but whole families still score near zero in some seeds (per-class std % src: docs/contribution_a_results.md
 0.31--0.46 for Bot, BruteForce, DoS, PortScan and WebAttack). The validation gain at % src: docs/contribution_a_results.md
 $\alpha=0.1$ (+0.084) exceeded the test gain (+0.077). At $\alpha=5.0$ the change is % src: docs/contribution_a_results.md
 +0.0001 to +0.0021 per seed, inside the centralized model's own seed spread. This is the % src: docs/contribution_a_results.md
-best of four candidates at $n=3$, not a tuned optimum; momentum was not swept beyond 0.5
-and 0.9, and whether momentum changes explanation agreement is untested.
+best of four candidates at $n=3$, not a tuned optimum; momentum was not swept beyond 0.5 % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
+and 0.9, and whether momentum changes explanation agreement is untested. % src: docs/preregistration_accuracy.md; docs/contribution_a_results.md; PROJECT_INSTRUCTIONS.md
 
 % -------------------------------------------------------------------------------------
 \section{Efficiency}
@@ -1302,20 +1311,20 @@ This appendix gives the full serving, communication and agent pre-screen measure
 supporting Section~VI-D. No test rows were read; parameters are in
 \texttt{configs/efficiency.yaml}.
 
-\emph{Serving.} The served model (\texttt{fedavg\_a0.5\_s42}, round 18, 19,849 % src: docs/efficiency_results.md
-parameters) was timed on an AMD Ryzen 7 7435HS CPU with 8 intra-op threads. Each of three % src: docs/efficiency_results.md
+\emph{Serving.} We timed the deployed checkpoint, round 18 of \texttt{fedavg\_a0.5\_s42} % src: docs/efficiency_results.md
+with 19,849 parameters, on an AMD Ryzen 7 7435HS CPU with 8 intra-op threads. Each of three % src: docs/efficiency_results.md
 sessions ran 500 warm-up calls, then 3 repeats of 5,000 single-row calls, and 5 passes of % src: docs/efficiency_results.md
 batch-1024 throughput over the validation split. Only the forward pass on scaled rows is % src: docs/efficiency_results.md
 timed. Table~\ref{tab:serving} reports the median of the three sessions with [min, max].
 
 \begin{table*}[t]
 \centering
-\caption{Serving variants (median over 3 timing sessions [min, max])}
+\caption{Serving variants (median over 3 timing sessions [min, max])} % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:serving}
 \footnotesize
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Variant & Val macro-F1 & p50 latency, batch 1 & p95 latency, batch 1 & Throughput, batch 1024 (rows/s) & Size (B)\\
+Variant & Val macro-F1 & p50 latency, batch 1 & p95 latency, batch 1 & Throughput, batch 1024 (rows/s) & Size (B)\\ % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 PyTorch eager & 0.9760 & 186.5\,$\mu$s [172.7, 193.2] & 322.1\,$\mu$s [254.1, 369.4] & 1,482,368 [1,411,067, 1,493,469] & 83,557\\ % src: docs/efficiency_results.md
 ONNX Runtime fp32 & 0.9760 & 45.7\,$\mu$s [40.6, 46.9] & 83.6\,$\mu$s [75.7, 88.5] & 1,071,700 [1,044,718, 1,124,598] & 80,704\\ % src: docs/efficiency_results.md
@@ -1325,9 +1334,9 @@ ONNX Runtime int8 (dynamic) & 0.8332 & 47.9\,$\mu$s [45.3, 57.9] & 98.1\,$\mu$s 
 \end{table*}
 
 ONNX fp32 matches PyTorch on all 143,513 validation rows and is about four times faster % src: docs/efficiency_results.md
-per flow, but slower at batch 1024. The backend now serves it by default and refuses to
-start unless every validation prediction equals PyTorch's; 50 of 50 sampled requests % src: docs/efficiency_results.md
-matched. Hot-swapped models always use PyTorch. Dynamic int8 changed only 0.54\% of % src: docs/efficiency_results.md
+per flow, but slower at batch 1024. It is now the backend's default engine, and % src: docs/efficiency_results.md
+the backend will not start if any validation prediction differs from PyTorch's; in 50 % src: docs/efficiency_results.md
+sampled requests both engines returned the same answer. Hot-swapped models always use PyTorch. Dynamic int8 changed only 0.54\% of % src: docs/efficiency_results.md
 predictions, but they fall on small classes (Bot F1 0.8815 to 0.4509, WebAttack 0.9671 % src: docs/efficiency_results.md
 to 0.4401, Infiltration 0.8889 to 0.3333), so validation macro-F1 fell by 0.1428 and % src: docs/efficiency_results.md
 int8 was dropped. The Gemm-to-MatMul rewrite needed for quantization matches PyTorch on
@@ -1336,15 +1345,16 @@ int8 was dropped. The Gemm-to-MatMul rewrite needed for quantization matches PyT
 \emph{Communication.} One fp32 model is 79,396 bytes; per round the server sends 793,960 % src: docs/efficiency_results.md
 bytes down and receives 793,960 up, 1,587,920 in total. As serialized Flower records the % src: docs/efficiency_results.md
 per-round figure is 1,623,600 bytes. Harness logs over 500 rounds match the arithmetic % src: docs/efficiency_results.md
-exactly for FedAvg, FedAvgM and FedYogi. Flower 1.33's FedAdam sends float64 weights from % src: docs/efficiency_results.md
-round 2 (2,381,880 versus 1,587,920 bytes per round); training is unaffected, and FedAdam % src: docs/contribution_a_results.md
-was not selected. Message metadata and network framing are not counted. Median wall time
+exactly for FedAvg, FedAvgM and FedYogi. One quirk: in Flower 1.33, % src: docs/efficiency_results.md
+FedAdam broadcasts float64 weights after the first round, 2,381,880 rather than % src: docs/contribution_a_results.md
+1,587,920 bytes per round. It does not change training, and FedAdam was not selected. % src: docs/contribution_a_results.md
+Message metadata and network framing are not counted. Median wall time
 per round is 51.4\,s (range 26.8--98.7\,s; round 1 median 84.2\,s), the same at % src: docs/efficiency_results.md
-$\alpha=0.1$ and $0.5$.
+$\alpha=0.1$ and $0.5$. % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 
 \emph{Update compression.} Client-to-server deltas were cast to fp16 or quantized to
 per-tensor int8, dequantized by the server and aggregated with unchanged FedAvg, at
-$\alpha=0.5$ for three seeds. An uncompressed run on the edited harness reproduced the
+$\alpha=0.5$ for three seeds. An uncompressed run on the edited harness reproduced the % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 published seed-42 curve exactly (21 of 21 rounds). Bytes saved are exact % src: docs/efficiency_results.md
 (Table~\ref{tab:compbytes}); the accuracy effect is not detectable at $n=3$ % src: docs/efficiency_results.md
 (Table~\ref{tab:compf1}). Seed 2024 crossed the 0.005 flag bound for both schemes and % src: docs/efficiency_results.md
@@ -1369,12 +1379,12 @@ int8 per tensor & 198,890 & 74.9\% & 37.5\%\\ % src: docs/efficiency_results.md
 
 \begin{table*}[t]
 \centering
-\caption{Compressed minus uncompressed validation macro-F1, $\alpha=0.5$ (per seed 42 / 1337 / 2024, then mean $\pm$ sd)}
+\caption{Compressed minus uncompressed validation macro-F1, $\alpha=0.5$ (per seed 42 / 1337 / 2024, then mean $\pm$ sd)} % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:compf1}
 \footnotesize
 \begin{tabular}{@{}lllll@{}}
 \toprule
-Scheme & Best-by-validation & Final round & Final-5 mean & Mean of rounds 1--20\\
+Scheme & Best-by-validation & Final round & Final-5 mean & Mean of rounds 1--20\\ % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 \midrule
 fp16 & +0.0036 / +0.0011 / $-0.0068$ & +0.0037 / $-0.0016$ / +0.0083 & $-0.0465$ / +0.0223 / $-0.0037$ & $-0.0029$ / +0.0168 / $-0.0011$\\ % src: docs/efficiency_results.md
  & $-0.0007\pm0.0054$ & $+0.0035\pm0.0050$ & $-0.0093\pm0.0347$ & $+0.0043\pm0.0109$\\ % src: docs/efficiency_results.md
@@ -1386,18 +1396,19 @@ int8 & +0.0020 / +0.0013 / $-0.0066$ & $-0.0876$ / +0.1173 / +0.0083 & $-0.0169$
 
 \emph{Agent pre-screen (a negative result).} ByzAgent makes one batched call per round.
 A pre-screen would send a silo to the agent only if its training loss exceeds $t$ times
-the round median, and trust the rest. $t$ was chosen on seed 42 as the largest grid value
-that kept every logged flag on a poisoned silo: $t=10$. Replayed on the other seeds % src: docs/efficiency_results.md
+the round median, and trust the rest. On seed 42 we took the biggest $t$ in the grid % src: docs/efficiency_results.md
+that still passed every logged flag on a poisoned silo through to the agent, $t=10$. % src: docs/efficiency_results.md
+Replayed on the other seeds % src: docs/efficiency_results.md
 (Table~\ref{tab:prescreen}), it hides the seed-1337 attack: 59 of 60 poisoned silo-rounds % src: docs/efficiency_results.md
-never reach the agent, because poisoned silo 0 is 95.4\% Benign and flipping its few % src: docs/efficiency_results.md
-attack rows barely moves its loss, while clean extreme silos reach 24.6 times the median. % src: docs/efficiency_results.md
+never reach the agent, because poisoned silo 0 is 95.4\% Benign: relabelling its % src: docs/efficiency_results.md
+handful of attack flows hardly changes its training loss, while clean extreme silos reach 24.6 times the median. % src: docs/efficiency_results.md
 A stronger flip can even lower the loss: in the gradual run at full flip fraction the
 poisoned silos' ratios fall to 0.005, 0.096 and 0.126. The planned live run was skipped % src: docs/efficiency_results.md
 and no redesign is planned.
 
 \begin{table}[h]
 \centering
-\caption{Pre-screen replay at $t=10$ (flag rate: replay / logged)}
+\caption{Pre-screen replay at $t=10$ (flag rate: replay / logged)} % src: docs/efficiency_results.md; PROJECT_INSTRUCTIONS.md
 \label{tab:prescreen}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
@@ -1429,7 +1440,7 @@ means a choice was made from what the read returned.
 \toprule
 \# & Read & Selected? & Note\\
 \midrule
-1 & One evaluation of each run's validation-selected checkpoint (headline numbers): FedAvg, FedProx, clean defence runs, exploratory runs, centralized and XGBoost & no & the checkpoint was fixed on validation first\\
+1 & Headline numbers: a single test pass over the checkpoint each run picked on validation: FedAvg, FedProx, clean defence runs, exploratory runs, centralized and XGBoost & no & the checkpoint was fixed on validation first\\ % src: docs/test_set_exposure_audit.md; PROJECT_INSTRUCTIONS.md
 2 & Centralized pilots, every arm scored on test (14 arms plus a smoke run) & partly & arms ranked on validation, but three rationales cite test scores (Table~\ref{tab:provenance})\\ % src: docs/test_set_exposure_audit.md
 3 & Legacy client-side scoring: each silo scored on its own test shard every round, in 35 runs & no & no analysis reads these rows\\ % src: docs/test_set_exposure_audit.md
 4 & Round-20 (unselected) checkpoint scored once per run & no & fed an earlier round-lottery figure, since replaced by a validation version\\ % src: docs/test_set_exposure_audit.md
@@ -1442,13 +1453,14 @@ means a choice was made from what the read returned.
 \end{tabularx}
 \end{table*}
 
-Table~\ref{tab:exposure} lists the reads. Not exposures, after checking: hot-swap
-retraining, backend model loading, XGBoost tuning (early stopping on validation), every
-ByzAgent statistic, and the method runs of the preregistered study. The sentence ``no
+Table~\ref{tab:exposure} lists the reads. We also checked several paths that turned out
+not to touch the test set at all: the preregistered method runs, every statistic given to
+ByzAgent, XGBoost tuning (which stops early on validation), model loading in the backend,
+and hot-swap retraining. The sentence ``no
 choice used any test score'' could not be written truthfully, so the disclosure in
-Section~V names the three choices instead. \emph{Rule going forward} (team decision,
-2026-10-12): no configuration other than the preregistered one is ever scored on the
-test set. The dashboard simulator now replays validation rows and computes no aggregate;
+Section~V names the three choices instead. \emph{Rule going forward:} the team decided
+on 2026-10-12 that the preregistered configuration is the only one that will ever be % src: PROJECT_INSTRUCTIONS.md
+evaluated on the test set. The dashboard simulator now replays validation rows and computes no aggregate;
 the public site's replay uses 500 stored test-row outputs. % src: PROJECT_INSTRUCTIONS.md
 
 % -------------------------------------------------------------------------------------
@@ -1466,10 +1478,10 @@ lost among the positive results (Table~\ref{tab:negative}).
 \toprule
 Hypothesis or attempt & Outcome & Where\\
 \midrule
-Agreement at $\alpha=0.1$ is below seed noise & directional, not significant (intervals overlap) & VI-B, D-B\\
+Agreement at $\alpha=0.1$ is below seed noise & directional, not significant (intervals overlap) & VI-B, D-B\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; docs/efficiency_results.md
 Label entropy explains agreement beyond size & failed conditioning on log size; sign flipped & VI-B, D-C\\
 Size-controlled partitions & impossible under this partitioner & D-C\\
-Agreement converges with accuracy over rounds & declines at $\alpha\le0.5$; untested, reduced fidelity & D-D\\
+Agreement converges with accuracy over rounds & declines at $\alpha\le0.5$; untested, reduced fidelity & D-D\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; docs/efficiency_results.md
 FedProx $\mu=0.0005$ improves agreement & inconclusive at $\alpha=0.1$, no effect at $\alpha=5.0$; one $\mu$ only & D-E\\ % src: docs/contribution_a_results.md
 FedProx $\mu=0.01$ & collapsed (val 0.7114) & B\\ % src: docs/test_set_exposure_audit.md
 Single-draw parity flags & artifacts; needed $N\ge3$ draws & D-F\\ % src: PROJECT_INSTRUCTIONS.md
@@ -1479,7 +1491,7 @@ Bot/WebAttack near-duplication inflates agreement & tested, not confirmed & D-H\
 Earlier ``3--8\%'' residual figure & no backing file; dropped & E\\ % src: PROJECT_INSTRUCTIONS.md
 Geometry statistics separate attackers & weak to null; validation accuracy inverts & F-B\\
 Multi-Krum excludes attackers & 0\% malicious exclusion; $f=2$ ``success'' is an artifact & VI-C, F-C\\ % src: PROJECT_INSTRUCTIONS.md
-Classical Krum, trimmed mean & Krum fails; trimmed-mean $f=2$ success not shown to be attack-related & F-C\\
+Classical Krum, trimmed mean & Krum fails; trimmed-mean $f=2$ success not shown to be attack-related & F-C\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; docs/efficiency_results.md
 ByzAgent detects attacks at seed 42 & lift $\le$ +0.05: ceiling artifact & VI-C, F-D\\ % src: docs/contribution_b_results.md
 Compositionally matched control attack & not constructible in this partition & F-D\\
 Agent rationale is faithful & strict error 11.7--22.5\%; update norm mis-cited & VI-C, F-E\\ % src: docs/contribution_b_results.md
@@ -1487,10 +1499,10 @@ Fixed attacker set is worst-case at every seed & no: rank 8 and 33 of 120 & F-F\
 Rolling history separates attack from composition & failed its preregistered test & VI-C, F-G\\
 Agent trend claims are reliable & about 35--45\% contradict the data & F-G\\ % src: PROJECT_INSTRUCTIONS.md
 Live outcome-level ByzAgent run; Krum in gradual mode & not run (would inherit the confound / could not change the verdict) & F-D, F-G\\
-Optimizers FedAdam, FedYogi & failed the $\alpha=0.5$ guard & G\\
+Optimizers FedAdam, FedYogi & failed the $\alpha=0.5$ guard & G\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; docs/efficiency_results.md
 Five of nine preregistered candidates & not run (budget) & G\\
 int8 serving & validation macro-F1 $-0.1428$; dropped & H\\ % src: docs/efficiency_results.md
-Update compression keeps accuracy & no detectable effect at $n=3$ either way & H\\
+Update compression keeps accuracy & no detectable effect at $n=3$ either way & H\\ % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; docs/efficiency_results.md
 train\_loss pre-screen in front of ByzAgent & threshold from seed 42 did not transfer (0.017 vs 0.483) & H\\ % src: PROJECT_INSTRUCTIONS.md
 \bottomrule
 \end{tabularx}
@@ -1503,15 +1515,16 @@ This appendix describes the software, supporting Section~III.
 
 \emph{Federated harness.} All results come from the Flower app in
 \texttt{federated/xfed\_federated/}, run as \texttt{flwr run federated local-simulation}.
-An older prototype in \texttt{src/federated/} never implemented best-by-validation
-selection; the root project file no longer points at it, so a bare \texttt{flwr run} fails
-on purpose instead of training with the wrong harness. The server logs per-round
+The repository also holds an early prototype, \texttt{src/federated/}, which lacks
+validation-based round selection. We removed the root project's pointer to it, so a plain
+\texttt{flwr run} now stops with an error rather than quietly using that prototype. The server logs per-round
 validation scores, the five client statistics, Krum selections or trim rates, and bytes
 moved. Flower's per-run environment pins the package versions read from the original
 runs (PyTorch 2.13.0 CPU build).
 
-\emph{Backend.} A FastAPI service loads the served checkpoint, re-checks its validation
-macro-F1 against the logged value and never reads the test file. Table~\ref{tab:api}
+\emph{Backend.} At start-up, a FastAPI service loads the deployed checkpoint and
+confirms that its validation macro-F1 equals the value logged during training; it has no
+code path that opens the test file. Table~\ref{tab:api}
 lists its endpoints.
 
 \begin{table}[h]
@@ -1539,15 +1552,16 @@ Endpoint & Purpose\\
 \emph{Dashboard.} A React front end has three routes: \emph{Live} (alert stream, selected
 alert with SHAP bars and summary, trust panel; Fig.~\ref{fig:dash1}), \emph{Investigate}
 (accuracy, agreement and trust evidence) and \emph{Limits} (known limitations). Each
-displayed number links to its source file. A simulator replays validation rows through
-the served model and marks each alert against its true label; it computes no aggregate.
+displayed number links to its source file. Alerts come from a simulator that feeds validation
+rows to the deployed model and shows, per alert, whether the prediction matched the
+label; it never accumulates these into a score.
 
 \emph{Hot swap.} An analyst can confirm or correct an alert's family (Fig.~\ref{fig:dash2}).
-Only the family label is sent. A separate process warm-starts from the base checkpoint
-(never from a previous swap), routes up to 200 extra training rows of that family to the % src: configs/hotswap.yaml
-target silo and runs 2 FedAvg rounds of 3 local epochs on CPU. The candidate replaces the % src: configs/hotswap.yaml
-served model only if its validation macro-F1 is at least the incumbent's, with no
-tolerance. Every swap is written to an append-only audit log with its seed and checkpoint
+Only the family label is sent. Retraining runs in its own process and always
+begins from the original base checkpoint, so swaps never stack on one another. It routes up to 200 extra training rows of that family to the % src: configs/hotswap.yaml
+target silo and runs 2 FedAvg rounds of 3 local epochs on CPU. The new model goes live % src: configs/hotswap.yaml
+only when its validation macro-F1 is equal to or higher than that of the model already
+in service; there is no tolerance band. Every swap is written to an append-only audit log with its seed and checkpoint
 hash.
 
 \begin{figure*}[t]
@@ -1574,7 +1588,7 @@ This appendix lists what is needed to rerun the work. Code and results:
 \texttt{xfed} (Python 3.11) is defined in \texttt{environment.yml} with pinned packages % src: environment.yml
 in \texttt{requirements.txt}. The raw CSVs are kept outside the repository. Seeds: data
 stage 42; partitions and training 42, 1337, 2024; SHAP evaluation rows 12345; attack % src: docs/measurement_protocol.md
-9001; parity draws 1001, 2002, 3003. Every parameter lives in \texttt{configs/} % src: docs/contribution_b_results.md
+9001; parity draws 1001, 2002, 3003. Every parameter lives in \texttt{configs/} % src: docs/contribution_b_results.md; docs/contribution_a_results.md
 (\texttt{data}, \texttt{model}, \texttt{attack}, \texttt{defense}, \texttt{agent},
 \texttt{federated\_methods}, \texttt{efficiency}, \texttt{hotswap}, \texttt{backend}).
 
