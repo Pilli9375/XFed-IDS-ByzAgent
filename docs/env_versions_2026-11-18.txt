@@ -1,0 +1,4 @@
+Recorded 2026-11-18 from the xfed conda env on the project machine.
+Python 3.11.15
+torch 2.6.0+cu124, flwr 1.33.0, shap 0.51.0, xgboost 3.2.0, onnxruntime 1.31.0, fastapi 0.138.2
+ollama version is 0.40.16

@@ -465,13 +465,13 @@ model serving and hot-swap retraining are CPU jobs as well.
 \toprule
 Component & Tool and version\\
 \midrule
-Language & Python 3.11\\ % src: environment.yml
+Language & Python 3.11.15\\ % src: docs/env_versions_2026-11-18.txt
 FL training (CPU) & PyTorch 2.13.0 (CPU build), Flower 1.33.0\\ % src: federated/pyproject.toml; docs/contribution_b_results.md
 Centralized MLP (GPU) & PyTorch 2.6.0+cu124\\ % src: requirements.txt
 Explanations & SHAP 0.51.0\\ % src: requirements.txt
 Baseline & XGBoost 3.2.0\\ % src: requirements.txt
 Serving & ONNX Runtime 1.31.0, FastAPI 0.138.2\\ % src: requirements.txt
-Trust agent & Ollama, model \texttt{llama3.1:8b-instruct-q4\_K\_M}\\
+Trust agent & Ollama 0.40.16 (installed at time of writing), model \texttt{llama3.1:8b-instruct-q4\_K\_M}\\ % src: docs/env_versions_2026-11-18.txt
 Dashboard & React 19.2.8\\ % src: frontend/package-lock.json
 Hardware & RTX 4050 (6\,GB), 24\,GB RAM, Windows~11; AMD Ryzen 7 7435HS CPU\\ % src: PROJECT_INSTRUCTIONS.md; docs/efficiency_results.md
 \bottomrule
