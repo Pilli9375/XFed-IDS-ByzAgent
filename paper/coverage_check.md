@@ -146,3 +146,7 @@ the classical rules.
 | Sealed checkpoints with hashes; single test evaluation; per-class F1 | G (Tabs. sealed, prereg_test, prereg_class) |
 | Prior exposure of μ=0.01 (test-scored once before) | B (Tab. provenance); I |
 | Environment: CPU build of torch in Flower's isolated env; pinned versions | V; K |
+
+## Revision 2026-11-18 (planning-chat review)
+
+Contribution 3, the conclusion and the VI-B floor sentence were reworded; no finding was added or removed. The duplicate "dashboard summaries carry no research claim" sentence was removed from Section VII; the same statement remains in II-G. Derived IQRs are labelled in the Fig. 2 caption and Appendix D (approved).

@@ -149,7 +149,12 @@ with open(os.path.join(ROOT, "paper", "number_check.md"), "w", encoding="utf-8")
             "source stores more digits and rounds to the paper's value at the paper's precision. Signs are "
             "compared by magnitude; the sign of every negative value was checked by hand against the source. "
             "Excluded as non-data: citation, table, figure and section numbers, metric names such as "
-            "Jaccard@10, model and dataset names, and TikZ coordinates.\n\n")
+            "Jaccard@10, model and dataset names, and TikZ coordinates.\n\n"
+            "**Derived source (approved by the planning chat):** `paper/figs/derived_values.json` holds "
+            "the interquartile ranges of Jaccard@10 and weighted tau, per alpha and per (alpha, family), "
+            "computed for this paper by `paper/figs/make_figs.py` from "
+            "`results/inspection/agreement_metrics.csv` (family_eligible rows). They are labelled as such "
+            "in the Fig. 2 caption and in Appendix D. Rows below citing that file are those values.\n\n")
     n_ok = sum(1 for r in rows if r[4].startswith("match"))
     f.write(f"**Total numbers: {len(rows)}. Matched: {n_ok}. Unmatched or unsourced: {problems}.**\n\n")
     f.write("| File | Line | Number | Source | Status |\n|---|---|---|---|---|\n")
