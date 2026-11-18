@@ -27,7 +27,7 @@ Sources compared: 54 saved abstracts of cited papers (`paper/_sources/`, git-ign
   - `42s apparent null was partly a ceiling artifact` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
   - `apparent null was partly a ceiling artifact of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
   - `null was partly a ceiling artifact of that` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md
-- EXEMPT (locked wording or numbers only): "We describe the agent as one that produces decisions plus a rationale of measured fidelity."
+- EXEMPT (locked wording or numbers only): "We describe the agent as one that produces decisions plus a rationale of measured fidelity, and the measurement shows it is partial: its strict citation error rose from 11.7\% (seed 42) to 22.5\% (seeds 1337 and 2024)."
   - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md
 - EXEMPT (locked wording or numbers only): "Instead it removed the same large, Benign-heavy silos (30.3\% and 23.0\% of the fleet, over 90\% Benign) in every round of every condition, including the clean control, where it excluded exactly in 20 of 20 rounds."
   - `30 3 and 23 0 of the fleet` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md
