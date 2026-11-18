@@ -102,6 +102,12 @@ rather than attack. Multi-Krum excluded a malicious silo 0\% of the time. % src:
 Federated learning, intrusion detection, explainable artificial intelligence,
 Byzantine robustness, large language models
 \end{IEEEkeywords}
+\begingroup\renewcommand{\thefootnote}{}
+\footnotetext{B.Tech CSE and Specializations, Capstone Project, Fall 2026-27, % numcheck: ignore
+Capstone ID [OUR ID]. % TODO: insert the capstone ID
+Registration numbers: V Naga Adithya 23BCE9062, T Shaun 23BCE9916, % numcheck: ignore
+P Sampath 23BCE8614, D Tharun 23BCE8818.} % numcheck: ignore
+\endgroup
 
 % =====================================================================================
 \section{Introduction}
@@ -138,21 +144,24 @@ separate evidence. Our contributions are:
 Kendall's $\tau$) across three levels of label skew for a FedAvg detector on corrected
 CICIDS2017, read against two reference lines: the chance level and a
 \emph{centralized-seed instability floor}, i.e., the agreement between centralized models
-trained identically apart from their random seed.
+trained identically apart from their random seed
+(Sections~\ref{sec:m-expl} and~\ref{sec:r-expl}).
 \item An observational analysis that separates label skew from silo size, which the
 Dirichlet partitioner ties together: KL divergence from the global label mix still
 predicts agreement after conditioning on log size. We report that entropy was tried
-first and failed this test.
+first and failed this test (Section~\ref{sec:r-expl}).
 \item A trust check that sets a language-model agent (ByzAgent) against three classical
 aggregators, namely trimmed mean, Krum and Multi-Krum, under a worst-case label-flipping
 attack.
 All four mechanisms respond to silo composition. The classical rules did not single out
 the attackers (Multi-Krum excluded a malicious silo 0\% of the time); ByzAgent's flags % src: PROJECT_INSTRUCTIONS.md
 also responded to the attack where silos were not already saturated. We also audit how
-often the agent's stated reasons match the numbers it was shown.
+often the agent's stated reasons match the numbers it was shown
+(Sections~\ref{sec:m-trust} and~\ref{sec:r-trust}).
 \item An evaluation protocol that selects every model and round on validation data, a
 written audit of every way the test set was read, one preregistered optimizer
-comparison, and serving and communication measurements for the deployed model.
+comparison, and serving and communication measurements for the deployed model
+(Sections~\ref{sec:setup}, \ref{sec:r-acc} and~\ref{sec:r-eff}).
 \end{enumerate}
 We do not claim the combination of FL, intrusion detection and explainability as new;
 recent work already combines
@@ -279,6 +288,7 @@ This work & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark\\
 
 % =====================================================================================
 \section{System Overview}
+\label{sec:system}
 
 Fig.~\ref{fig:pipeline} shows the five stages. \emph{Data}: the corrected CICIDS2017
 flows are cleaned into eight attack families plus Benign and split once into training,
@@ -289,7 +299,8 @@ each silo computes SHAP attributions locally and sends only top-$k$ feature indi
 the server, which compares them with the global model's ranking. \emph{Trust check}: the
 server logs five statistics per silo and round; ByzAgent or a classical robust rule
 decides how much each update counts. \emph{Dashboard}: a FastAPI backend serves the
-selected model, explanations and trust decisions to a React front end.
+selected model, explanations and trust decisions to a React front end
+\iffullversion (Fig.~\ref{fig:dashlive})\fi.
 
 \begin{figure}[t]
 \centering
@@ -312,6 +323,15 @@ selected model, explanations and trust decisions to a React front end.
 federated runs and are reported separately.}
 \label{fig:pipeline}
 \end{figure}
+
+\iffullversion
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/dash_live.png}
+\caption{Dashboard, Live route: alert stream, one alert's SHAP contributions, and the trust panel.}
+\label{fig:dashlive}
+\end{figure}
+\fi
 
 % =====================================================================================
 \section{Methodology}
@@ -369,6 +389,7 @@ Best-by-validation round & rounds differ by up to 0.118 in validation macro-F1\\
 \end{table}
 
 \subsection{Explanation check}
+\label{sec:m-expl}
 Because DeepExplainer breaks on our LayerNorm layers (an additivity error of 2.43), % src: PROJECT_INSTRUCTIONS.md
 every silo uses SHAP's GradientExplainer~\cite{lundberg2017,erion2021} on its own copy of
 the model at the selected round. The background is 200 rows drawn once from the silo's % src: docs/measurement_protocol.md
@@ -394,6 +415,7 @@ $n$ only, with no $p$-values, because silos from the same run follow one common 
 of global models and so are not independent samples.
 
 \subsection{Trust check}
+\label{sec:m-trust}
 \emph{Attack.} At $\alpha=0.5$, seed 42, $f$ silos relabel 40\% of their non-Benign rows % src: docs/contribution_b_results.md
 as Benign from round 1. The attacker set was found by enumerating all 120 triples % src: docs/contribution_b_results.md
 of silos and keeping the one with the highest minimum per-family coverage, giving
@@ -429,10 +451,34 @@ excluded, against the matching chance rate. For ByzAgent we report each silo's f
 
 % =====================================================================================
 \section{Experimental Setup}
+\label{sec:setup}
 Experiments ran on one laptop with an RTX 4050 (6\,GB), 24\,GB RAM and Windows~11. The % src: PROJECT_INSTRUCTIONS.md
 centralized MLP, XGBoost and the locally hosted agent (Ollama) used the GPU. Federated
 training did not: Flower builds an isolated runtime with the CPU build of PyTorch. SHAP,
 model serving and hot-swap retraining are CPU jobs as well.
+\iffullversion Table~\ref{tab:tools} lists the software versions.
+\begin{table}[t]
+\centering
+\caption{Implementation and tools}
+\label{tab:tools}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright\arraybackslash}p{2.9cm}X@{}}
+\toprule
+Component & Tool and version\\
+\midrule
+Language & Python 3.11\\ % src: environment.yml
+FL training (CPU) & PyTorch 2.13.0 (CPU build), Flower 1.33.0\\ % src: federated/pyproject.toml; docs/contribution_b_results.md
+Centralized MLP (GPU) & PyTorch 2.6.0+cu124\\ % src: requirements.txt
+Explanations & SHAP 0.51.0\\ % src: requirements.txt
+Baseline & XGBoost 3.2.0\\ % src: requirements.txt
+Serving & ONNX Runtime 1.31.0, FastAPI 0.138.2\\ % src: requirements.txt
+Trust agent & Ollama, model \texttt{llama3.1:8b-instruct-q4\_K\_M}\\
+Dashboard & React 19.2.8\\ % src: frontend/package-lock.json
+Hardware & RTX 4050 (6\,GB), 24\,GB RAM, Windows~11; AMD Ryzen 7 7435HS CPU\\ % src: PROJECT_INSTRUCTIONS.md; docs/efficiency_results.md
+\bottomrule
+\end{tabularx}
+\end{table}
+\fi
 
 Every model and every round was chosen on validation data. Headline test numbers come
 from a single evaluation of each run's validation-selected checkpoint, and trust-check
@@ -452,6 +498,7 @@ and in \fullref{app:testaudit}.
 \section{Results}
 
 \subsection{Detection accuracy}
+\label{sec:r-acc}
 Table~\ref{tab:acc} gives test macro-F1 over the seven headline classes. At
 $\alpha=5.0$ FedAvg matches the centralized MLP. At $\alpha=0.5$ the mean hides one weak % src: PROJECT_INSTRUCTIONS.md; docs/contribution_a_results.md; docs/contribution_b_results.md; data/README.md; docs/preregistration_accuracy.md; docs/efficiency_results.md
 seed (seed 2024, 0.8605), and at $\alpha=0.1$ whole families collapse: mean per-class % src: docs/contribution_a_results.md
@@ -484,6 +531,7 @@ FedAvgM$^\dagger$ & 0.5930 $\pm$ 0.0632 & 0.9852 $\pm$ 0.0005 & 0.9911 $\pm$ 0.0
 \end{table}
 
 \subsection{Explanation check}
+\label{sec:r-expl}
 Fig.~\ref{fig:agree} shows agreement between each eligible silo and the global model.
 Median Jaccard@10 rises from 0.333 at $\alpha=0.1$ to 0.538 and 0.667, and weighted $\tau$ % src: PROJECT_INSTRUCTIONS.md
 from 0.592 to 0.787 and 0.844. Every level is 5.1--10.3 times the chance Jaccard of % src: PROJECT_INSTRUCTIONS.md
@@ -528,6 +576,7 @@ SHAP setting and no test. Per-family results, the parity monitor, FedProx and th
 faithfulness checks are in \fullref{app:expl} and \fullref{app:resid}.
 
 \subsection{Trust check}
+\label{sec:r-trust}
 Of the five statistics, only training loss separates the malicious silos: its Glass's
 $\delta$ under attack is 33.8 times its value for the same silos in a clean run at $f=3$, % src: PROJECT_INSTRUCTIONS.md
 and 154.3 times at $f=2$. These ratios are seed-42 effect sizes, not cut-offs: a % src: PROJECT_INSTRUCTIONS.md
@@ -581,6 +630,7 @@ Baselines, the history matrix and the gradual attack are single runs by design. 
 tables are in \fullref{app:trust}.
 
 \subsection{Efficiency}
+\label{sec:r-eff}
 Table~\ref{tab:eff} summarises the serving and communication measurements. ONNX
 Runtime fp32 gives the same predictions as PyTorch on all 143,513 validation rows and is % src: docs/efficiency_results.md
 the default serving engine; int8 quantization was dropped after validation macro-F1
@@ -646,8 +696,11 @@ attacker selection that does not ride the composition axis, and a check of wheth
 server momentum changes explanation agreement.
 
 \section*{Acknowledgment}
-We thank [Guide name], School of Computer Science and Engineering, VIT-AP University,
-for guidance throughout this project.
+We thank Prof. Gargi Madala and the School of Computer Science and Engineering,
+VIT-AP University, for their guidance and support throughout this project. We also
+thank the Canadian Institute for Cybersecurity (CIC) at the University of New Brunswick
+for releasing CICIDS2017, and the DistriNet group at KU Leuven for the corrected
+version on which every experiment here was run.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
