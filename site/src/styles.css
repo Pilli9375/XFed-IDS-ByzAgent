@@ -417,12 +417,12 @@ em.em { font-style: italic; }
 
 /* ---------- trust (dark) ---------- */
 .dark { color: var(--cream); }
-.trust { position: relative; isolation: isolate; padding: 128px var(--gutter); }
+.trust { position: relative; isolation: isolate; overflow-x: clip; padding: 128px var(--gutter); } /* contain transient overflow during reveals (360 px) */
 /* curtains: the panel is the section's background, so it can rise and widen on its own */
 .curtain { position: absolute; inset: 0; border-radius: 28px 28px 0 0; transform-origin: 50% 0; will-change: transform; }
 .trust > .curtain { background: var(--cocoa); }
 .trust > .wrap { position: relative; }
-.limits-sec { position: relative; isolation: isolate; background: var(--cocoa-2); }
+.limits-sec { position: relative; isolation: isolate; overflow-x: clip; background: var(--cocoa-2); }
 .curtain-cream { background-color: var(--cream); background-image: var(--grain); }
 .limits-sec > .limits { position: relative; }
 .trust .kicker { color: var(--terracotta-light); }
