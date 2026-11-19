@@ -26,7 +26,7 @@ Backup answers: test set and accuracy at α=0.1: Adithya. Significance of 0.333 
 
 ### Slide 1 (Title)
 
-Adithya: Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Prof. Gargi Madala. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted. I give the overview and the system design; Shaun the problem, objectives and data; Tharun related work and the explanation check; Sampath the trust check, efficiency and our summary. I also run the live demo.
+Adithya: Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Dr. M. Gargi. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted. I give the overview and the system design; Shaun the problem, objectives and data; Tharun related work and the explanation check; Sampath the trust check, efficiency and our summary. I also run the live demo.
 
 - *Likely question:* Who built which part?
 - *Short answer:* Each of us presents the part we worked on; the report lists every member's contribution.
