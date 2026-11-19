@@ -2,89 +2,116 @@
 
 Sources compared: 54 saved abstracts of cited papers (`paper/_sources/`, git-ignored), the IEEE paper (`paper/main.tex`, `paper/appendix.tex`), `README.md`, and every Markdown file under `docs/handbook/`. Report prose only: tables, code excerpts and the verbatim ByzAgent prompt are excluded, because they reproduce data or code by design.
 
-**Sentences sharing an 8-word run: 22 total; 22 exempt (locked wording the project requires verbatim, or runs made of result numbers); 0 counted.**
+**Sentences sharing an 8-word run: 29 total; 29 exempt (locked wording the project requires verbatim, or runs made of result numbers); 0 counted.**
 
-- EXEMPT (00_abstract.md): "Test macro-F1 is 0.516 ± 0.048, 0.941 ± 0.057 and 0.990 ± 0.001 at the three skew levels, against 0.9900 ± 0.0022 for a centralized model."
+- EXEMPT (src/00_abstract.md): "Test macro-F1 is 0.516 ± 0.048, 0.941 ± 0.057 and 0.990 ± 0.001 at the three skew levels, against 0.9900 ± 0.0022 for a centralized model."
   - `0 516 0 048 0 941 0 057` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/07_reference.md, paper/main.tex
   - `516 0 048 0 941 0 057 and` in paper/main.tex
   - `0 048 0 941 0 057 and 0` in paper/main.tex
   - `048 0 941 0 057 and 0 990` in paper/main.tex
-- EXEMPT (00_abstract.md): "Multi-Krum excluded a malicious silo 0% of the time."
+- EXEMPT (src/00_abstract.md): "Multi-Krum excluded a malicious silo 0% of the time."
   - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (00_abstract.md): "It produces decisions plus a rationale of measured fidelity."
+- EXEMPT (src/00_abstract.md): "It produces decisions plus a rationale of measured fidelity."
   - `it produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/main.tex
   - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/appendix.tex, paper/main.tex
-- EXEMPT (04_results.md): "The cluster bootstrap at α=0.1, which resamples (seed, silo) clusters 10,000 times over 29 clusters, gives a 95% interval of [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ."
+- EXEMPT (src/04_results.md): "The cluster bootstrap at α=0.1, which resamples (seed, silo) clusters 10,000 times over 29 clusters, gives a 95% interval of [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ."
   - `0 250 0 429 for jaccard 10 and` in paper/appendix.tex
   - `250 0 429 for jaccard 10 and 0` in paper/appendix.tex
   - `0 429 for jaccard 10 and 0 541` in paper/appendix.tex
   - `429 for jaccard 10 and 0 541 0` in paper/appendix.tex
-- EXEMPT (04_results.md): "Multi-Krum excluded a malicious silo 0% of the time."
+- EXEMPT (src/04_results.md): "Multi-Krum excluded a malicious silo 0% of the time."
   - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (04_results.md): "All four are the four lowest-Benign silos at that seed, with 9.2%, 0.3%, 0.1% and 12.3% Benign traffic against 81.5% to 98.0% for every other silo."
+- EXEMPT (src/04_results.md): "All four are the four lowest-Benign silos at that seed, with 9.2%, 0.3%, 0.1% and 12.3% Benign traffic against 81.5% to 98.0% for every other silo."
   - `9 2 0 3 0 1 and 12` in paper/appendix.tex
   - `2 0 3 0 1 and 12 3` in paper/appendix.tex
   - `0 3 0 1 and 12 3 benign` in paper/appendix.tex
-- EXEMPT (04_results.md): "A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated."
+- EXEMPT (src/04_results.md): "A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated."
   - `a real compositional confound saturates some silos flag` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `real compositional confound saturates some silos flag rates` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `compositional confound saturates some silos flag rates independent` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `confound saturates some silos flag rates independent of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (04_results.md): "Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition.""
+- EXEMPT (src/04_results.md): "Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition.""
   - `seed 42s apparent null was partly a ceiling` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `42s apparent null was partly a ceiling artifact` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `apparent null was partly a ceiling artifact of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
   - `null was partly a ceiling artifact of that` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (04_results.md): "ByzAgent produces decisions plus a rationale of measured fidelity."
+- EXEMPT (src/04_results.md): "ByzAgent produces decisions plus a rationale of measured fidelity."
   - `byzagent produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, paper/appendix.tex
   - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/appendix.tex, paper/main.tex
-- EXEMPT (04_results.md): "The strict citation error, meaning the share of quoted values that do not match the data, was 11.7% at seed 42 and 22.5% at seeds 1337 and 2024."
+- EXEMPT (src/04_results.md): "The strict citation error, meaning the share of quoted values that do not match the data, was 11.7% at seed 42 and 22.5% at seeds 1337 and 2024."
   - `11 7 at seed 42 and 22 5` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/06_review.md
   - `7 at seed 42 and 22 5 at` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/06_review.md
-- EXEMPT (05_conclusion.md): "Multi-Krum excluded a malicious silo 0% of the time, and its one apparent success was an artifact of composition."
+- EXEMPT (src/05_conclusion.md): "Multi-Krum excluded a malicious silo 0% of the time, and its one apparent success was an artifact of composition."
   - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (06c_appendix_explanation.md): "At α=0.1 the 95% percentile interval is [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ."
+- EXEMPT (src/06c_appendix_explanation.md): "At α=0.1 the 95% percentile interval is [0.250, 0.429] for Jaccard@10 and [0.541, 0.661] for weighted τ."
   - `the 95 percentile interval is 0 250 0` in paper/appendix.tex
   - `95 percentile interval is 0 250 0 429` in paper/appendix.tex
   - `percentile interval is 0 250 0 429 for` in paper/appendix.tex
   - `interval is 0 250 0 429 for jaccard` in paper/appendix.tex
-- EXEMPT (06c_appendix_explanation.md): "**Post-hoc, and not part of the pre-specified rule:** removing the entire α=5.0, seed-1337 run, whose global model exceeded the limit, leaves the α=5.0 medians unchanged, with Jaccard@10 at 0.667 and τ at 0.844."
+- EXEMPT (src/06c_appendix_explanation.md): "**Post-hoc, and not part of the pre-specified rule:** removing the entire α=5.0, seed-1337 run, whose global model exceeded the limit, leaves the α=5.0 medians unchanged, with Jaccard@10 at 0.667 and τ at 0.844."
   - `jaccard 10 at 0 667 and at 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02b_explanation.md
   - `10 at 0 667 and at 0 844` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02b_explanation.md
-- EXEMPT (06d_appendix_trust.md): "In every case the last-five average goes down, by 3.7 to 7.7 points, and the higher-coverage attacker sets lower it more."
+- EXEMPT (src/06d_appendix_trust.md): "In every case the last-five average goes down, by 3.7 to 7.7 points, and the higher-coverage attacker sets lower it more."
   - `by 3 7 to 7 7 points and` in paper/appendix.tex
-- EXEMPT (06d_appendix_trust.md): "Trimmed mean uses β = f/n (0.3 at f=3, 0.2 at f=2), computed at run time."
+- EXEMPT (src/06d_appendix_trust.md): "Trimmed mean uses β = f/n (0.3 at f=3, 0.2 at f=2), computed at run time."
   - `f n 0 3 at f 3 0` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/01_background.md
   - `n 0 3 at f 3 0 2` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/01_background.md
   - `0 3 at f 3 0 2 at` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/01_background.md
   - `3 at f 3 0 2 at f` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/01_background.md
-- EXEMPT (06d_appendix_trust.md): "Multi-Krum excluded a malicious silo 0% of the time."
+- EXEMPT (src/06d_appendix_trust.md): "Multi-Krum excluded a malicious silo 0% of the time."
   - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
   - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
-- EXEMPT (06d_appendix_trust.md): "Silos 0, 3, 5 and 8 have the lowest Benign shares at seed 42, namely 9.2%, 0.3%, 0.1% and 12.3%; three of them attack, while silo 8 never does."
+- EXEMPT (src/06d_appendix_trust.md): "Silos 0, 3, 5 and 8 have the lowest Benign shares at seed 42, namely 9.2%, 0.3%, 0.1% and 12.3%; three of them attack, while silo 8 never does."
   - `9 2 0 3 0 1 and 12` in paper/appendix.tex
   - `2 0 3 0 1 and 12 3` in paper/appendix.tex
-- EXEMPT (06d_appendix_trust.md): "it produces decisions plus a rationale of measured fidelity."
+- EXEMPT (src/06d_appendix_trust.md): "it produces decisions plus a rationale of measured fidelity."
   - `it produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/main.tex
   - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/appendix.tex, paper/main.tex
-- EXEMPT (06d_appendix_trust.md): "cosine-to-aggregate went from 4.4% to 18.2%, and update norm from 25.1% to 42.6%."
+- EXEMPT (src/06d_appendix_trust.md): "cosine-to-aggregate went from 4.4% to 18.2%, and update norm from 25.1% to 42.6%."
   - `4 4 to 18 2 and update norm` in paper/appendix.tex
-- EXEMPT (06d_appendix_trust.md): "Training loss (3.8% to 4.7%) and validation accuracy (8.6% to 10.3%) stayed low ( )."
+- EXEMPT (src/06d_appendix_trust.md): "Training loss (3.8% to 4.7%) and validation accuracy (8.6% to 10.3%) stayed low ( )."
   - `training loss 3 8 to 4 7 and` in paper/appendix.tex
   - `loss 3 8 to 4 7 and validation` in paper/appendix.tex
   - `3 8 to 4 7 and validation accuracy` in paper/appendix.tex
   - `8 to 4 7 and validation accuracy 8` in paper/appendix.tex
-- EXEMPT (06d_appendix_trust.md): "silo 0 held 19,223 poisonable rows (4.56% of the silo) at seed 1337 against 48,296 (35.78%) at seed 2024, an eightfold difference."
+- EXEMPT (src/06d_appendix_trust.md): "silo 0 held 19,223 poisonable rows (4.56% of the silo) at seed 1337 against 48,296 (35.78%) at seed 2024, an eightfold difference."
   - `at seed 1337 against 48 296 35 78` in paper/appendix.tex
   - `seed 1337 against 48 296 35 78 at` in paper/appendix.tex
   - `1337 against 48 296 35 78 at seed` in paper/appendix.tex
   - `against 48 296 35 78 at seed 2024` in paper/appendix.tex
-- EXEMPT (06e_appendix_prereg_eff_audit.md): "In the seed-42 gradual run, once every eligible row is flipped, the attackers' ratios drop to 0.005, 0.096 and 0.126:"
+- EXEMPT (src/06e_appendix_prereg_eff_audit.md): "In the seed-42 gradual run, once every eligible row is flipped, the attackers' ratios drop to 0.005, 0.096 and 0.126:"
   - `to 0 005 0 096 and 0 126` in paper/appendix.tex
+- EXEMPT (src_short/04_results.md): "partial r=−0.57 at α=0.1 (n=29) and −0.82 for Jaccard@10 and −0.87 for τ at α=0.5 (n=30)."
+  - `partial r 0 57 at 0 1 n` in README.md
+  - `r 0 57 at 0 1 n 29` in README.md
+- EXEMPT (src_short/04_results.md): "**Classical rules.** Multi-Krum excluded a malicious silo 0% of the time."
+  - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
+  - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
+  - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+- EXEMPT (src_short/04_results.md): "A real compositional confound saturates some silos' flag rates independent of any attack; real attack-responsive detection is also present and becomes visible where silos are not already saturated."
+  - `a real compositional confound saturates some silos flag` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `real compositional confound saturates some silos flag rates` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `compositional confound saturates some silos flag rates independent` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `confound saturates some silos flag rates independent of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+- EXEMPT (src_short/04_results.md): "Seed 42's apparent null was partly a ceiling artifact of that seed's unusually bimodal composition.""
+  - `seed 42s apparent null was partly a ceiling` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `42s apparent null was partly a ceiling artifact` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `apparent null was partly a ceiling artifact of` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+  - `null was partly a ceiling artifact of that` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex
+- EXEMPT (src_short/04_results.md): "ByzAgent produces decisions plus a rationale of measured fidelity."
+  - `byzagent produces decisions plus a rationale of measured` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, paper/appendix.tex
+  - `produces decisions plus a rationale of measured fidelity` in README.md, docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/01_background.md, docs/handbook/src/02c_trust.md, docs/handbook/src/03_honesty.md, docs/handbook/src/06_review.md, paper/appendix.tex, paper/main.tex
+- EXEMPT (src_short/04_results.md): "Its strict citation error was 11.7% at seed 42 and 22.5% at the other seeds, where it kept citing update norm (about 59% of explanations) after that statistic had stopped tracking its decisions."
+  - `11 7 at seed 42 and 22 5` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/06_review.md
+  - `7 at seed 42 and 22 5 at` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/06_review.md
+- EXEMPT (src_short/04_results.md): "- Multi-Krum excluded a malicious silo 0% of the time."
+  - `multi krum excluded a malicious silo 0 of` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
+  - `krum excluded a malicious silo 0 of the` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, paper/main.tex
+  - `excluded a malicious silo 0 of the time` in docs/handbook/XFed_Team_Handbook.md, docs/handbook/src/00_start.md, docs/handbook/src/02c_trust.md, docs/handbook/src/06_review.md, paper/main.tex

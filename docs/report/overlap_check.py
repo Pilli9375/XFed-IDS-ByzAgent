@@ -44,7 +44,8 @@ def words(text):
 
 def report_prose():
     out = []
-    for f in sorted(glob.glob(os.path.join(ROOT, "docs", "report", "src", "*.md"))):
+    for f in sorted(glob.glob(os.path.join(ROOT, "docs", "report", "src", "*.md"))
+                    + glob.glob(os.path.join(ROOT, "docs", "report", "src_short", "*.md"))):
         text = open(f, encoding="utf-8").read()
         text = re.sub(r"```.*?```", " ", text, flags=re.S)
         lines = []
@@ -59,7 +60,7 @@ def report_prose():
         t = re.sub(r"@(?:fig|tab|sec):[\w-]+", " ", t)
         t = re.sub(r"`[^`]*`", " ", t)
         t = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", t)
-        out.append((os.path.basename(f), t))
+        out.append((os.path.relpath(f, os.path.join(ROOT, "docs", "report")).replace("\\", "/"), t))
     return out
 
 
