@@ -10,23 +10,23 @@ Speaking rate assumed: 140 words per minute, applied to the spoken part of each 
 
 | Speaker | Slides presented | Words | Estimated time |
 |---|---|---:|---:|
-| Adithya | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 19, 20, 21, 22 | 1389 | 9:55 + about 5:00 demo |
-| Shaun | 11, 12, 13 | 266 | 1:54 |
-| Tharun | 15, 16 | 207 | 1:29 |
-| Sampath | 17, 18 | 205 | 1:28 |
-| **Total** | | 2067 | 14:46 + about 5:00 demo |
+| Adithya | 1, 2, 3, 8, 9, 10, 14, 20 | 759 | 5:25 + about 5:00 demo |
+| Shaun | 4, 5, 11, 12, 13 | 457 | 3:16 |
+| Tharun | 6, 7, 15, 16 | 416 | 2:58 |
+| Sampath | 17, 18, 19, 21, 22 | 487 | 3:29 |
+| **Total** | | 2119 | 15:08 + about 5:00 demo |
 
-Balance: the split was given by the team and is kept as given. Adithya presents most slides and the demo; Shaun, Tharun and Sampath present the data, explanation-check and trust-check slides and answer the backup questions on their parts.
+Split (team decision, 2026-11-19): Adithya: title, outline, overview, architecture, modules, tools, detection accuracy, dashboard and live demo, Thank-you. Shaun: problem, objectives, dataset, partitioning, parameters. Tharun: related work, improvements, both explanation-check slides. Sampath: both trust-check slides, efficiency, what we checked, summary.
 
-Hand-offs: Adithya to Shaun (end of the tools slide), Shaun to Adithya (end of parameters), Adithya to Tharun (end of accuracy), Tharun to Sampath (end of explanation robustness), Sampath to Adithya (end of ByzAgent). The hand-off line is the last sentence of each of those notes.
+Hand-offs, in order (the hand-off line ends the outgoing speaker's note, and the next note opens with a thank-you): Adithya to Shaun (slide 3 to 4), Shaun to Tharun (5 to 6), Tharun to Adithya (7 to 8), Adithya to Shaun (10 to 11), Shaun to Adithya (13 to 14), Adithya to Tharun (14 to 15), Tharun to Sampath (16 to 17), Sampath to Adithya (19 to 20), Adithya to Sampath (20 to 21), Sampath to Adithya (22 to 25).
 
-Backup answers: test set, accuracy at α=0.1 and "what's new": Adithya. Significance of 0.333 vs 0.429: Tharun. Krum and the LLM: Sampath.
+Backup answers: test set and accuracy at α=0.1: Adithya. Significance of 0.333 vs 0.429 and "what's new": Tharun. Krum and the LLM: Sampath. The Bibliography slides are not presented; their notes stay with Adithya.
 
 ## Adithya
 
 ### Slide 1 (Title)
 
-Adithya: Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Prof. Gargi Madala. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted. I will introduce the problem and the system. Shaun covers the data and settings, Tharun the explanation check, Sampath the trust check, and I close with efficiency, the live dashboard and our limitations.
+Adithya: Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Prof. Gargi Madala. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks whether its own explanations and its own participants can be trusted. I give the overview and the system design; Shaun the problem, objectives and data; Tharun related work and the explanation check; Sampath the trust check, efficiency and our summary. I also run the live demo.
 
 - *Likely question:* Who built which part?
 - *Short answer:* Each of us presents the part we worked on; the report lists every member's contribution.
@@ -40,42 +40,14 @@ Adithya: This is the university outline, and we follow it in order. First the in
 
 ### Slide 3 (Project Overview)
 
-Adithya: An intrusion detection system learns what attacks look like from labelled network flows. No single organisation sees every attack, but organisations cannot pool their traffic, because flow records describe internal hosts, users and services. Federated learning lets ten organisations, which we call silos, train one shared detector while their traffic stays at home. Our system has five stages: data, federated training, an explanation check, a trust check, and a dashboard. Stages three and four are separate experiments with separate evidence, and we report them separately throughout.
+Adithya: An intrusion detection system learns what attacks look like from labelled network flows. No single organisation sees every attack, but organisations cannot pool their traffic, because flow records describe internal hosts, users and services. Federated learning lets ten organisations, which we call silos, train one shared detector while their traffic stays at home. Our system has five stages: data, federated training, an explanation check, a trust check, and a dashboard. Stages three and four are separate experiments with separate evidence, and we report them separately throughout. Shaun now sets out the problem.
 
 - *Likely question:* Why not just share anonymised traffic?
 - *Short answer:* Flow records still reveal internal hosts and services; in federated learning only weights and small summaries leave a silo.
 
-### Slide 4 (Problem Statement & Motivations)
-
-Adithya: Most federated IDS papers stop at accuracy. We think two more questions matter to anyone who would run one. First, do the participants' models detect attacks for the same reasons? An analyst reads an explanation, and if each silo's model relies on different features, that explanation depends on whose model was asked. Second, is anyone poisoning the shared model? The server only sees weight updates, so a silo that relabels its own data can bend the model, and an honest silo with unusual traffic can look suspicious too. Those two questions are our two checks.
-
-- *Likely question:* Why would explanations differ if accuracy is the same?
-- *Short answer:* Each silo trains on its own skewed slice of traffic; the same accuracy can rest on different features, and that is what we measure.
-
-### Slide 5 (Objectives & Expected Impact)
-
-Adithya: We set three objectives. One: train a federated detector across ten silos at three levels of label skew. Two: measure how far each silo's explanations agree with the global model, against a seed-noise floor, so that a difference can be told apart from randomness. Three: test whether a local LLM agent can flag poisoned silos, compared with classical robust rules. The impact is practical. An analyst learns when federated explanations can be trusted, and the evaluation is auditable, with every model chosen on validation data.
-
-- *Likely question:* Is the LLM agent meant to replace Krum?
-- *Short answer:* No. We compare it with Krum, Multi-Krum and trimmed mean and report where each one fails.
-
-### Slide 6 (Related Work & Their Limitations)
-
-Adithya: This table is a compact version of Table I in our paper. Several systems already combine federated learning, intrusion detection and explanations, such as FEDFOREST and Bilal et al., so we do not claim that combination. Oki et al. are the closest: they showed that federated training pulls explanations closer to a centralized model. The survey by Gholizade et al. lists explanation consistency under non-IID data as an open challenge with no agreed metric. What stays open is how far Oki's result holds as skew grows, how much seeds alone move rankings, and whether robust rules cope with honest but unusual silos.
-
-- *Likely question:* Which paper is closest to yours?
-- *Short answer:* Oki et al. (IEEE Networking Letters, 2024); we extend their question across label skew and add a seed-noise reference.
-
-### Slide 7 (Improvements over Existing Solutions)
-
-Adithya: Here is how our work differs, stated carefully. We build on Oki et al. and characterise where their reduction in explanation distance breaks down as client data becomes more heterogeneous. We add a null control: centralized models that differ only by random seed, so a federated gap can be compared with seed noise. In the trust check we test the Krum family with ten clients and hand it the true attacker count. And we audit how often our agent's written reasons match the numbers it was shown. We do not claim the combination of federated learning, IDS and explainability.
-
-- *Likely question:* Isn't a seed control standard practice?
-- *Short answer:* Watson et al. showed seeds change explanations; we did not find a seed reference reported in the federated IDS papers we read.
-
 ### Slide 8 (System Architecture / Data Flow)
 
-Adithya: This is the architecture. The data is cleaned once and split once, then spread over ten silos. Each silo trains the shared MLP locally and sends only weights to the server, which averages them with FedAvg and keeps the round that is best on validation. For the explanation check, each silo runs SHAP on its own copy and sends only its top-k feature indices; no raw flows and no SHAP values leave a silo. For the trust check, the server logs five statistics per silo per round. The dashboard serves the selected model, its explanations and the trust decisions.
+Adithya: Thanks, Tharun. This is the architecture. The data is cleaned once and split once, then spread over ten silos. Each silo trains the shared MLP locally and sends only weights to the server, which averages them with FedAvg and keeps the round that is best on validation. For the explanation check, each silo runs SHAP on its own copy and sends only its top-k feature indices; no raw flows and no SHAP values leave a silo. For the trust check, the server logs five statistics per silo per round. The dashboard serves the selected model, its explanations and the trust decisions.
 
 - *Likely question:* What exactly crosses the client-to-server boundary?
 - *Short answer:* Model weights, top-k feature indices and the per-silo statistics; never raw flows or SHAP magnitudes.
@@ -101,33 +73,12 @@ Adithya: Detection first. We report macro-F1, not accuracy, because Benign is 75
 - *Likely question:* Is FedAvgM your headline model?
 - *Short answer:* No. The explanation and trust results use the published FedAvg runs; FedAvgM is our one preregistered test evaluation.
 
-### Slide 19 (Experimental Outcomes: Efficiency)
-
-Adithya: Thanks, Sampath. Serving and communication, measured on one laptop CPU. ONNX Runtime in fp32 gives identical predictions to PyTorch on all 143,513 validation rows and cuts per-flow latency from 186.5 to 45.7 microseconds, so it is our default. At batch 1024, PyTorch has the higher throughput, and we say so. A round moves 1,587,920 bytes for ten silos. Compressing updates saves 50.0% or 74.9% of upload, with no detectable effect at three seeds. int8 quantization for serving was dropped because validation macro-F1 fell by 0.1428.
-
-- *Likely question:* Why not int8 for serving?
-- *Short answer:* Validation macro-F1 fell by 0.1428, with the losses in the small classes, so we kept fp32.
-
 ### Slide 20 (Experimental Outcomes: Dashboard (live demo))
 
-Adithya: Now the live dashboard; I'll switch to the browser for about five minutes and follow the demo script. These three screenshots are the fallback if the demo fails. Left: a live alert with its SHAP contributions and an LLM summary labelled 'not a research result'; those sentences are a usability feature, not a research claim. Middle: the trust panel, clean run against attack run for each organisation. Right: the hot-swap gate, which retrains from the base model and replaces the served model only if it is at least as good on validation. The stream replays validation rows, never test rows.
+Adithya: Thanks, Sampath. Now the live dashboard; I'll switch to the browser for about five minutes and follow the demo script. These three screenshots are the fallback if the demo fails. Left: a live alert with its SHAP contributions and an LLM summary labelled 'not a research result'; those sentences are a usability feature, not a research claim. Middle: the trust panel, clean run against attack run for each organisation. Right: the hot-swap gate, which retrains from the base model and replaces the served model only if it is at least as good on validation. The stream replays validation rows, never test rows. Sampath will then cover what we checked and what failed.
 
 - *Likely question:* Is the dashboard showing test data?
 - *Short answer:* No. It replays validation rows; only the key-figure row shows the preregistered test number, scored once.
-
-### Slide 21 (Experimental Outcomes: What We Checked, and What Failed)
-
-Adithya: We want to be clear about the test set. Every model and round was chosen on validation. Three early choices were first justified with test numbers; re-checked on validation, the same values win, and we disclose it. Since 12 October, only the preregistered FedAvgM checkpoints were scored on test, once. We also report what failed: the rolling-history agent failed its preregistered test, the pre-screen threshold did not transfer across seeds, and int8 was dropped. Every number in the paper and the report was checked against its source file, and all 58 references were verified.
-
-- *Likely question:* Did you touch the test set?
-- *Short answer:* Yes, in documented ways: the audit lists every read, and nothing was selected from it.
-
-### Slide 22 (Key Findings)
-
-Adithya: To summarise. FedAvg holds centralized accuracy at mild skew and loses it at strong skew. In the explanation check, agreement falls with skew, and at alpha 0.1 it reaches the level seeds alone produce, which we report as directional. In the separate trust check, the classical rules and the agent all reacted to silo composition; only the agent also responded to the attack, where silos were not saturated. Our limits: three seeds, a worst-case attacker on the composition axis, and a partly unfaithful agent rationale. Detect the attack, then check the detector.
-
-- *Likely question:* What would you do with three more months?
-- *Short answer:* More seeds for the floor and the baselines, seeded multi-draw SHAP, and a partition design that varies size and skew independently.
 
 ### Slide 23 (not presented: Bibliography)
 
@@ -145,7 +96,7 @@ Adithya: This slide is not presented; it stays up only if asked. These are the m
 
 ### Slide 25 (not presented: 16)
 
-Adithya: Thank you for listening. We are happy to take questions. Whoever owns a section answers first: Shaun for the data and settings, Tharun for the explanation check, Sampath for the trust check, and me for the rest. Anyone may add the limitation that goes with an answer. We never combine the two checks into one claim, and if we did not measure something, we say so rather than guess.
+Adithya: Thank you for listening. We are happy to take questions. Whoever owns a section answers first: Shaun for the problem and the data, Tharun for related work and the explanation check, Sampath for the trust check, efficiency and our checks, and me for the system, accuracy and the demo. Anyone may add the limitation that goes with an answer. We never combine the two checks into one claim, and if we did not measure something, we say so rather than guess.
 
 - *Likely question:* Can you show the demo again?
 - *Short answer:* Yes; the dashboard is still running, and the backup slides cover the hardest questions.
@@ -164,14 +115,21 @@ Adithya: Because of label skew, not federation itself. At alpha 5.0 FedAvg score
 - *Likely question:* Would more rounds fix it?
 - *Short answer:* Not reliably: under skew the global model jumps between rounds, which is why every model is its best-by-validation round.
 
-### Slide 31 (backup: What's new here?)
-
-Adithya: Not the combination of federated learning, intrusion detection and explainability; several recent papers cover that. What we add is a seed-noise null control for explanation agreement, which we did not find reported in the federated IDS work we read; a characterisation of where Oki et al.'s convergence breaks down as alpha falls; a test of the Krum family at ten silos with an oracle attacker count; and an audit of how often the agent's written reasons match its data. All of it sits inside a protocol with validation-only selection.
-
-- *Likely question:* Couldn't someone have done the seed control before?
-- *Short answer:* Possibly; we say we did not find it in the federated IDS papers we read, and we do not claim to be first.
-
 ## Shaun
+
+### Slide 4 (Problem Statement & Motivations)
+
+Shaun: Thank you, Adithya. Most federated IDS papers stop at accuracy. We think two more questions matter to anyone who would run one. First, do the participants' models detect attacks for the same reasons? An analyst reads an explanation, and if each silo's model relies on different features, that explanation depends on whose model was asked. Second, is anyone poisoning the shared model? The server only sees weight updates, so a silo that relabels its own data can bend the model, and an honest silo with unusual traffic can look suspicious too. Those two questions are our two checks.
+
+- *Likely question:* Why would explanations differ if accuracy is the same?
+- *Short answer:* Each silo trains on its own skewed slice of traffic; the same accuracy can rest on different features, and that is what we measure.
+
+### Slide 5 (Objectives & Expected Impact)
+
+Shaun: We set three objectives. One: train a federated detector across ten silos at three levels of label skew. Two: measure how far each silo's explanations agree with the global model, against a seed-noise floor, so that a difference can be told apart from randomness. Three: test whether a local LLM agent can flag poisoned silos, compared with classical robust rules. The impact is practical. An analyst learns when federated explanations can be trusted, and the evaluation is auditable, with every model chosen on validation data. Tharun will now place this against related work.
+
+- *Likely question:* Is the LLM agent meant to replace Krum?
+- *Short answer:* No. We compare it with Krum, Multi-Krum and trimmed mean and report where each one fails.
 
 ### Slide 11 (Dataset Description: Distrinet CICIDS2017 V4)
 
@@ -196,6 +154,20 @@ Shaun: These are the locked settings. StandardScaler, because RobustScaler degen
 
 ## Tharun
 
+### Slide 6 (Related Work & Their Limitations)
+
+Tharun: Thank you, Shaun. This table is a compact version of Table I in our paper. Several systems already combine federated learning, intrusion detection and explanations, such as FEDFOREST and Bilal et al., so we do not claim that combination. Oki et al. are the closest: they showed that federated training pulls explanations closer to a centralized model. The survey by Gholizade et al. lists explanation consistency under non-IID data as an open challenge with no agreed metric. What stays open is how far Oki's result holds as skew grows, how much seeds alone move rankings, and whether robust rules cope with honest but unusual silos.
+
+- *Likely question:* Which paper is closest to yours?
+- *Short answer:* Oki et al. (IEEE Networking Letters, 2024); we extend their question across label skew and add a seed-noise reference.
+
+### Slide 7 (Improvements over Existing Solutions)
+
+Tharun: Here is how our work differs, stated carefully. We build on Oki et al. and characterise where their reduction in explanation distance breaks down as client data becomes more heterogeneous. We add a null control: centralized models that differ only by random seed, so a federated gap can be compared with seed noise. In the trust check we test the Krum family with ten clients and hand it the true attacker count. And we audit how often our agent's written reasons match the numbers it was shown. We do not claim the combination of federated learning, IDS and explainability. Adithya now shows the architecture.
+
+- *Likely question:* Isn't a seed control standard practice?
+- *Short answer:* Watson et al. showed seeds change explanations; we did not find a seed reference reported in the federated IDS papers we read.
+
 ### Slide 15 (Experimental Outcomes: Explanation Check: Agreement vs α)
 
 Tharun: Thank you. Each silo explains the same 14 rows with SHAP on its own model, and we compare its top ten features with the global model's. Median Jaccard at ten rises from 0.333 at alpha 0.1 to 0.538 and 0.667, and weighted tau from 0.592 to 0.844. Every level is 5.1 to 10.3 times chance. The real yardstick is the hatched band: centralized models that differ only by seed agree at 0.429. At alpha 0.1 we fall below that floor while accuracy is still 0.516. The bootstrap interval overlaps the floor, so this is directional, not significant.
@@ -217,6 +189,13 @@ Tharun: No, and we say so on the slide. At alpha 0.1 the median Jaccard at ten i
 - *Likely question:* Why not more seeds to settle it?
 - *Short answer:* Each seed is a full set of federated runs plus SHAP; more seeds for the floor are our first next step.
 
+### Slide 31 (backup: What's new here?)
+
+Tharun: Not the combination of federated learning, intrusion detection and explainability; several recent papers cover that. What we add is a seed-noise null control for explanation agreement, which we did not find reported in the federated IDS work we read; a characterisation of where Oki et al.'s convergence breaks down as alpha falls; a test of the Krum family at ten silos with an oracle attacker count; and an audit of how often the agent's written reasons match its data. All of it sits inside a protocol with validation-only selection.
+
+- *Likely question:* Couldn't someone have done the seed control before?
+- *Short answer:* Possibly; we say we did not find it in the federated IDS papers we read, and we do not claim to be first.
+
 ## Sampath
 
 ### Slide 17 (Experimental Outcomes: Trust Check: Signals, Baselines)
@@ -228,10 +207,31 @@ Sampath: Thank you. The trust check is a separate experiment. At alpha 0.5, thre
 
 ### Slide 18 (Experimental Outcomes: Trust Check: ByzAgent)
 
-Sampath: ByzAgent is a local Llama 3.1 model. Each round it reads the five statistics for all ten silos and answers trust, downweight or quarantine for each one; it is never told the attacker count. The figure shows each malicious silo's flag rate in a clean run, open marker, and under attack, filled. Our locked conclusion is on the right; I'll read it. [Read the quote.] We describe the agent as producing decisions plus a rationale of measured fidelity: its citation error rose from 11.7% to 22.5% at the other seeds. Repeat calls agreed exactly 27 of 30 times. Adithya continues with efficiency.
+Sampath: ByzAgent is a local Llama 3.1 model. Each round it reads the five statistics for all ten silos and answers trust, downweight or quarantine for each one; it is never told the attacker count. The figure shows each malicious silo's flag rate in a clean run, open marker, and under attack, filled. Our locked conclusion is on the right; I'll read it. [Read the quote.] We describe the agent as producing decisions plus a rationale of measured fidelity: its citation error rose from 11.7% to 22.5% at the other seeds. Repeat calls agreed exactly 27 of 30 times. I'll continue with efficiency.
 
 - *Likely question:* So does ByzAgent detect attacks?
 - *Short answer:* Partly: attack-responsive flags appear where silos are not already saturated by composition, as the locked claim says.
+
+### Slide 19 (Experimental Outcomes: Efficiency)
+
+Sampath: Next, serving and communication, measured on one laptop CPU. ONNX Runtime in fp32 gives identical predictions to PyTorch on all 143,513 validation rows and cuts per-flow latency from 186.5 to 45.7 microseconds, so it is our default. At batch 1024, PyTorch has the higher throughput, and we say so. A round moves 1,587,920 bytes for ten silos. Compressing updates saves 50.0% or 74.9% of upload, with no detectable effect at three seeds. int8 quantization for serving was dropped because validation macro-F1 fell by 0.1428. Adithya will now show the live dashboard.
+
+- *Likely question:* Why not int8 for serving?
+- *Short answer:* Validation macro-F1 fell by 0.1428, with the losses in the small classes, so we kept fp32.
+
+### Slide 21 (Experimental Outcomes: What We Checked, and What Failed)
+
+Sampath: Thanks, Adithya. We want to be clear about the test set. Every model and round was chosen on validation. Three early choices were first justified with test numbers; re-checked on validation, the same values win, and we disclose it. Since 12 October, only the preregistered FedAvgM checkpoints were scored on test, once. We also report what failed: the rolling-history agent failed its preregistered test, the pre-screen threshold did not transfer across seeds, and int8 was dropped. Every number in the paper and the report was checked against its source file, and all 58 references were verified.
+
+- *Likely question:* Did you touch the test set?
+- *Short answer:* Yes, in documented ways: the audit lists every read, and nothing was selected from it.
+
+### Slide 22 (Key Findings)
+
+Sampath: To summarise. FedAvg holds centralized accuracy at mild skew and loses it at strong skew. In the explanation check, agreement falls with skew, and at alpha 0.1 it reaches the level seeds alone produce, which we report as directional. In the separate trust check, the classical rules and the agent all reacted to silo composition; only the agent also responded to the attack, where silos were not saturated. Our limits: three seeds, a worst-case attacker on the composition axis, and a partly unfaithful agent rationale. Detect the attack, then check the detector. Adithya will close.
+
+- *Likely question:* What would you do with three more months?
+- *Short answer:* More seeds for the floor and the baselines, seeded multi-draw SHAP, and a partition design that varies size and skew independently.
 
 ### Slide 28 (backup: Why did Krum fail?)
 
