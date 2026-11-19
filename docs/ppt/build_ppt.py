@@ -307,7 +307,14 @@ PAPER = "paper/main.tex"
 def s_title(s):
     tf = shape(s, "TextShape 1").text_frame
     title_run = tf.paragraphs[1].runs[0]
-    title_run.text = "XFed-IDS-ByzAgent: Explainable and Trust-Aware Federated Intrusion Detection"
+    title_run.text = "XFed-IDS-ByzAgent:"
+    # line break after the name, then the rest of the title in a copy of the same run (same formatting)
+    br = etree.SubElement(tf.paragraphs[1]._p, qn("a:br"))
+    br.append(copy.deepcopy(title_run._r.find(qn("a:rPr"))))
+    title_run._r.addnext(br)
+    rest = copy.deepcopy(title_run._r)
+    rest.find(qn("a:t")).text = "Explainable and Trust-Aware Federated Intrusion Detection"
+    br.addnext(rest)   # line 2 fits at the template's 28 pt, so the size is unchanged
     sup = shape(s, "TextShape 2").text_frame.paragraphs[0].runs
     # runs: "Supervised By:", " ", "Prof. /", "Dr.", " "
     sup[2].text = "Prof. Gargi Madala"
