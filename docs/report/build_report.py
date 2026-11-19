@@ -54,6 +54,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REPORT = ROOT / "docs" / "report"
 PRIVATE = REPORT / "private"
 SRC = REPORT / "src"
+SRC_SHORT = REPORT / "src_short"  # condensed version: CHAPTERS.txt lists its chapter files
 TEMPLATE = PRIVATE / "CAPSTONE_THESIS_Sample_Format.docx"
 BIODATA = PRIVATE / "biodata.md"
 PHOTOS = PRIVATE / "photos"
@@ -66,7 +67,9 @@ BIB = ROOT / "paper" / "refs.bib"
 # to print "HoD, Department of <name>" and "the Head of the Department, Department of <name>".
 DEPARTMENT = ""
 TITLE = "XFED-IDS-BYZAGENT: EXPLAINABLE AND TRUST-AWARE FEDERATED INTRUSION DETECTION"
-GUIDE = "Prof. Gargi Madala"
+GUIDE = "Dr. M. Gargi"
+GUIDE_EMAIL = "gargilucky@gmail.com"  # printed under the guide's name in the submission build only
+CAPSTONE_ID = "05A119E7"
 MONTH_YEAR = "NOVEMBER 2026"
 MEMBERS = [  # (name as printed, registration number)
     ("V Naga Adithya", "23BCE9062"),
@@ -498,8 +501,9 @@ def parse_markdown(text):
 
 # ================================================================== builder
 class Report:
-    def __init__(self, submission):
+    def __init__(self, submission, short=False):
         self.submission = submission
+        self.short = short
         self.doc = docx.Document(str(TEMPLATE))
         self.bib = parse_bib(BIB)
         self.cite_order = []
@@ -536,6 +540,22 @@ class Report:
             if txt not in P(i):
                 raise SystemExit(f"template changed: body[{i}] = {P(i)!r}, expected {txt!r}")
 
+    def guide_lines(self, p):
+        """Guide's name, with the e-mail on the next line in the submission build."""
+        run = set_text(p, GUIDE)
+        if self.submission and GUIDE_EMAIL:
+            run.add_break()
+            run2 = p.add_run(GUIDE_EMAIL)
+            if run._r.rPr is not None:
+                run2._r.insert(0, copy.deepcopy(run._r.rPr))
+            run2.bold = False
+            # the e-mail adds a line; drop one blank paragraph beside it so the page does not overflow
+            for sib in (p._p.getnext(), p._p.getprevious()):
+                if sib is not None and sib.tag == qn("w:p") and not Paragraph(sib, self.doc).text.strip() \
+                        and not sib.xpath(".//w:drawing") and not sib.xpath("./w:pPr/w:sectPr"):
+                    sib.getparent().remove(sib)
+                    break
+
     def front_pages(self):
         body = list(self.doc.element.body.iterchildren())
         P = lambda i: Paragraph(body[i], self.doc)
@@ -543,8 +563,11 @@ class Report:
         set_text(P(T_TITLE), TITLE.replace(": ", ":\n", 1))
         for idx, (name, reg) in zip(T_NAMES, MEMBERS):
             set_text(P(idx), f"{name} ({reg})")
-        set_text(P(T_GUIDE), GUIDE)
+        self.guide_lines(P(T_GUIDE))
         set_text(P(T_DATE), MONTH_YEAR)
+        idp = P(T_TITLE + 4)  # empty line under "A CAPSTONE PROJECT REPORT"
+        r = idp.add_run(f"Capstone ID: {CAPSTONE_ID}")
+        r.bold = True
 
         # certificate
         p = P(T_CERT_BODY)
@@ -560,7 +583,7 @@ class Report:
                      "record of bonafide work done under my guidance. The contents of this Project work, in full or "
                      "in parts, have neither been taken from any other source nor have been submitted to any other "
                      "Institute or University for award of any degree or diploma and the same is certified.", rpr)
-        set_text(P(T_CERT_GUIDE), GUIDE)
+        self.guide_lines(P(T_CERT_GUIDE))
         p = P(T_CERT_HOD)
         rpr = copy.deepcopy(p.runs[0]._r.rPr)
         for r in list(p._p):
@@ -849,9 +872,20 @@ class Report:
         self.check_template()
         self.make_styles()
         self.front_pages()
+        # no empty paragraphs after the member list: they can spill onto a page of their own
+        body_el = self.doc.element.body
+        last = body_el[-1] if body_el[-1].tag != qn("w:sectPr") else body_el[-2]
+        while last.tag == qn("w:p") and not Paragraph(last, self.doc).text.strip() and not last.xpath(".//w:drawing"):
+            prev = last.getprevious()
+            body_el.remove(last)
+            last = prev
 
         abstract = (SRC / "00_abstract.md").read_text(encoding="utf-8")
-        chapter_files = sorted(f for f in SRC.glob("[0-9][0-9]*_*.md") if not f.name.startswith("00_"))
+        if self.short:
+            listing = (SRC_SHORT / "CHAPTERS.txt").read_text(encoding="utf-8").split()
+            chapter_files = [REPORT / x for x in listing if x and not x.startswith("#")]
+        else:
+            chapter_files = sorted(f for f in SRC.glob("[0-9][0-9]*_*.md") if not f.name.startswith("00_"))
         chapters = []
         for f in chapter_files:
             for blk in parse_markdown(f.read_text(encoding="utf-8")):
@@ -879,7 +913,8 @@ class Report:
         self.heading_page("List of Figures", tc="LIST OF FIGURES")
         p = self.doc.add_paragraph(style="Normal")
         add_field(p, 'TOC \\h \\z \\t "Figure Caption,1"', "Right-click and choose Update Field.")
-        for fname, heading in (("00_abbreviations.md", "List of Abbreviations"), ("00_symbols.md", "List of Symbols")):
+        front_lists = [("00_abbreviations.md", "List of Abbreviations"), ("00_symbols.md", "List of Symbols")]
+        for fname, heading in front_lists:
             path = SRC / fname
             if not path.exists():
                 continue
@@ -954,7 +989,7 @@ class Report:
         self.uncited = sorted(set(self.bib) - set(self.cite_order))
 
         if self.submission:
-            self.biodata()
+            self.biodata_compact() if self.short else self.biodata()
 
         self.doc.core_properties.title = "XFed-IDS-ByzAgent: Explainable and Trust-Aware Federated Intrusion Detection"
         self.doc.core_properties.author = ", ".join(n for n, _ in MEMBERS)
@@ -975,12 +1010,7 @@ class Report:
                   ("Permanent Address", "Permanent Address")]
         for k, person in enumerate(people):
             reg = person.get("Reg. No.", "").strip()
-            photo = None
-            for folder in (PHOTOS, PRIVATE):  # private/photos/ or directly in private/
-                for ext in (".jpg", ".jpeg", ".png"):
-                    cand = folder / f"{reg}{ext}"
-                    if photo is None and cand.exists():
-                        photo = cand
+            photo = find_photo(reg)
             if photo is None:
                 self.missing_photos.append(f"{person.get('Name', '?')} ({reg})")
             t = self.doc.add_table(rows=1, cols=2 if photo else 1)
@@ -1012,6 +1042,62 @@ class Report:
                 p.add_run(f"{label}\t: {person.get(key, '').strip()}")
             spacer = self.doc.add_paragraph(style="Normal")
             set_spacing(spacer, after=480)
+
+
+    def biodata_compact(self):
+        """All members on one page: photo beside Name, Reg. No., Mobile, E-mail, Address."""
+        text = BIODATA.read_text(encoding="utf-8")
+        people = []
+        for blockm in re.finditer(r"^##\s+(.*?)\n(.*?)(?=^##\s|\Z)", text, re.S | re.M):
+            people.append(dict(re.findall(r"^-\s*([^:]+):\s*(.*)$", blockm.group(2), re.M)))
+        order = {reg: k for k, (_, reg) in enumerate(MEMBERS)}
+        people.sort(key=lambda f: order.get(f.get("Reg. No.", "").strip(), 99))
+        self.heading_page("BIODATA", tc="BIODATA", style_line=259)
+        labels = [("Name", "Name"), ("Reg. No.", "Reg. No."), ("Mobile Number", "Mobile"), ("E-mail", "E-mail"),
+                  ("Permanent Address", "Permanent Address")]
+        t = self.doc.add_table(rows=len(people), cols=2)
+        t.alignment = WD_TABLE_ALIGNMENT.CENTER
+        for k, person in enumerate(people):
+            reg = person.get("Reg. No.", "").strip()
+            photo = find_photo(reg)
+            row = t.rows[k]
+            row._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
+            pc, info = row.cells
+            pc.width, info.width = Cm(3.4), Cm(13.0)
+            if photo:
+                pc.paragraphs[0].add_run().add_picture(str(photo), width=Cm(2.7))
+            else:
+                self.missing_photos.append(f"{person.get('Name', '?')} ({reg})")
+            set_spacing(pc.paragraphs[0], after=200)
+            first = True
+            for label, key in labels:
+                p = info.paragraphs[0] if first else info.add_paragraph()
+                first = False
+                p.style = self.doc.styles["Normal"]
+                set_spacing(p, line=264, after=0)
+                tabs = OxmlElement("w:tabs")
+                tab = OxmlElement("w:tab")
+                tab.set(qn("w:val"), "left")
+                tab.set(qn("w:pos"), "2127")
+                tabs.append(tab)
+                ppr(p).append(tabs)
+                ind = OxmlElement("w:ind")
+                ind.set(qn("w:left"), "2268")
+                ind.set(qn("w:hanging"), "2268")
+                ppr(p).append(ind)
+                r = p.add_run(f"{label}\t: {person.get(key, '').strip()}")
+                r.font.size = Pt(11)
+            set_spacing(info.paragraphs[-1], after=280)
+
+
+def find_photo(reg):
+    """A member's photo: private/photos/<reg>.<ext> or private/<reg>.<ext> (double extensions allowed)."""
+    for folder in (PHOTOS, PRIVATE):
+        for ext in (".jpg", ".jpeg", ".png", ".jpg.jpeg", ".jpeg.jpg", ".png.jpg"):
+            cand = folder / f"{reg}{ext}"
+            if cand.exists():
+                return cand
+    return None
 
 
 # ================================================================== figures that must be prepared
@@ -1080,19 +1166,28 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-pdf", action="store_true")
     ap.add_argument("--only", choices=["public", "submission"])
+    version = ap.add_mutually_exclusive_group()
+    version.add_argument("--short", action="store_true", help="condensed report (default)")
+    version.add_argument("--full", action="store_true", help="complete-record report (_FULL)")
+    version.add_argument("--both", action="store_true", help="build the short and the full report")
     args = ap.parse_args()
     prepare_figures()
-    builds = [("public", REPORT / "XFed_Capstone_Report.docx", False),
-              ("submission", PRIVATE / "XFed_Capstone_Report_SUBMISSION.docx", True)]
-    for name, out, sub in builds:
+    versions = [False, True] if args.both else [bool(args.full)]
+    builds = []
+    for full in versions:
+        tag = "_FULL" if full else ""
+        builds += [("public", REPORT / f"XFed_Capstone_Report{tag}.docx", False, full),
+                   ("submission", PRIVATE / f"XFed_Capstone_Report{tag}_SUBMISSION.docx", True, full)]
+    for name, out, sub, full in builds:
         if args.only and args.only != name:
             continue
-        rep = Report(submission=sub)
+        name = f"{'full' if full else 'short'} {name}"
+        rep = Report(submission=sub, short=not full)
         rep.build(out)
         print(f"[{name}] wrote {out.relative_to(ROOT)}; {len(rep.cite_order)} references cited, "
               f"{len(rep.labels)} labels")
         if rep.uncited:
-            print(f"[{name}] bib entries not cited: {', '.join(rep.uncited)}")
+            print(f"[{name}] bib entries not cited: {len(rep.uncited)}")
         if rep.missing_photos:
             print(f"[{name}] biodata photos missing (no photo printed): {'; '.join(rep.missing_photos)}")
         if not args.no_pdf:
