@@ -317,12 +317,24 @@ def s_title(s):
     br.addnext(rest)   # line 2 fits at the template's 28 pt, so the size is unchanged
     sup = shape(s, "TextShape 2").text_frame.paragraphs[0].runs
     # runs: "Supervised By:", " ", "Prof. /", "Dr.", " "
-    sup[2].text = "Prof. Gargi Madala"
+    sup[2].text = "Dr. M. Gargi"
     for r in sup[3:]:
         r.text = ""
+    # the guide's e-mail on its own line under the name, in the name's colour, not bold
+    sup_p = shape(s, "TextShape 2").text_frame.paragraphs[0]
+    mail_p = copy.deepcopy(sup_p._p)
+    for r in mail_p.findall(qn("a:r")):
+        mail_p.remove(r)
+    sup_p._p.addnext(mail_p)
+    from pptx.text.text import _Paragraph
+    _run(_Paragraph(mail_p, sup_p._parent), "gargilucky@gmail.com", 14, color=RGBColor(0x36, 0x13, 0x09))
     team = shape(s, "CustomShape 3").text_frame
     paras = team.paragraphs
-    # paras[0] = "SDP Id:" (left blank to write by hand), paras[1] = "Name of the Student(s) with Regd. No.:"
+    # paras[0] = "SDP Id:", paras[1] = "Name of the Student(s) with Regd. No.:"
+    sdp_end = paras[0]._p.find(qn("a:endParaRPr"))
+    _run(paras[0], " 05A119E7", 14, bold=True)
+    if sdp_end is not None:
+        paras[0]._p.append(sdp_end)  # keep endParaRPr last, as the schema requires
     names = ["V Naga Adithya (23BCE9062)", "T Shaun (23BCE9916)", "P Sampath (23BCE8614)",
              "D Tharun (23BCE8818)"]
     for p, name in zip(paras[2:6], names):
@@ -335,8 +347,8 @@ def s_title(s):
             if "Amravati" in r.text:
                 r.text = r.text.replace("Amravati", "Amaravati")
     notes(s, "Adithya",
-          "Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Prof. Gargi "
-          "Madala. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. "
+          "Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Dr. M. "
+          "Gargi. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. "
           "In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks "
           "whether its own explanations and its own participants can be trusted. I give the overview and the system "
           "design; Shaun the problem, objectives and data; Tharun related work and the explanation check; Sampath "
