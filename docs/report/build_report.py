@@ -68,7 +68,6 @@ BIB = ROOT / "paper" / "refs.bib"
 DEPARTMENT = ""
 TITLE = "XFED-IDS-BYZAGENT: EXPLAINABLE AND TRUST-AWARE FEDERATED INTRUSION DETECTION"
 GUIDE = "Dr. M. Gargi"
-GUIDE_EMAIL = "gargilucky@gmail.com"  # printed under the guide's name in the submission build only
 CAPSTONE_ID = "05A119E7"
 MONTH_YEAR = "NOVEMBER 2026"
 MEMBERS = [  # (name as printed, registration number)
@@ -541,20 +540,8 @@ class Report:
                 raise SystemExit(f"template changed: body[{i}] = {P(i)!r}, expected {txt!r}")
 
     def guide_lines(self, p):
-        """Guide's name, with the e-mail on the next line in the submission build."""
-        run = set_text(p, GUIDE)
-        if self.submission and GUIDE_EMAIL:
-            run.add_break()
-            run2 = p.add_run(GUIDE_EMAIL)
-            if run._r.rPr is not None:
-                run2._r.insert(0, copy.deepcopy(run._r.rPr))
-            run2.bold = False
-            # the e-mail adds a line; drop one blank paragraph beside it so the page does not overflow
-            for sib in (p._p.getnext(), p._p.getprevious()):
-                if sib is not None and sib.tag == qn("w:p") and not Paragraph(sib, self.doc).text.strip() \
-                        and not sib.xpath(".//w:drawing") and not sib.xpath("./w:pPr/w:sectPr"):
-                    sib.getparent().remove(sib)
-                    break
+        """Guide's name only (no e-mail in any build)."""
+        set_text(p, GUIDE)
 
     def front_pages(self):
         body = list(self.doc.element.body.iterchildren())
