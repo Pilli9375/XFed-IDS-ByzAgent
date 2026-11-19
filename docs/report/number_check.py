@@ -195,9 +195,10 @@ def tokens(text):
 
 def main():
     rows, problems, ignored = [], 0, []
-    files = sorted(f for f in os.listdir(SRC) if f.endswith(".md"))
+    files = [os.path.join(d, f) for d in ("src", "src_short")
+             for f in sorted(os.listdir(os.path.join(ROOT, "docs", "report", d))) if f.endswith(".md")]
     for fname in files:
-        for blk in blocks_of(os.path.join(SRC, fname)):
+        for blk in blocks_of(os.path.join(ROOT, "docs", "report", fname)):
             chapter, section, text, srcs, ign = blk[:5]
             toks = tokens(text)
             if not toks:
