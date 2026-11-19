@@ -320,17 +320,13 @@ def s_title(s):
     sup[2].text = "Dr. M. Gargi"
     for r in sup[3:]:
         r.text = ""
-    # the guide's e-mail on its own line under the name, in the name's colour, not bold
-    sup_p = shape(s, "TextShape 2").text_frame.paragraphs[0]
-    mail_p = copy.deepcopy(sup_p._p)
-    for r in mail_p.findall(qn("a:r")):
-        mail_p.remove(r)
-    sup_p._p.addnext(mail_p)
-    from pptx.text.text import _Paragraph
-    _run(_Paragraph(mail_p, sup_p._parent), "gargilucky@gmail.com", 14, color=RGBColor(0x36, 0x13, 0x09))
     team = shape(s, "CustomShape 3").text_frame
     paras = team.paragraphs
-    # paras[0] = "SDP Id:", paras[1] = "Name of the Student(s) with Regd. No.:"
+    # paras[0] = "SDP Id:" (runs "SDP", " ", "Id", ":"), relabelled "Capstone Id:" in the same red run;
+    # paras[1] = "Name of the Student(s) with Regd. No.:"
+    for r in paras[0].runs:
+        if r.text == "SDP":
+            r.text = "Capstone"
     sdp_end = paras[0]._p.find(qn("a:endParaRPr"))
     _run(paras[0], " 05A119E7", 14, bold=True)
     if sdp_end is not None:
