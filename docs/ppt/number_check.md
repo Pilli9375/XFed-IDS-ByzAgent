@@ -257,8 +257,8 @@ Numbers inside figures are not text and are not in this table: the three paper f
 | slide 19 | notes | 0.1428 | docs/efficiency_results.md | match (exact) |
 | slide 21 | table | 2,279 | paper/number_check.md | match (exact) |
 | slide 21 | table | 2,279 | paper/number_check.md | match (exact) |
-| slide 21 | table | 4,038 | docs/report/number_check.md | match (exact) |
-| slide 21 | table | 4,038 | docs/report/number_check.md | match (exact) |
+| slide 21 | table | 5,211 | docs/report/number_check.md | match (exact) |
+| slide 21 | table | 5,211 | docs/report/number_check.md | match (exact) |
 | slide 21 | table | 2026 | PROJECT_INSTRUCTIONS.md | match (exact) |
 | slide 21 | table | 10 | PROJECT_INSTRUCTIONS.md | match (exact) |
 | slide 21 | table | 12 | PROJECT_INSTRUCTIONS.md | match (exact) |
