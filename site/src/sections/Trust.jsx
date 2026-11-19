@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { trust, sources as sourcesLabel } from '../copy.js';
 import { d, loadLarge, src, srcAttack, srcByz } from '../data.js';
 import { f2, f3, pctWhole, pp, signed2 } from '../format.js';
-import { prefersReduced, useInView } from '../motion.js';
+import { AFTER_CURTAIN, prefersReduced, useCurtain, useDragScroll, useInView } from '../motion.js';
 import Rich from '../components/Rich.jsx';
 import Src from '../components/Src.jsx';
 import Reveal from '../components/Reveal.jsx';
+import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 
 const LABELS = ['trust', 'downweight', 'quarantine'];
 const GLYPH = ['', '–', '×'];
@@ -37,10 +38,10 @@ function shape(byz) {
 
 function Cards() {
   const ref = useRef(null);
-  const seen = useInView(ref);
+  const seen = useInView(ref, { rootMargin: AFTER_CURTAIN });
   const cards = [
-    { k: trust.cards.multiKrum, v: pctWhole(d.multiKrumExclusion), cls: 'v1', dot: true, href: src('multiKrum') },
-    { k: trust.cards.krumCost, v: pp(d.krumCleanCost), cls: 'v2', href: src('krumCost') },
+    { k: trust.cards.multiKrum, v: pctWhole(d.multiKrumExclusion), cls: 'v1 slam', dot: true, href: src('multiKrum') },
+    { k: trust.cards.krumCost, v: pp(d.krumCleanCost), cls: 'v2 slam', href: src('krumCost') },
     { k: trust.cards.signal, v: trust.cards.signalValue, cls: 'v3', href: src('attackSignal') },
   ];
   return (
@@ -48,7 +49,7 @@ function Cards() {
       {cards.map((c, i) => (
         <div key={c.k} className={`tcard rv lift${seen ? ' in' : ''}`} style={{ transitionDelay: `${i * 0.1}s` }}>
           <div className="k mono">{c.dot && <span className="pulse" aria-hidden="true" />}{c.k}</div>
-          <div className={`v ${c.cls} disp`}>{c.v}</div>
+          <div className={`v ${c.cls} disp`} style={{ animationDelay: `${0.3 + i * 0.14}s` }}>{c.v}</div>
           <Src href={c.href} />
         </div>
       ))}
@@ -58,6 +59,8 @@ function Cards() {
 
 function Grid({ T, seed, tr, sel, setSel }) {
   const cellRefs = useRef({});
+  const scrollRef = useRef(null);
+  useDragScroll(scrollRef);
   const nR = d.nRounds;
   const nS = d.nSilos;
   const key = (side, silo, round) => `${side}-${silo}-${round}`;
@@ -118,7 +121,7 @@ function Grid({ T, seed, tr, sel, setSel }) {
   const [kh, nh] = count('b', (s) => !T.mal.includes(s));
 
   return (
-    <div className="tgrid-scroll">
+    <div ref={scrollRef} className="tgrid-scroll">
       <div className="tgrid">
         <div className="thead mono">
           <div className="c-lab" style={{ border: 0 }} />
@@ -184,7 +187,9 @@ function Detail({ T, seed, sel }) {
 
 export default function Trust() {
   const secRef = useRef(null);
+  const curtainRef = useRef(null);
   const gridRef = useRef(null);
+  useCurtain(secRef, curtainRef);
   const near = useInView(secRef, { rootMargin: '1200px 0px', threshold: 0 });
   const gridSeen = useInView(gridRef, { threshold: 0.18 });
   const [data, setData] = useState(null);
@@ -220,12 +225,11 @@ export default function Trust() {
 
   return (
     <section id="trust" ref={secRef} className="trust dark" aria-labelledby="trust-title">
+      <div ref={curtainRef} className="curtain" aria-hidden="true" />
       <div className="wrap">
-        <Reveal>
-          <p className="kicker mono">{trust.kicker}</p>
-          <h2 id="trust-title" className="h2 big disp"><Rich parts={trust.title} /></h2>
-          <p className="lede">{trust.body}</p>
-        </Reveal>
+        <Wipe className="kicker mono" rootMargin={AFTER_CURTAIN}>{trust.kicker}</Wipe>
+        <SplitHeading id="trust-title" className="h2 big disp" parts={trust.title} rootMargin={AFTER_CURTAIN} />
+        <Reveal as="p" className="lede" rootMargin={AFTER_CURTAIN} style={{ transitionDelay: '.35s' }}>{trust.body}</Reveal>
 
         <Cards />
 

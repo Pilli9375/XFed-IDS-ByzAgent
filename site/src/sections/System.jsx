@@ -2,18 +2,15 @@ import { useRef } from 'react';
 import { system } from '../copy.js';
 import { d } from '../data.js';
 import { useInView } from '../motion.js';
-import Rich from '../components/Rich.jsx';
-import Reveal from '../components/Reveal.jsx';
+import SplitHeading, { Wipe } from '../components/SplitHeading.jsx';
 
 export default function System() {
   const grid = useRef(null);
   const seen = useInView(grid);
   return (
     <section id="system" className="system" aria-labelledby="system-title">
-      <Reveal>
-        <p className="kicker mono">{system.kicker}</p>
-        <h2 id="system-title" className="h2 disp"><Rich parts={system.title} emClass="plum" /></h2>
-      </Reveal>
+      <Wipe className="kicker mono">{system.kicker}</Wipe>
+      <SplitHeading id="system-title" className="h2 disp" parts={system.title} emClass="plum" />
       <ol ref={grid} className="stages" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {system.stages.map((s, i) => (
           <li key={s.n} className={`stage ${s.tone} rv lift${seen ? ' in' : ''}`} style={{ transitionDelay: `${i * 0.09}s` }}>

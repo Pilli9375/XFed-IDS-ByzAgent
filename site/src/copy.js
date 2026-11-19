@@ -41,6 +41,9 @@ export const hero = {
   badge: 'EVERY NUMBER · LINKS TO · ITS SOURCE · ',
   ctaReplay: 'Watch the replay',
   ctaFindings: 'Read the findings',
+  // film length: public/film/xfed_film_16x9.mp4 runs 70.8 s (film/src/timeline.json, 2124 frames at 30 fps)
+  ctaFilm: 'Watch the 70-second film',
+  filmClose: 'Close',
   stats: {
     flows: 'flows after cleaning',
     orgs: 'organizations, no data shared',

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { startSmoothScroll, useAnchorScroll } from './motion.js';
+import { startSmoothScroll, useAnchorScroll, useRefreshOnResize } from './motion.js';
 import Loader from './sections/Loader.jsx';
 import Nav from './sections/Nav.jsx';
 import Hero from './sections/Hero.jsx';
@@ -11,6 +11,7 @@ import Trust from './sections/Trust.jsx';
 import Replay from './sections/Replay.jsx';
 import Limits from './sections/Limits.jsx';
 import Footer from './sections/Footer.jsx';
+import Cursor from './components/Cursor.jsx';
 
 // 'loading' (counter running) -> 'leaving' (panel sliding up, hero plays) -> 'done'
 const initialPhase = () => (document.documentElement.classList.contains('with-loader') ? 'loading' : 'done');
@@ -20,6 +21,7 @@ export default function App() {
 
   useEffect(() => startSmoothScroll(), []);
   useAnchorScroll();
+  useRefreshOnResize();
 
   return (
     <div className="page">
@@ -36,6 +38,7 @@ export default function App() {
         <Limits />
       </main>
       <Footer />
+      <Cursor />
     </div>
   );
 }
