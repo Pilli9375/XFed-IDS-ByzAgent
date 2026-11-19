@@ -322,11 +322,13 @@ def s_title(s):
         r.text = ""
     team = shape(s, "CustomShape 3").text_frame
     paras = team.paragraphs
-    # paras[0] = "SDP Id:" (runs "SDP", " ", "Id", ":"), relabelled "Capstone Id:" in the same red run;
+    # paras[0] = "SDP Id:" (runs "SDP", " ", "Id", ":"), relabelled "Capstone ID:" in the same red runs;
     # paras[1] = "Name of the Student(s) with Regd. No.:"
     for r in paras[0].runs:
         if r.text == "SDP":
             r.text = "Capstone"
+        elif r.text == "Id":
+            r.text = "ID"
     sdp_end = paras[0]._p.find(qn("a:endParaRPr"))
     _run(paras[0], " 05A119E7", 14, bold=True)
     if sdp_end is not None:
