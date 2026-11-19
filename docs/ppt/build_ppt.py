@@ -7,6 +7,8 @@ Input:  docs/ppt/template/Capstone_PPT_Template.pptx (16 slides, 16:9)
 Output: docs/ppt/XFed_Capstone_Final_Review.pptx
         docs/ppt/slide_sources.json   (per slide: source files for every number on it)
         docs/ppt/speaker_script.md    (all notes grouped by speaker, timing, demo script)
+Then run docs/ppt/export_pdf.ps1: it re-saves the deck through PowerPoint with all fonts embedded
+(Bebas Neue, the template's title-slide font, must be installed) and exports the PDF.
 
 Every output slide is a clone of one template slide, so the title style, logo,
 page-number dot and fonts are the template's own. Page numbers are the template's
@@ -1388,6 +1390,11 @@ def main():
         built.append((s, fn.__name__, speaker, sources))
     for s in originals:
         delete_slide(PRS, s)
+    # Ask PowerPoint to embed the fonts, every character (not a subset); export_pdf.ps1 then
+    # re-saves through PowerPoint, which writes the font data into the file.
+    root = PRS.part._element
+    root.set("embedTrueTypeFonts", "1")
+    root.set("saveSubsetFonts", "0")
     PRS.save(OUT)
 
     meta = []
