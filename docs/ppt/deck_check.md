@@ -12,14 +12,14 @@ Wording searched in slides, tables, notes and `speaker_script.md`: "first to", "
 
 | Slide | Speaker | Spoken words |
 |---:|---|---:|
-| 1 | Adithya | 90 |
+| 1 | Adithya | 92 |
 | 2 | Adithya | 90 |
-| 3 | Adithya | 86 |
-| 4 | Adithya | 95 |
-| 5 | Adithya | 85 |
-| 6 | Adithya | 102 |
-| 7 | Adithya | 99 |
-| 8 | Adithya | 99 |
+| 3 | Adithya | 92 |
+| 4 | Shaun | 98 |
+| 5 | Shaun | 93 |
+| 6 | Tharun | 105 |
+| 7 | Tharun | 104 |
+| 8 | Adithya | 101 |
 | 9 | Adithya | 84 |
 | 10 | Adithya | 84 |
 | 11 | Shaun | 95 |
@@ -30,16 +30,16 @@ Wording searched in slides, tables, notes and `speaker_script.md`: "first to", "
 | 16 | Tharun | 110 |
 | 17 | Sampath | 103 |
 | 18 | Sampath | 102 |
-| 19 | Adithya | 85 |
-| 20 | Adithya | 100 |
-| 21 | Adithya | 94 |
-| 22 | Adithya | 92 |
+| 19 | Sampath | 91 |
+| 20 | Adithya | 112 |
+| 21 | Sampath | 96 |
+| 22 | Sampath | 95 |
 | 23 | Adithya | 86 |
 | 24 | Adithya | 86 |
-| 25 | Adithya | 69 |
+| 25 | Adithya | 81 |
 | 26 | Adithya | 90 |
 | 27 | Tharun | 90 |
 | 28 | Sampath | 85 |
 | 29 | Sampath | 91 |
 | 30 | Adithya | 81 |
-| 31 | Adithya | 89 |
+| 31 | Tharun | 89 |

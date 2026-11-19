@@ -7,6 +7,8 @@ Input:  docs/ppt/template/Capstone_PPT_Template.pptx (16 slides, 16:9)
 Output: docs/ppt/XFed_Capstone_Final_Review.pptx
         docs/ppt/slide_sources.json   (per slide: source files for every number on it)
         docs/ppt/speaker_script.md    (all notes grouped by speaker, timing, demo script)
+Then run docs/ppt/export_pdf.ps1: it re-saves the deck through PowerPoint with all fonts embedded
+(Bebas Neue, the template's title-slide font, must be installed) and exports the PDF.
 
 Every output slide is a clone of one template slide, so the title style, logo,
 page-number dot and fonts are the template's own. Page numbers are the template's
@@ -329,9 +331,9 @@ def s_title(s):
           "Good morning. We are V Naga Adithya, T Shaun, P Sampath and D Tharun, supervised by Prof. Gargi "
           "Madala. Our project is XFed-IDS-ByzAgent: explainable and trust-aware federated intrusion detection. "
           "In one line, it is a federated intrusion detection system that doesn't just detect attacks, but checks "
-          "whether its own explanations and its own participants can be trusted. I will introduce the problem and "
-          "the system. Shaun covers the data and settings, Tharun the explanation check, Sampath the trust check, "
-          "and I close with efficiency, the live dashboard and our limitations.",
+          "whether its own explanations and its own participants can be trusted. I give the overview and the system "
+          "design; Shaun the problem, objectives and data; Tharun related work and the explanation check; Sampath "
+          "the trust check, efficiency and our summary. I also run the live demo.",
           "Who built which part?",
           "Each of us presents the part we worked on; the report lists every member's contribution.")
 
@@ -384,14 +386,15 @@ def s_overview(s):
           "describe internal hosts, users and services. Federated learning lets ten organisations, which we call "
           "silos, train one shared detector while their traffic stays at home. Our system has five stages: data, "
           "federated training, an explanation check, a trust check, and a dashboard. Stages three and four are "
-          "separate experiments with separate evidence, and we report them separately throughout.",
+          "separate experiments with separate evidence, and we report them separately throughout. Shaun now sets "
+          "out the problem.",
           "Why not just share anonymised traffic?",
           "Flow records still reveal internal hosts and services; in federated learning only weights and small "
           "summaries leave a silo.")
 
 
 # 4 ---------------------------------------------------------------------------- problem
-@slide(T_PROBLEM, "Adithya", [PAPER])
+@slide(T_PROBLEM, "Shaun", [PAPER])
 def s_problem(s):
     set_heading(s, "Problem Statement & Motivations")
     add_text(s, 0.3, 1.2, 9.2, 1.6, bullets([
@@ -405,8 +408,8 @@ def s_problem(s):
     box(s, 5.1, 3.0, 4.2, 1.45, ["Is anyone poisoning the model?",
                                  "The server sees only weights; a silo can relabel its data"],
         fill=TINT_B, line=BLUE, size=16)
-    notes(s, "Adithya",
-          "Most federated IDS papers stop at accuracy. We think two more questions matter to anyone who would run "
+    notes(s, "Shaun",
+          "Thank you, Adithya. Most federated IDS papers stop at accuracy. We think two more questions matter to anyone who would run "
           "one. First, do the participants' models detect attacks for the same reasons? An analyst reads an "
           "explanation, and if each silo's model relies on different features, that explanation depends on whose "
           "model was asked. Second, is anyone poisoning the shared model? The server only sees weight updates, so "
@@ -418,7 +421,7 @@ def s_problem(s):
 
 
 # 5 ---------------------------------------------------------------------------- objectives
-@slide(T_OBJ, "Adithya", [PI])
+@slide(T_OBJ, "Shaun", [PI])
 def s_objectives(s):
     set_heading(s, "Objectives & Expected Impact")
     add_text(s, 0.3, 1.15, 4.6, 0.4, [{"text": "Objectives", "size": 18, "bold": True, "color": MAROON}])
@@ -432,19 +435,19 @@ def s_objectives(s):
         "Analysts learn when federated explanations can be trusted",
         "An auditable protocol: validation selection, one preregistered test read",
     ], size=18, space=14))
-    notes(s, "Adithya",
+    notes(s, "Shaun",
           "We set three objectives. One: train a federated detector across ten silos at three levels of label "
           "skew. Two: measure how far each silo's explanations agree with the global model, against a seed-noise "
           "floor, so that a difference can be told apart from randomness. Three: test whether a local LLM agent can "
           "flag poisoned silos, compared with classical robust rules. The impact is practical. An analyst learns "
           "when federated explanations can be trusted, and the evaluation is auditable, with every model chosen "
-          "on validation data.",
+          "on validation data. Tharun will now place this against related work.",
           "Is the LLM agent meant to replace Krum?",
           "No. We compare it with Krum, Multi-Krum and trimmed mean and report where each one fails.")
 
 
 # 6 ---------------------------------------------------------------------------- related work
-@slide(T_RELATED, "Adithya", [PAPER, "paper/refs.bib"])
+@slide(T_RELATED, "Tharun", [PAPER, "paper/refs.bib"])
 def s_related(s):
     set_heading(s, "Related Work & Their Limitations")
     Y = "✓"
@@ -474,8 +477,8 @@ def s_related(s):
         "No seed-noise reference in federated IDS agreement numbers",
         "Robust rules assume honest clients look alike",
     ], size=14, space=8))
-    notes(s, "Adithya",
-          "This table is a compact version of Table I in our paper. Several systems already combine federated "
+    notes(s, "Tharun",
+          "Thank you, Shaun. This table is a compact version of Table I in our paper. Several systems already combine federated "
           "learning, intrusion detection and explanations, such as FEDFOREST and Bilal et al., so we do not claim "
           "that combination. Oki et al. are the closest: they showed that federated training pulls explanations "
           "closer to a centralized model. The survey by Gholizade et al. lists explanation consistency under "
@@ -488,7 +491,7 @@ def s_related(s):
 
 
 # 7 ---------------------------------------------------------------------------- improvements
-@slide(T_IMPROVE, "Adithya", [PI])
+@slide(T_IMPROVE, "Tharun", [PI])
 def s_improve(s):
     set_heading(s, "Improvements over Existing Solutions")
     add_text(s, 0.3, 1.25, 9.2, 3.4, bullets([
@@ -498,13 +501,14 @@ def s_improve(s):
         "Audits how often the agent's own explanations are accurate",
         "Not claimed: the FL + IDS + XAI combination itself",
     ], size=18, space=14))
-    notes(s, "Adithya",
+    notes(s, "Tharun",
           "Here is how our work differs, stated carefully. We build on Oki et al. and characterise where their "
           "reduction in explanation distance breaks down as client data becomes more heterogeneous. We add a null "
           "control: centralized models that differ only by random seed, so a federated gap can be compared with "
           "seed noise. In the trust check we test the Krum family with ten clients and hand it the true attacker "
           "count. And we audit how often our agent's written reasons match the numbers it was shown. We do not "
-          "claim the combination of federated learning, IDS and explainability.",
+          "claim the combination of federated learning, IDS and explainability. Adithya now shows the "
+          "architecture.",
           "Isn't a seed control standard practice?",
           "Watson et al. showed seeds change explanations; we did not find a seed reference reported in the "
           "federated IDS papers we read.")
@@ -550,7 +554,7 @@ def s_arch(s):
                  ("Leaves: ", True), ("weights, top-k indices, statistics.", False)],
         "size": 14}])
     notes(s, "Adithya",
-          "This is the architecture. The data is cleaned once and split once, then spread over ten silos. Each "
+          "Thanks, Tharun. This is the architecture. The data is cleaned once and split once, then spread over ten silos. Each "
           "silo trains the shared MLP locally and sends only weights to the server, which averages them with "
           "FedAvg and keeps the round that is best on validation. For the explanation check, each silo runs SHAP "
           "on its own copy and sends only its top-k feature indices; no raw flows and no SHAP values leave a "
@@ -867,14 +871,14 @@ def s_trust2(s):
           "shows each malicious silo's flag rate in a clean run, open marker, and under attack, filled. Our locked "
           "conclusion is on the right; I'll read it. [Read the quote.] We describe the agent as producing "
           "decisions plus a rationale of measured fidelity: its citation error rose from 11.7% to 22.5% at the "
-          "other seeds. Repeat calls agreed exactly 27 of 30 times. Adithya continues with efficiency.",
+          "other seeds. Repeat calls agreed exactly 27 of 30 times. I'll continue with efficiency.",
           "So does ByzAgent detect attacks?",
           "Partly: attack-responsive flags appear where silos are not already saturated by composition, as the "
           "locked claim says.")
 
 
 # 13f -------------------------------------------------------------------------- efficiency
-@slide(T_RESULTS, "Adithya", [PI, EFF, PAPER])
+@slide(T_RESULTS, "Sampath", [PI, EFF, PAPER])
 @results_slide("Efficiency")
 def s_eff(s):
     rows = [["Quantity (CPU, one laptop)", "Value"],
@@ -888,13 +892,13 @@ def s_eff(s):
         "ONNX fp32 is the default: identical predictions on 143,513 validation rows",
         "Compression: no detectable effect at n=3; int8 serving dropped",
     ], size=16, space=6))
-    notes(s, "Adithya",
-          "Thanks, Sampath. Serving and communication, measured on one laptop CPU. ONNX Runtime in fp32 gives "
+    notes(s, "Sampath",
+          "Next, serving and communication, measured on one laptop CPU. ONNX Runtime in fp32 gives "
           "identical predictions to PyTorch on all 143,513 validation rows and cuts per-flow latency from 186.5 to "
           "45.7 microseconds, so it is our default. At batch 1024, PyTorch has the higher throughput, and we say "
           "so. A round moves 1,587,920 bytes for ten silos. Compressing updates saves 50.0% or 74.9% of upload, "
           "with no detectable effect at three seeds. int8 quantization for serving was dropped because validation "
-          "macro-F1 fell by 0.1428.",
+          "macro-F1 fell by 0.1428. Adithya will now show the live dashboard.",
           "Why not int8 for serving?",
           "Validation macro-F1 fell by 0.1428, with the losses in the small classes, so we kept fp32.")
 
@@ -921,20 +925,20 @@ def s_dash(s):
                                               "feature, not a research claim", "size": 14, "italic": True,
                                       "color": GREY}])
     notes(s, "Adithya",
-          "Now the live dashboard; I'll switch to the browser for about five minutes and follow the demo script. "
+          "Thanks, Sampath. Now the live dashboard; I'll switch to the browser for about five minutes and follow the demo script. "
           "These three screenshots are the fallback if the demo fails. Left: a live alert with its SHAP "
           "contributions and an LLM summary labelled 'not a research result'; those sentences are a usability "
           "feature, not a research claim. Middle: the trust panel, clean run against attack run for each "
           "organisation. Right: the hot-swap gate, which retrains from the base model and replaces the served "
           "model only if it is at least as good on validation. The stream replays validation rows, never test "
-          "rows.",
+          "rows. Sampath will then cover what we checked and what failed.",
           "Is the dashboard showing test data?",
           "No. It replays validation rows; only the key-figure row shows the preregistered test number, scored "
           "once.")
 
 
 # 13h -------------------------------------------------------------------------- honesty
-@slide(T_RESULTS, "Adithya", [PI, AUD, "paper/number_check.md", "docs/report/number_check.md",
+@slide(T_RESULTS, "Sampath", [PI, AUD, "paper/number_check.md", "docs/report/number_check.md",
                               "paper/citation_check.md", "paper/overlap_check.md", EFF, CB])
 @results_slide("What We Checked, and What Failed")
 def s_honesty(s):
@@ -948,8 +952,8 @@ def s_honesty(s):
     add_table(s, 0.3, 1.2, 9.3, rows, [3.1, 3.1, 3.1], size=14, row_h=0.78)
     add_text(s, 0.3, 4.45, 8.2, 0.4, [{"text": "Full list of test-set reads: docs/test_set_exposure_audit.md",
                                        "size": 14, "italic": True, "color": GREY}])
-    notes(s, "Adithya",
-          "We want to be clear about the test set. Every model and round was chosen on validation. Three early "
+    notes(s, "Sampath",
+          "Thanks, Adithya. We want to be clear about the test set. Every model and round was chosen on validation. Three early "
           "choices were first justified with test numbers; re-checked on validation, the same values win, and we "
           "disclose it. Since 12 October, only the preregistered FedAvgM checkpoints were scored on test, once. We "
           "also report what failed: the rolling-history agent failed its preregistered test, the pre-screen "
@@ -960,7 +964,7 @@ def s_honesty(s):
 
 
 # 14 --------------------------------------------------------------------------- summary
-@slide(T_SUMMARY, "Adithya", [PAPER, PI])
+@slide(T_SUMMARY, "Sampath", [PAPER, PI])
 def s_summary(s):
     sh = shape(s, "TextShape 2")
     tf = sh.text_frame
@@ -1002,13 +1006,13 @@ def s_summary(s):
             np_.space_before = Pt(2)
     sh.top = Inches(0.55)
     sh.height = Inches(4.15)
-    notes(s, "Adithya",
+    notes(s, "Sampath",
           "To summarise. FedAvg holds centralized accuracy at mild skew and loses it at strong skew. In the "
           "explanation check, agreement falls with skew, and at alpha 0.1 it reaches the level seeds alone "
           "produce, which we report as directional. In the separate trust check, the classical rules and the agent "
           "all reacted to silo composition; only the agent also responded to the attack, where silos were not "
           "saturated. Our limits: three seeds, a worst-case attacker on the composition axis, and a partly "
-          "unfaithful agent rationale. Detect the attack, then check the detector.",
+          "unfaithful agent rationale. Detect the attack, then check the detector. Adithya will close.",
           "What would you do with three more months?",
           "More seeds for the floor and the baselines, seeded multi-draw SHAP, and a partition design that varies "
           "size and skew independently.")
@@ -1095,8 +1099,8 @@ def s_thanks(s):
     s.shapes._spTree.append(el)
     notes(s, "Adithya",
           "Thank you for listening. We are happy to take questions. Whoever owns a section answers first: Shaun "
-          "for the data and settings, Tharun for the explanation check, Sampath for the trust check, and me for "
-          "the rest. Anyone may add the limitation that goes with an answer. We never combine the two checks into "
+          "for the problem and the data, Tharun for related work and the explanation check, Sampath for the trust "
+          "check, efficiency and our checks, and me for the system, accuracy and the demo. Anyone may add the limitation that goes with an answer. We never combine the two checks into "
           "one claim, and if we did not measure something, we say so rather than guess.",
           "Can you show the demo again?",
           "Yes; the dashboard is still running, and the backup slides cover the hardest questions.")
@@ -1209,7 +1213,7 @@ backup("What's new here?",
         "Krum family at 10 silos with an oracle attacker count",
         "An audit of the agent's own rationale against its data",
         "Validation-only selection and one preregistered test read"],
-       "Adithya", [PI],
+       "Tharun", [PI],
        "Not the combination of federated learning, intrusion detection and explainability; several recent papers "
        "cover that. What we add is a seed-noise null control for explanation agreement, which we did not find "
        "reported in the federated IDS work we read; a characterisation of where Oki et al.'s convergence breaks "
@@ -1323,14 +1327,18 @@ def write_speaker_script(built):
         extra = " + about 5:00 demo" if sp == "Adithya" else ""
         L.append(f"| {sp} | {', '.join(nums[sp])} | {words[sp]} | {fmt_min(words[sp] / WPM)}{extra} |")
     L.append(f"| **Total** | | {total} | {fmt_min(total / WPM)} + about 5:00 demo |\n")
-    L.append("Balance: the split was given by the team and is kept as given. Adithya presents most slides and "
-             "the demo; Shaun, Tharun and Sampath present the data, explanation-check and trust-check slides "
-             "and answer the backup questions on their parts.\n")
-    L.append("Hand-offs: Adithya to Shaun (end of the tools slide), Shaun to Adithya (end of parameters), Adithya "
-             "to Tharun (end of accuracy), Tharun to Sampath (end of explanation robustness), Sampath to Adithya "
-             "(end of ByzAgent). The hand-off line is the last sentence of each of those notes.\n")
-    L.append("Backup answers: test set, accuracy at α=0.1 and \"what's new\": Adithya. Significance of 0.333 vs "
-             "0.429: Tharun. Krum and the LLM: Sampath.\n")
+    L.append("Split (team decision, 2026-11-19): Adithya: title, outline, overview, architecture, modules, "
+             "tools, detection accuracy, dashboard and live demo, Thank-you. Shaun: problem, objectives, dataset, "
+             "partitioning, parameters. Tharun: related work, improvements, both explanation-check slides. "
+             "Sampath: both trust-check slides, efficiency, what we checked, summary.\n")
+    L.append("Hand-offs, in order (the hand-off line ends the outgoing speaker's note, and the next note "
+             "opens with a thank-you): Adithya to Shaun (slide 3 to 4), Shaun to Tharun (5 to 6), Tharun to "
+             "Adithya (7 to 8), Adithya to Shaun (10 to 11), Shaun to Adithya (13 to 14), Adithya to Tharun "
+             "(14 to 15), Tharun to Sampath (16 to 17), Sampath to Adithya (19 to 20), Adithya to Sampath "
+             "(20 to 21), Sampath to Adithya (22 to 25).\n")
+    L.append("Backup answers: test set and accuracy at α=0.1: Adithya. Significance of 0.333 vs 0.429 and "
+             "\"what's new\": Tharun. Krum and the LLM: Sampath. The Bibliography slides are not presented; their "
+             "notes stay with Adithya.\n")
     for sp in order:
         L.append(f"## {sp}\n")
         for n, s2, title, heading, note, is_backup, presented in rows:
@@ -1382,6 +1390,11 @@ def main():
         built.append((s, fn.__name__, speaker, sources))
     for s in originals:
         delete_slide(PRS, s)
+    # Ask PowerPoint to embed the fonts, every character (not a subset); export_pdf.ps1 then
+    # re-saves through PowerPoint, which writes the font data into the file.
+    root = PRS.part._element
+    root.set("embedTrueTypeFonts", "1")
+    root.set("saveSubsetFonts", "0")
     PRS.save(OUT)
 
     meta = []

@@ -25,7 +25,7 @@
   {
    "slide": 4,
    "builder": "s_problem",
-   "speaker": "Adithya",
+   "speaker": "Shaun",
    "sources": [
     "paper/main.tex"
    ]
@@ -33,7 +33,7 @@
   {
    "slide": 5,
    "builder": "s_objectives",
-   "speaker": "Adithya",
+   "speaker": "Shaun",
    "sources": [
     "PROJECT_INSTRUCTIONS.md"
    ]
@@ -41,7 +41,7 @@
   {
    "slide": 6,
    "builder": "s_related",
-   "speaker": "Adithya",
+   "speaker": "Tharun",
    "sources": [
     "paper/main.tex",
     "paper/refs.bib"
@@ -50,7 +50,7 @@
   {
    "slide": 7,
    "builder": "s_improve",
-   "speaker": "Adithya",
+   "speaker": "Tharun",
    "sources": [
     "PROJECT_INSTRUCTIONS.md"
    ]
@@ -171,7 +171,7 @@
   {
    "slide": 19,
    "builder": "s_eff",
-   "speaker": "Adithya",
+   "speaker": "Sampath",
    "sources": [
     "PROJECT_INSTRUCTIONS.md",
     "docs/efficiency_results.md",
@@ -187,7 +187,7 @@
   {
    "slide": 21,
    "builder": "s_honesty",
-   "speaker": "Adithya",
+   "speaker": "Sampath",
    "sources": [
     "PROJECT_INSTRUCTIONS.md",
     "docs/test_set_exposure_audit.md",
@@ -202,7 +202,7 @@
   {
    "slide": 22,
    "builder": "s_summary",
-   "speaker": "Adithya",
+   "speaker": "Sampath",
    "sources": [
     "paper/main.tex",
     "PROJECT_INSTRUCTIONS.md"
@@ -282,7 +282,7 @@
   {
    "slide": 31,
    "builder": "build",
-   "speaker": "Adithya",
+   "speaker": "Tharun",
    "sources": [
     "PROJECT_INSTRUCTIONS.md"
    ]
