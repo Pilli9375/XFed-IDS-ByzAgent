@@ -961,7 +961,7 @@ def s_honesty(s):
             ["Every model and round chosen on validation", "Rolling history failed its preregistered test",
              "Paper: 2,279 of 2,279 numbers matched"],
             ["Three early choices cited test; validation picks the same", "Pre-screen threshold did not "
-             "transfer across seeds", "Report: 4,038 of 4,038 numbers matched"],
+             "transfer across seeds", "Report: 5,211 of 5,211 numbers matched"],
             ["Since 2026-10-12: one preregistered test read", "int8 serving dropped (−0.1428 val macro-F1)",
              "58 references verified; overlap: 0 counted"]]
     add_table(s, 0.3, 1.2, 9.3, rows, [3.1, 3.1, 3.1], size=14, row_h=0.78)
