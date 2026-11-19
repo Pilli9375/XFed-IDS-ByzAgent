@@ -1,0 +1,6 @@
+src_short/01_introduction.md
+src_short/02_system_design.md
+src_short/03_cost_analysis.md
+src_short/04_results.md
+src/05_conclusion.md
+src_short/06_appendix.md
